@@ -16,7 +16,7 @@
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:16px;max-width:900px;margin:0 auto}
   .poster{background:#fff;border-radius:18px;padding:22px;text-align:center;border:3px solid var(--navy);break-inside:avoid;page-break-inside:avoid}
   .poster.entry{border-color:var(--gold);background:#fffaf0}
-  .em{font-size:56px;line-height:1}
+  .em{width:110px;height:110px;margin:0 auto;font-size:64px;line-height:110px}.em svg{width:100%;height:100%}
   .poster h2{margin:8px 0 4px;font-size:22px}
   .poster p{margin:4px 0;color:#4b5d7c;font-size:14px}
   .qr svg{width:220px;height:220px;margin:10px auto;display:block}
@@ -39,6 +39,7 @@
 </div>
 <div class="grid" id="grid"></div>
 <script src="data.js"></script>
+<script src="art.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script>
   const base = location.href.replace(/qr-kodlari\.html.*$/, "");
@@ -51,9 +52,9 @@
     d.innerHTML = `<span class="tag">${tag}</span><div class="em">${em}</div><h2>${title}</h2><p>${text}</p><div class="qr">${svg(url)}</div>` + (code ? `<span class="code">${code}</span>` : "");
     g.appendChild(d);
   }
-  card("entry", "GİRİŞ", "🐢", "Okyanus Kaşifi Ol!", "Telefonunun kamerasıyla okut, pasaportunu aç ve görevlere başla.", base, "");
-  KASIF.stations.forEach((s, i) => card("", `GÖREV ${i+1}`, s.emoji, s.title,
-    s.quiz ? "Pasaportundaki “QR Tara” ile okut, soruyu bil, rozeti kap!" : "Görevi bitirince ekranda çıkan QR'ı okut.",
+  card("entry", "GİRİŞ", artSVG("palyaco"), "Okyanus Kaşifi Ol!", "Telefonunun kamerasıyla okut, pasaportunu aç ve görevlere başla.", base, "");
+  KASIF.stations.forEach((s, i) => card("", `GÖREV ${i+1}`, stampSVG(s), s.title,
+    s.quiz ? "Pasaportundaki “QR Tara” ile okut, soruyu bil, damgayı kap!" : "Görevi bitirince ekranda çıkan QR'ı okut.",
     base + "#s=" + s.code, s.code));
 </script>
 </body>

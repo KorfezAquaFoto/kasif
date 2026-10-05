@@ -3,26 +3,26 @@ OKYANUS KAŞİFİ PASAPORTU – prototip
 
 Sunucusuz, uygulama indirmeden, ilk açılıştan sonra internetsiz çalışan web oyunu.
 
-YAYINLAMA (ücretsiz, ~5 dk)
-1. https://pages.cloudflare.com → ücretsiz hesap aç
-2. Workers & Pages → Create → Pages → "Upload assets" (Direct Upload)
-3. Proje adı ver (ör. korfez-kasif) → bu klasörün İÇİNDEKİ dosyaları sürükle-bırak → Deploy
-4. Adres: https://korfez-kasif.pages.dev
-   (Netlify Drop ya da GitHub Pages da olur. HTTPS şart, yoksa kamera açılmaz.)
+YAYIN: GitHub Pages  →  https://korfezaquafoto.github.io/kasif/
+(Not: pages.dev adresleri Türkiye'de erişime engelli, Cloudflare Pages kullanmayın.)
+
+GÜNCELLEME
+1. github.com/KorfezAquaFoto/kasif → Add file → Upload files
+2. Bu klasörün İÇİNDEKİ her şeyi sürükle → Commit changes (aynı adlı dosyalar üzerine yazılır)
+3. 1-2 dk sonra telefonlar internete bağlanınca yeni sürümü kendiliğinden alır.
 
 QR KODLARI
 - Yayınlanan adreste  /qr-kodlari.html  sayfasını aç → Yazdır.
   Giriş QR'ı + 7 görev QR'ı, o adrese göre otomatik üretilir.
-- Ekran/greenbox görevleri: o QR'ı dokunmatik uygulamanın bitiş ekranında göster.
 
 DÜZENLEME
-- Görevler, sorular, kodlar: data.js
-- Bir şey değiştirdiğinde sw.js içindeki VERSION'ı artır (kasif-v1 → kasif-v2),
+- Görevler, sorular, kodlar: data.js   |   Canlı çizimleri: art.js
+- Bir şey değiştirdiğinde sw.js içindeki VERSION'ı artır (kasif-v2 → kasif-v3),
   yoksa telefonlar eski sürümü önbellekten açmaya devam eder.
 - Kod değiştirirsen QR'ları yeniden yazdır.
 
 TEST
-- Kodu elle yazma kutusu: QR altındaki kod (ör. KPL-7Q2M).
+- Kodu elle yazma kutusu: QR altındaki kod (ör. KBK-3H8T).
 - Menü (☰) → Sıfırla ile baştan başlanır.
 
 BİLİNEN SINIRLAR (sunucusuz olduğu için)

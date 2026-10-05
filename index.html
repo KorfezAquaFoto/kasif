@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Okyanus Kaşifi Pasaportu</title>
-<meta name="theme-color" content="#0e2a5c">
+<meta name="theme-color" content="#0b3c6e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,26 +12,56 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" href="icons/icon-192.png">
+<link rel="preload" href="fonts/baloo-2-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+<!-- Okyanus arka planı -->
+<div class="ocean" aria-hidden="true">
+  <div class="rays"><i></i><i></i><i></i></div>
+  <div class="bubbles"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <svg class="swimmer s1" viewBox="0 0 60 30"><path d="M8 15 C18 3 40 3 52 15 C40 27 18 27 8 15 Z M10 15 L0 5 L2 15 L0 25 Z"/></svg>
+  <svg class="swimmer s2" viewBox="0 0 60 30"><path d="M8 15 C18 3 40 3 52 15 C40 27 18 27 8 15 Z M10 15 L0 5 L2 15 L0 25 Z"/></svg>
+  <svg class="swimmer s3" viewBox="0 0 60 30"><path d="M8 15 C18 3 40 3 52 15 C40 27 18 27 8 15 Z M10 15 L0 5 L2 15 L0 25 Z"/></svg>
+  <svg class="seabed" viewBox="0 0 400 90" preserveAspectRatio="none">
+    <path d="M0 90 L0 62 C40 50 70 70 110 58 C150 46 180 66 220 56 C260 46 300 64 340 52 C370 44 390 54 400 50 L400 90 Z" fill="#06203f"/>
+    <path d="M30 60 C28 40 34 30 30 18 M30 40 C22 34 20 26 22 20 M30 44 C38 38 40 30 38 24" stroke="#0a2c52" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M330 54 C326 36 336 26 332 12 M332 34 C342 28 346 20 344 14" stroke="#0a2c52" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M180 62 q6 -24 0 -40 q-6 16 0 40 M190 62 q8 -20 4 -34" stroke="#0a2c52" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </svg>
+</div>
 
 <!-- KARŞILAMA -->
 <section id="v-welcome" class="view">
-  <div class="welcome">
-    <div class="logo-turtle" aria-hidden="true">🐢</div>
-    <p class="brand" data-aq></p>
-    <h1>Okyanus Kaşifi<br>Pasaportu</h1>
-    <p class="lead">Akvaryumda saklanan QR kodları bul, görevleri tamamla, rozetleri topla ve sertifikanı kazan!</p>
+  <div class="cover-wrap">
+    <div class="passport" id="passport">
+      <div class="passport-inner">
+        <p class="pp-brand" data-aq></p>
+        <svg class="pp-emblem" viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="2.5"/>
+          <circle cx="60" cy="60" r="47" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 4"/>
+          <path d="M30 58 C42 38 72 36 88 56 C72 76 42 76 30 58 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M32 58 L18 46 L22 58 L18 70 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+          <circle cx="76" cy="54" r="3" fill="currentColor"/>
+          <path d="M52 44 Q56 58 52 72 M62 42 Q66 58 62 74" stroke="currentColor" stroke-width="2" fill="none"/>
+          <path d="M26 88 q8 -6 16 0 t16 0 t16 0 t16 0 M34 96 q8 -6 16 0 t16 0 t16 0" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M60 14 l3 6 l-3 -2 l-3 2 z" fill="currentColor"/>
+        </svg>
+        <h1 class="pp-title">OKYANUS KAŞİFİ<br><span>PASAPORTU</span></h1>
+      </div>
+    </div>
+  </div>
+  <div class="sheet">
+    <p class="sheet-lead">Akvaryumda saklanan QR kodları bul, soruları bil, <b>7 damgayı</b> topla!</p>
     <label class="field">
       <span>Kaşif adın</span>
-      <input id="in-name" maxlength="16" autocomplete="off" placeholder="Örn. Deniz" enterkeyhint="done">
+      <input id="in-name" maxlength="16" autocomplete="off" placeholder="Adını yaz" enterkeyhint="done">
     </label>
-    <p class="field-label">Kaşif karakterini seç</p>
+    <p class="field-label">Kaşif dostunu seç</p>
     <div class="avatars" id="avatars"></div>
-    <button class="btn btn-gold" id="btn-start">Maceraya Başla</button>
-    <button class="link" id="btn-restore-open">Daha önce oynadım, rozetlerimi geri getir</button>
+    <button class="btn btn-gold" id="btn-start">Pasaportumu Aç</button>
+    <button class="link" id="btn-restore-open">Daha önce oynadım, damgalarımı geri getir</button>
   </div>
 </section>
 
@@ -39,26 +69,36 @@
 <section id="v-home" class="view">
   <header class="topbar">
     <div class="me"><span class="me-av" id="me-av"></span><div><b id="me-name"></b><small id="me-id"></small></div></div>
-    <button class="icon-btn" id="btn-menu" aria-label="Menü">☰</button>
+    <button class="icon-btn" id="btn-menu" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   </header>
-  <div class="progress-card">
-    <div class="progress-head"><h2>Görevlerim</h2><span class="pill" id="count"></span></div>
-    <div class="bar"><i id="bar"></i></div>
-    <p class="muted" id="progress-text"></p>
+
+  <div class="page">
+    <div class="page-head">
+      <div><p class="eyebrow">Damga sayfam</p><h2 id="count"></h2></div>
+      <div class="stars" id="stars"></div>
+    </div>
+    <div class="track"><div class="track-fill" id="bar"></div><span class="track-fish" id="track-fish">
+      <svg viewBox="0 0 60 30"><path d="M8 15 C18 3 40 3 52 15 C40 27 18 27 8 15 Z M10 15 L0 5 L2 15 L0 25 Z" fill="#ff8a1f"/><circle cx="44" cy="13" r="2.5" fill="#111"/></svg></span></div>
+    <p class="page-msg" id="progress-text"></p>
+    <ul class="slots" id="slots"></ul>
   </div>
+
   <div class="done-banner hidden" id="done-banner">
-    <div>🏆 <b>Tüm görevler tamam!</b><br><small>Sertifikanı al ve paylaş.</small></div>
+    <div class="trophy">🏆</div>
+    <div><b>Tüm damgalar tamam!</b><small>Okyanus Kaşifi sertifikan hazır.</small></div>
     <button class="btn btn-gold sm" id="btn-cert">Sertifika</button>
   </div>
-  <ul class="tasks" id="tasks"></ul>
   <div class="install hidden" id="install"></div>
   <p class="offline-ok hidden" id="offline-ok">✓ İnternetsiz oynamaya hazır</p>
-  <div class="fab-wrap"><button class="btn btn-gold fab" id="btn-scan"><span>📷</span> QR Tara</button></div>
+
+  <div class="fab-wrap"><button class="btn btn-gold fab" id="btn-scan">
+    <svg viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg>
+    QR Tara</button></div>
 </section>
 
 <!-- TARAYICI -->
-<section id="v-scan" class="view dark">
-  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri">←</button><b>QR kodu çerçeveye getir</b><span></span></header>
+<section id="v-scan" class="view">
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title" id="scan-title">QR kodu çerçeveye getir</b><span class="tb-sp"></span></header>
   <div class="cam">
     <video id="video" playsinline muted autoplay></video>
     <div class="frame"><i></i><i></i><i></i><i></i></div>
@@ -67,7 +107,7 @@
   <div class="manual">
     <p>Kamera çalışmıyor mu? QR'ın altındaki kodu yaz:</p>
     <form id="manual-form" class="row">
-      <input id="in-code" placeholder="Örn. KPL-7Q2M" autocapitalize="characters" autocomplete="off">
+      <input id="in-code" placeholder="Örn. KBK-3H8T" autocapitalize="characters" autocomplete="off">
       <button class="btn btn-gold sm">Onayla</button>
     </form>
   </div>
@@ -75,25 +115,30 @@
 
 <!-- SORU -->
 <section id="v-quiz" class="view">
-  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri">←</button><b>Kaşif sorusu</b><span></span></header>
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title">Kaşif sorusu</b><span class="tb-sp"></span></header>
   <div class="quiz">
-    <div class="quiz-badge" id="quiz-badge"></div>
-    <p class="muted center" id="quiz-title"></p>
-    <h2 class="center" id="quiz-q"></h2>
-    <div class="options" id="quiz-opts"></div>
-    <p class="quiz-msg" id="quiz-msg"></p>
+    <div class="quiz-art" id="quiz-art"></div>
+    <div class="paper">
+      <p class="eyebrow center" id="quiz-title"></p>
+      <h2 class="center" id="quiz-q"></h2>
+      <div class="options" id="quiz-opts"></div>
+      <p class="quiz-msg" id="quiz-msg"></p>
+    </div>
   </div>
 </section>
 
-<!-- ROZET KAZANILDI -->
+<!-- DAMGA KAZANILDI -->
 <section id="v-reward" class="view reward-view">
   <div class="reward">
-    <div class="rays" aria-hidden="true"></div>
-    <p class="kicker">Yeni rozet!</p>
-    <div class="big-badge" id="rw-badge"></div>
+    <p class="kicker">Yeni damga!</p>
+    <div class="stamp-stage">
+      <div class="ink-ring" id="ink-ring"></div>
+      <div class="big-stamp" id="rw-stamp"></div>
+    </div>
+    <p class="rw-name" id="rw-name"></p>
     <h2 id="rw-title"></h2>
-    <p class="fact" id="rw-fact"></p>
-    <p class="pill light" id="rw-count"></p>
+    <div class="fact-card"><b>Biliyor muydun?</b><p id="rw-fact"></p></div>
+    <p class="rw-count" id="rw-count"></p>
     <button class="btn btn-gold" id="rw-next">Devam</button>
   </div>
   <canvas id="confetti" aria-hidden="true"></canvas>
@@ -101,37 +146,48 @@
 
 <!-- SERTİFİKA -->
 <section id="v-cert" class="view">
-  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri">←</button><b>Sertifikan</b><span></span></header>
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title">Sertifikan</b><span class="tb-sp"></span></header>
   <div class="cert-wrap">
     <img id="cert-img" alt="Okyanus Kaşifi sertifikası">
     <button class="btn btn-gold" id="btn-share">Paylaş / Kaydet</button>
-    <p class="muted center small">Sertifikan telefonuna resim olarak kaydedilir.</p>
+    <p class="note">Sertifikan telefonuna resim olarak kaydedilir.</p>
   </div>
 </section>
 
-<!-- MENÜ / KURTARMA -->
+<!-- MENÜ -->
 <section id="v-menu" class="view">
-  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri">←</button><b>Kaşif çantam</b><span></span></header>
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title">Kaşif çantam</b><span class="tb-sp"></span></header>
   <div class="menu">
-    <div class="card">
-      <h3>Rozetlerimi sakla</h3>
-      <p class="muted">Bu QR'ın ekran görüntüsünü al. Bir sonraki gelişinde ya da telefon değiştirdiğinde okutursan rozetlerin geri gelir.</p>
+    <div class="paper">
+      <h3>Damgalarımı sakla</h3>
+      <p>Bu QR'ın ekran görüntüsünü al. Bir sonraki gelişinde ya da telefon değiştirdiğinde okutursan damgaların geri gelir.</p>
       <div class="rec-qr" id="rec-qr"></div>
       <p class="mono center" id="rec-id"></p>
     </div>
-    <div class="card">
-      <h3>Rozetlerimi geri getir</h3>
-      <p class="muted">Daha önce kaydettiğin kurtarma QR'ını okut.</p>
+    <div class="paper">
+      <h3>Damgalarımı geri getir</h3>
+      <p>Daha önce kaydettiğin kurtarma QR'ını okut.</p>
       <button class="btn btn-ghost" id="btn-restore-scan">Kurtarma QR'ı okut</button>
     </div>
-    <div class="card">
+    <div class="paper">
       <h3>Baştan başla</h3>
-      <p class="muted">Tüm rozetler bu telefondan silinir.</p>
+      <p>Tüm damgalar bu telefondan silinir.</p>
       <button class="btn btn-danger" id="btn-reset">Sıfırla</button>
     </div>
-    <p class="muted center small" id="ver"></p>
+    <p class="note" id="ver"></p>
   </div>
 </section>
+
+<!-- Alt sayfa: damga detayı -->
+<div class="drawer hidden" id="drawer">
+  <div class="drawer-box">
+    <div class="drawer-art" id="dr-art"></div>
+    <p class="eyebrow center" id="dr-name"></p>
+    <h3 class="center" id="dr-title"></h3>
+    <p class="center" id="dr-text"></p>
+    <button class="btn btn-ghost" id="dr-close">Kapat</button>
+  </div>
+</div>
 
 <!-- Uyarı penceresi -->
 <div class="modal hidden" id="modal" role="dialog" aria-modal="true">
@@ -144,6 +200,7 @@
 </div>
 
 <script src="data.js"></script>
+<script src="art.js"></script>
 <script src="vendor/jsQR.js" defer></script>
 <script src="vendor/qrcode.js" defer></script>
 <script src="app.js" defer></script>
