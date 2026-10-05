@@ -1,0 +1,31 @@
+OKYANUS KAŞİFİ PASAPORTU – prototip
+=====================================
+
+Sunucusuz, uygulama indirmeden, ilk açılıştan sonra internetsiz çalışan web oyunu.
+
+YAYINLAMA (ücretsiz, ~5 dk)
+1. https://pages.cloudflare.com → ücretsiz hesap aç
+2. Workers & Pages → Create → Pages → "Upload assets" (Direct Upload)
+3. Proje adı ver (ör. korfez-kasif) → bu klasörün İÇİNDEKİ dosyaları sürükle-bırak → Deploy
+4. Adres: https://korfez-kasif.pages.dev
+   (Netlify Drop ya da GitHub Pages da olur. HTTPS şart, yoksa kamera açılmaz.)
+
+QR KODLARI
+- Yayınlanan adreste  /qr-kodlari.html  sayfasını aç → Yazdır.
+  Giriş QR'ı + 7 görev QR'ı, o adrese göre otomatik üretilir.
+- Ekran/greenbox görevleri: o QR'ı dokunmatik uygulamanın bitiş ekranında göster.
+
+DÜZENLEME
+- Görevler, sorular, kodlar: data.js
+- Bir şey değiştirdiğinde sw.js içindeki VERSION'ı artır (kasif-v1 → kasif-v2),
+  yoksa telefonlar eski sürümü önbellekten açmaya devam eder.
+- Kod değiştirirsen QR'ları yeniden yazdır.
+
+TEST
+- Kodu elle yazma kutusu: QR altındaki kod (ör. KPL-7Q2M).
+- Menü (☰) → Sıfırla ile baştan başlanır.
+
+BİLİNEN SINIRLAR (sunucusuz olduğu için)
+- İlerleme telefonda saklanır. iPhone'da site 7 gün açılmazsa silinebilir;
+  "Ana Ekrana Ekle" yapılırsa ya da kurtarma QR'ı saklanırsa sorun olmaz.
+- İstatistik yok. Kodlar dosyada açık; çocuk oyunu için yeterli koruma soru adımıdır.

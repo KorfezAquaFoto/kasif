@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Okyanus Kaşifi – QR Kodları</title>
+<style>
+  :root{--navy:#0e2a5c;--ocean:#1d6fb8;--gold:#f2b632}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--navy);background:#eef4fb}
+  .bar{padding:16px;max-width:900px;margin:0 auto}
+  .bar h1{margin:0 0 6px;font-size:22px}
+  .bar p{margin:4px 0;color:#4b5d7c;font-size:14px}
+  .bar button{margin-top:10px;padding:10px 18px;border:0;border-radius:99px;background:var(--gold);font-weight:800;font-size:15px;cursor:pointer}
+  .warn{display:none;background:#fff3d6;border:1px solid var(--gold);padding:10px 12px;border-radius:10px;margin-top:10px;font-size:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:16px;max-width:900px;margin:0 auto}
+  .poster{background:#fff;border-radius:18px;padding:22px;text-align:center;border:3px solid var(--navy);break-inside:avoid;page-break-inside:avoid}
+  .poster.entry{border-color:var(--gold);background:#fffaf0}
+  .em{font-size:56px;line-height:1}
+  .poster h2{margin:8px 0 4px;font-size:22px}
+  .poster p{margin:4px 0;color:#4b5d7c;font-size:14px}
+  .qr svg{width:220px;height:220px;margin:10px auto;display:block}
+  .code{font-family:ui-monospace,Menlo,monospace;font-size:20px;font-weight:800;letter-spacing:.1em;background:#eef4fb;border-radius:8px;padding:4px 10px;display:inline-block}
+  .tag{display:inline-block;font-size:12px;font-weight:800;color:#fff;background:var(--ocean);border-radius:99px;padding:3px 10px;margin-bottom:6px}
+  @media print{
+    body{background:#fff}.bar{display:none}
+    .grid{grid-template-columns:1fr 1fr;gap:10mm;padding:0}
+    .poster{height:128mm}
+  }
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>Okyanus Kaşifi – Yazdırılabilir QR kodları</h1>
+  <p>Bu sayfa, oyunun yayınlandığı adrese göre QR'ları otomatik üretir: <b id="origin"></b></p>
+  <p>Görev kodları <code>data.js</code> dosyasından gelir. Kodu değiştirirsen bu sayfayı yeniden yazdır.</p>
+  <div class="warn" id="warn">⚠️ Sayfayı bilgisayarda dosya olarak açtın. QR'lar ancak oyun internette yayınlandıktan sonra o adresten açılınca doğru olur.</div>
+  <button onclick="print()">Yazdır (A4, sayfa başına 2 poster)</button>
+</div>
+<div class="grid" id="grid"></div>
+<script src="data.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script>
+  const base = location.href.replace(/qr-kodlari\.html.*$/, "");
+  document.getElementById("origin").textContent = base;
+  if (location.protocol === "file:") document.getElementById("warn").style.display = "block";
+  function svg(text){ const q = qrcode(0, "M"); q.addData(text); q.make(); return q.createSvgTag({ cellSize: 6, margin: 2, scalable: true }); }
+  const g = document.getElementById("grid");
+  function card(cls, tag, em, title, text, url, code){
+    const d = document.createElement("div"); d.className = "poster " + cls;
+    d.innerHTML = `<span class="tag">${tag}</span><div class="em">${em}</div><h2>${title}</h2><p>${text}</p><div class="qr">${svg(url)}</div>` + (code ? `<span class="code">${code}</span>` : "");
+    g.appendChild(d);
+  }
+  card("entry", "GİRİŞ", "🐢", "Okyanus Kaşifi Ol!", "Telefonunun kamerasıyla okut, pasaportunu aç ve görevlere başla.", base, "");
+  KASIF.stations.forEach((s, i) => card("", `GÖREV ${i+1}`, s.emoji, s.title,
+    s.quiz ? "Pasaportundaki “QR Tara” ile okut, soruyu bil, rozeti kap!" : "Görevi bitirince ekranda çıkan QR'ı okut.",
+    base + "#s=" + s.code, s.code));
+</script>
+</body>
+</html>

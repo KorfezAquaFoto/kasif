@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Okyanus Kaşifi Pasaportu</title>
+<meta name="theme-color" content="#0e2a5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Okyanus Kaşifi">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+<!-- KARŞILAMA -->
+<section id="v-welcome" class="view">
+  <div class="welcome">
+    <div class="logo-turtle" aria-hidden="true">🐢</div>
+    <p class="brand" data-aq></p>
+    <h1>Okyanus Kaşifi<br>Pasaportu</h1>
+    <p class="lead">Akvaryumda saklanan QR kodları bul, görevleri tamamla, rozetleri topla ve sertifikanı kazan!</p>
+    <label class="field">
+      <span>Kaşif adın</span>
+      <input id="in-name" maxlength="16" autocomplete="off" placeholder="Örn. Deniz" enterkeyhint="done">
+    </label>
+    <p class="field-label">Kaşif karakterini seç</p>
+    <div class="avatars" id="avatars"></div>
+    <button class="btn btn-gold" id="btn-start">Maceraya Başla</button>
+    <button class="link" id="btn-restore-open">Daha önce oynadım, rozetlerimi geri getir</button>
+  </div>
+</section>
+
+<!-- ANA EKRAN -->
+<section id="v-home" class="view">
+  <header class="topbar">
+    <div class="me"><span class="me-av" id="me-av"></span><div><b id="me-name"></b><small id="me-id"></small></div></div>
+    <button class="icon-btn" id="btn-menu" aria-label="Menü">☰</button>
+  </header>
+  <div class="progress-card">
+    <div class="progress-head"><h2>Görevlerim</h2><span class="pill" id="count"></span></div>
+    <div class="bar"><i id="bar"></i></div>
+    <p class="muted" id="progress-text"></p>
+  </div>
+  <div class="done-banner hidden" id="done-banner">
+    <div>🏆 <b>Tüm görevler tamam!</b><br><small>Sertifikanı al ve paylaş.</small></div>
+    <button class="btn btn-gold sm" id="btn-cert">Sertifika</button>
+  </div>
+  <ul class="tasks" id="tasks"></ul>
+  <div class="install hidden" id="install"></div>
+  <p class="offline-ok hidden" id="offline-ok">✓ İnternetsiz oynamaya hazır</p>
+  <div class="fab-wrap"><button class="btn btn-gold fab" id="btn-scan"><span>📷</span> QR Tara</button></div>
+</section>
+
+<!-- TARAYICI -->
+<section id="v-scan" class="view dark">
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri">←</button><b>QR kodu çerçeveye getir</b><span></span></header>
+  <div class="cam">
+    <video id="video" playsinline muted autoplay></video>
+    <div class="frame"><i></i><i></i><i></i><i></i></div>
+    <p class="cam-msg hidden" id="cam-msg"></p>
+  </div>
+  <div class="manual">
+    <p>Kamera çalışmıyor mu? QR'ın altındaki kodu yaz:</p>
+    <form id="manual-form" class="row">
+      <input id="in-code" placeholder="Örn. KPL-7Q2M" autocapitalize="characters" autocomplete="off">
+      <button class="btn btn-gold sm">Onayla</button>
+    </form>
+  </div>
+</section>
+
+<!-- SORU -->
+<section id="v-quiz" class="view">
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri">←</button><b>Kaşif sorusu</b><span></span></header>
+  <div class="quiz">
+    <div class="quiz-badge" id="quiz-badge"></div>
+    <p class="muted center" id="quiz-title"></p>
+    <h2 class="center" id="quiz-q"></h2>
+    <div class="options" id="quiz-opts"></div>
+    <p class="quiz-msg" id="quiz-msg"></p>
+  </div>
+</section>
+
+<!-- ROZET KAZANILDI -->
+<section id="v-reward" class="view reward-view">
+  <div class="reward">
+    <div class="rays" aria-hidden="true"></div>
+    <p class="kicker">Yeni rozet!</p>
+    <div class="big-badge" id="rw-badge"></div>
+    <h2 id="rw-title"></h2>
+    <p class="fact" id="rw-fact"></p>
+    <p class="pill light" id="rw-count"></p>
+    <button class="btn btn-gold" id="rw-next">Devam</button>
+  </div>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+</section>
+
+<!-- SERTİFİKA -->
+<section id="v-cert" class="view">
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri">←</button><b>Sertifikan</b><span></span></header>
+  <div class="cert-wrap">
+    <img id="cert-img" alt="Okyanus Kaşifi sertifikası">
+    <button class="btn btn-gold" id="btn-share">Paylaş / Kaydet</button>
+    <p class="muted center small">Sertifikan telefonuna resim olarak kaydedilir.</p>
+  </div>
+</section>
+
+<!-- MENÜ / KURTARMA -->
+<section id="v-menu" class="view">
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri">←</button><b>Kaşif çantam</b><span></span></header>
+  <div class="menu">
+    <div class="card">
+      <h3>Rozetlerimi sakla</h3>
+      <p class="muted">Bu QR'ın ekran görüntüsünü al. Bir sonraki gelişinde ya da telefon değiştirdiğinde okutursan rozetlerin geri gelir.</p>
+      <div class="rec-qr" id="rec-qr"></div>
+      <p class="mono center" id="rec-id"></p>
+    </div>
+    <div class="card">
+      <h3>Rozetlerimi geri getir</h3>
+      <p class="muted">Daha önce kaydettiğin kurtarma QR'ını okut.</p>
+      <button class="btn btn-ghost" id="btn-restore-scan">Kurtarma QR'ı okut</button>
+    </div>
+    <div class="card">
+      <h3>Baştan başla</h3>
+      <p class="muted">Tüm rozetler bu telefondan silinir.</p>
+      <button class="btn btn-danger" id="btn-reset">Sıfırla</button>
+    </div>
+    <p class="muted center small" id="ver"></p>
+  </div>
+</section>
+
+<!-- Uyarı penceresi -->
+<div class="modal hidden" id="modal" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <div class="modal-ico" id="modal-ico"></div>
+    <h3 id="modal-title"></h3>
+    <p id="modal-text"></p>
+    <div class="modal-btns" id="modal-btns"></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="vendor/jsQR.js" defer></script>
+<script src="vendor/qrcode.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
