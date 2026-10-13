@@ -21,9 +21,9 @@ window.KASIF = {
     "tunel":         { label: "Büyük Tünel",   kind: "ozel" }
   },
   groups: [
-    { kind: "kita",   label: "Kıtalar" },
-    { kind: "korfez", label: "Körfezimiz" },
-    { kind: "ozel",   label: "Özel bölgeler" }
+    { kind: "kita",   label: "Kıtalar macerası", icon: "🌍" },
+    { kind: "korfez", label: "Bizim körfez",     icon: "⚓" },
+    { kind: "ozel",   label: "Özel bölgeler",    icon: "⭐" }
   ],
   stations: [
     {

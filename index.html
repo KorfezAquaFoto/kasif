@@ -34,8 +34,10 @@
 
 <!-- KARŞILAMA -->
 <section id="v-welcome" class="view">
-  <div class="cover-wrap">
+  <div class="cover-wrap"><div class="book-open">
+    <div class="idpage" id="idpage-w"></div>
     <div class="passport" id="passport">
+      <div class="pp-back"></div>
       <div class="passport-inner">
         <p class="pp-brand" data-aq></p>
         <svg class="pp-emblem" viewBox="0 0 120 120" aria-hidden="true">
@@ -51,7 +53,8 @@
         <h1 class="pp-title">OKYANUS KAŞİFİ<br><span>PASAPORTU</span></h1>
       </div>
     </div>
-  </div>
+  </div></div>
+  <p class="ready-msg" id="ready-msg"></p>
   <div class="sheet">
     <p class="sheet-lead">Akvaryumda saklanan QR kodları bul, soruları bil, <b>9 damgayı</b> topla!</p>
     <label class="field">
@@ -82,8 +85,11 @@
     <p class="page-msg" id="progress-text"></p>
     <div class="map" id="map"></div>
     <p class="map-cap" id="map-cap"></p>
-    <ul class="slots" id="slots"></ul>
   </div>
+
+  <!-- Pasaport defteri: yana kaydırılan sayfalar -->
+  <div class="book" id="book"></div>
+  <div class="book-dots" id="book-dots"></div>
 
   <div class="done-banner hidden" id="done-banner">
     <div class="trophy">🏆</div>
@@ -133,9 +139,18 @@
 <section id="v-reward" class="view reward-view">
   <div class="reward">
     <p class="kicker">Yeni damga!</p>
-    <div class="stamp-stage">
-      <div class="ink-ring" id="ink-ring"></div>
-      <div class="big-stamp" id="rw-stamp"></div>
+    <div class="rw-page">
+      <div class="leaf-hd"><span id="rw-page-hd"></span></div>
+      <div class="stamp-stage">
+        <div class="ink-ring" id="ink-ring"></div>
+        <div class="big-stamp" id="rw-stamp"></div>
+      </div>
+      <svg class="rw-tool" id="rw-tool" viewBox="0 0 120 120" aria-hidden="true">
+        <ellipse cx="60" cy="20" rx="23" ry="19" fill="#b06f3a"/><ellipse cx="53" cy="13" rx="8" ry="5" fill="#d79a62"/>
+        <rect x="50" y="34" width="20" height="44" rx="6" fill="#8a5a2b"/>
+        <rect x="14" y="76" width="92" height="24" rx="7" fill="#6b4523"/>
+        <rect x="18" y="98" width="84" height="12" rx="4" fill="#f5bd3a"/>
+      </svg>
     </div>
     <p class="rw-name" id="rw-name"></p>
     <h2 id="rw-title"></h2>
@@ -143,8 +158,7 @@
     <p class="rw-count" id="rw-count"></p>
     <button class="btn btn-gold" id="rw-next">Devam</button>
   </div>
-  <canvas id="confetti" aria-hidden="true"></canvas>
-</section>
+  <canvas id="confetti" aria-hidden="true"></canvas></section>
 
 <!-- SERTİFİKA -->
 <section id="v-cert" class="view">
