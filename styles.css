@@ -261,9 +261,6 @@ body.scan-mode .ocean{filter:brightness(.4)}
 .reward .btn{margin-top:16px}
 #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:11}
 
-/* ---------- Sertifika ---------- */
-.cert-wrap{display:grid;gap:14px}
-.cert-wrap img{width:100%;border-radius:16px;box-shadow:0 18px 40px rgba(0,0,0,.45);background:#fff;min-height:200px}
 
 /* ---------- Menü ---------- */
 .menu{display:grid;gap:12px}
@@ -318,3 +315,29 @@ body.scan-mode .ocean{filter:brightness(.4)}
 .fab.pulse{animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{50%{transform:scale(1.04);box-shadow:0 5px 0 #b06f00,0 0 0 10px rgba(245,189,58,.3)}}
 @media (prefers-reduced-motion:reduce){.fab.pulse{animation:none}}
+
+/* ---------- Final: pasaport tamamlandı ---------- */
+.final{display:grid;gap:12px;text-align:center}
+.final-stage{position:relative;height:330px;margin-top:6px}
+.final-cover{position:absolute;left:50%;top:6px;width:200px;height:286px;margin-left:-100px;border-radius:8px 18px 18px 8px;color:var(--gold);
+  background:radial-gradient(120% 80% at 70% 20%,#1d4a8a 0%,#123266 45%,#0b2148 100%);
+  box-shadow:inset 10px 0 12px -6px rgba(0,0,0,.45),0 22px 40px rgba(0,0,0,.45);transition:background .6s,color .6s,transform .4s}
+.final-cover .passport-inner{justify-content:flex-start;gap:12px;padding-top:20px}
+.final-cover .pp-title{font-size:18px}
+.final-cover .pp-name{margin:0;font-weight:800;font-size:18px;color:#fff}
+.final-cover.gold{color:#6a4300;background:radial-gradient(120% 90% at 30% 20%,#fff2b8 0%,#f5bd3a 45%,#c98500 100%);transform:scale(1.04)}
+.final-cover.gold .pp-name{color:#4a2d00}
+.final-cover.gold .passport-inner{border-color:rgba(106,67,0,.45)}
+.final-cover.gold::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.75) 45%,transparent 60%);
+  background-size:250% 100%;animation:shine 1.4s .2s ease-out both}
+@keyframes shine{from{background-position:120% 0}to{background-position:-60% 0}}
+.final-seal{position:absolute;left:50%;top:172px;width:128px;margin-left:-64px;animation:stampin .3s .48s cubic-bezier(.3,1.5,.6,1) both}
+.final-seal svg{width:100%;display:block;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
+.final-tool{top:112px}
+.final-h{font-size:26px}
+.final-p{margin:0;color:#cfe6ff;font-size:17px}
+.final img{width:100%;border-radius:16px;box-shadow:0 18px 40px rgba(0,0,0,.45);background:#0b3c6e;min-height:200px;margin-top:6px}
+.confetti-layer{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:11}
+.id-leaf .id-seal{position:absolute;right:10px;top:8px;width:92px;transform:rotate(12deg);z-index:2}
+.id-seal svg{width:100%;display:block;filter:drop-shadow(0 4px 6px rgba(0,0,0,.25))}
+@media (prefers-reduced-motion:reduce){.final-cover.gold::after{animation:none}}

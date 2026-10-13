@@ -136,7 +136,7 @@ function renderBook(){
   const L = leaves(), book = $("#book");
   book.innerHTML = L.map((g, pi) => {
     const no = `<span class="pgno">— ${pi + 1} —</span>`;
-    if (!g) return `<section class="leaf id-leaf"><div class="idcard">${idHTML()}</div><p class="howto-t">Nasıl oynanır?</p><ol class="howto">${howtoHTML()}</ol>${no}</section>`;
+    if (!g) return `<section class="leaf id-leaf">${count() === ST.length ? `<span class="id-seal">${finalSealSVG()}</span>` : ""}<div class="idcard">${idHTML()}</div><p class="howto-t">Nasıl oynanır?</p><ol class="howto">${howtoHTML()}</ol>${no}</section>`;
     const list = ST.filter(st => REG[st.region].kind === g.kind);
     const got = list.filter(st => S.badges[st.id]).length;
     return `<section class="leaf"><div class="leaf-hd"><span>${g.icon || ""} ${esc(g.label)}</span><span class="chip">${got} / ${list.length}</span></div>
@@ -360,14 +360,14 @@ function award(st){
   $("#rw-fact").textContent = st.fact;
   const n = count(), t = ST.length;
   $("#rw-count").textContent = `⭐ ${n} / ${t} damga`;
-  $("#rw-next").textContent = n === t ? "Sertifikamı al 🏆" : "Pasaportuma dön";
+  $("#rw-next").textContent = n === t ? "Final damgamı bas ⭐" : "Pasaportuma dön";
   $("#rw-next").onclick = () => n === t ? openCert() : show("v-home", false);
   stack = []; show("v-reward", false);
   const rv = $("#v-reward"); rv.classList.remove("shake"); void rv.offsetWidth; rv.classList.add("shake");
   setTimeout(() => { if (navigator.vibrate) navigator.vibrate(80); confetti(n === t ? 260 : 120); }, 560);
 }
-function confetti(N){
-  const c = $("#confetti"), x = c.getContext("2d"), dpr = devicePixelRatio || 1;
+function confetti(N, sel = "#confetti", view = "v-reward"){
+  const c = $(sel), x = c.getContext("2d"), dpr = devicePixelRatio || 1;
   c.width = innerWidth * dpr; c.height = innerHeight * dpr; x.setTransform(dpr,0,0,dpr,0,0);
   const cols = ["#f5bd3a","#7fe3ff","#ff7b54","#7be08f","#ffffff","#c08cff"];
   const P = Array.from({length:N}, () => ({ x:innerWidth/2, y:innerHeight*0.3, vx:(Math.random()-.5)*13, vy:-Math.random()*13-3,
@@ -379,15 +379,24 @@ function confetti(N){
       x.save(); x.translate(p.x,p.y); x.rotate(p.r); x.fillStyle = p.c;
       if (p.o) { x.beginPath(); x.arc(0,0,p.s/2.4,0,7); x.fill(); } else x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);
       x.restore(); });
-    if (++f < 170 && current === "v-reward") requestAnimationFrame(tick); else x.clearRect(0,0,innerWidth,innerHeight);
+    if (++f < 170 && current === view) requestAnimationFrame(tick); else x.clearRect(0,0,innerWidth,innerHeight);
   })();
 }
 
-// ---------- Sertifika ----------
+// ---------- Final: pasaport tamamlandı ----------
+// Damga aleti büyük altın "Okyanus Kaşifi" damgasını kapağa basar, kapak altına döner.
+// Paylaşılan resim sertifika değil, çocuğun dolu pasaportu.
 let certBlob = null;
 function openCert(){
   if (count() < ST.length) return show("v-home", false);
   stack = ["v-home"]; show("v-cert", false);
+  document.querySelectorAll("#v-cert [data-aq]").forEach(el => el.textContent = D.aquarium);
+  $("#final-name").textContent = S.name;
+  $("#final-p").textContent = `${S.name}, ${D.aquarium}'daki ${ST.length} bölgenin hepsini keşfettin. Pasaportun artık altın!`;
+  const cover = $("#final-cover"), seal = $("#final-seal"), tool = $("#final-tool");
+  seal.innerHTML = finalSealSVG(); cover.classList.remove("gold");
+  [seal, tool].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
+  setTimeout(() => { cover.classList.add("gold"); if (navigator.vibrate) navigator.vibrate([60,40,120]); confetti(280, "#confetti2", "v-cert"); }, 560);
   $("#cert-img").removeAttribute("src");
   drawCert().then(blob => { certBlob = blob; $("#cert-img").src = URL.createObjectURL(blob); });
 }
@@ -395,6 +404,7 @@ function svgImg(svg){
   return new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null);
     i.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); });
 }
+// Dolu pasaport sayfası (1080x1350): altın başlık, kaşif kartı, 9 damga, final damgası
 async function drawCert(){
   const F = '"Baloo 2",ui-rounded,system-ui,sans-serif';
   try { await Promise.all([document.fonts.load(`800 40px "Baloo 2"`, "ŞĞİ"), document.fonts.load(`600 40px "Baloo 2"`, "ŞĞİ")]); } catch(e){}
@@ -404,37 +414,46 @@ async function drawCert(){
   x.fillStyle = g; x.fillRect(0,0,W,H);
   x.strokeStyle = "rgba(255,255,255,.14)"; x.lineWidth = 3;
   for (let i=0;i<30;i++){ x.beginPath(); x.arc((i*397)%W, (i*613)%H, 6+(i*7)%22, 0, 7); x.stroke(); }
-  rr(x,60,60,W-120,H-120,44); x.fillStyle = "#fff8ec"; x.fill();
-  x.lineWidth = 12; x.strokeStyle = "#f5bd3a"; x.stroke();
-  rr(x,92,92,W-184,H-184,30); x.setLineDash([10,12]); x.lineWidth = 3; x.strokeStyle = "#c9b48a"; x.stroke(); x.setLineDash([]);
-  x.textAlign = "center";
-  x.fillStyle = "#0f5a96"; x.font = `800 34px ${F}`; x.fillText(D.aquarium.toLocaleUpperCase("tr-TR"), W/2, 178);
-  x.fillStyle = "#10264d"; x.font = `800 92px ${F}`; x.fillText("OKYANUS KAŞİFİ", W/2, 276);
-  x.fillStyle = "#e39a12"; x.font = `800 46px ${F}`; x.fillText("S E R T İ F İ K A S I", W/2, 336);
+  // pasaport sayfası
+  x.save(); x.shadowColor = "rgba(0,0,0,.35)"; x.shadowBlur = 40; x.shadowOffsetY = 16;
+  rr(x,60,50,W-120,H-150,48); x.fillStyle = "#fff8ec"; x.fill(); x.restore();
+  x.save(); rr(x,60,50,W-120,H-150,48); x.clip();
+  x.strokeStyle = "rgba(56,182,216,.16)"; x.lineWidth = 3;
+  for (let i=0;i<60;i++){ x.beginPath(); x.arc(60+(i*263)%960, 50+(i*181)%1200, 6+(i*5)%16, 0, 7); x.stroke(); }
+  // altın başlık bandı
+  const gg = x.createLinearGradient(0,50,0,240); gg.addColorStop(0,"#ffe38a"); gg.addColorStop(1,"#f5bd3a");
+  x.fillStyle = gg; x.fillRect(60,50,W-120,190);
+  x.restore();
+  x.textAlign = "left";
+  x.fillStyle = "#7a4a00"; x.font = `800 32px ${F}`; x.fillText(D.aquarium.toLocaleUpperCase("tr-TR"), 120, 118);
+  x.fillStyle = "#10264d"; x.font = `800 64px ${F}`; x.fillText("Okyanus Kaşifi", 120, 186);
+  x.fillStyle = "#7a4a00"; x.font = `600 34px ${F}`; x.fillText("pasaportu tamamlandı!", 120, 226);
+  // kaşif kartı
   const avImg = await svgImg(artSVG(S.avatar));
-  x.beginPath(); x.arc(W/2, 456, 86, 0, 7); x.fillStyle = "#e3f0fb"; x.fill(); x.lineWidth = 8; x.strokeStyle = "#f5bd3a"; x.stroke();
-  if (avImg) x.drawImage(avImg, W/2-72, 384, 144, 144);
-  x.fillStyle = "#6a7891"; x.font = `600 36px ${F}`; x.fillText("Bu sertifika", W/2, 596);
-  x.fillStyle = "#10264d"; let fs = 104; x.font = `800 ${fs}px ${F}`;
-  while (x.measureText(S.name).width > W - 280 && fs > 44) { fs -= 4; x.font = `800 ${fs}px ${F}`; }
-  x.fillText(S.name, W/2, 700);
-  x.fillStyle = "#f5bd3a"; rr(x, W/2-210, 724, 420, 8, 4); x.fill();
-  x.fillStyle = "#6a7891"; x.font = `600 36px ${F}`;
-  x.fillText(`adlı kaşifimize, ${D.aquarium}'daki ${ST.length} damganın`, W/2, 796);
-  x.fillText("hepsini topladığı için verilmiştir.", W/2, 844);
-  // damgalar: 2 sıra
+  x.beginPath(); x.arc(210, 380, 96, 0, 7); x.fillStyle = "#e3f0fb"; x.fill(); x.lineWidth = 10; x.strokeStyle = "#f5bd3a"; x.stroke();
+  if (avImg) x.drawImage(avImg, 130, 300, 160, 160);
+  x.fillStyle = "#10264d"; let fs = 80; x.font = `800 ${fs}px ${F}`;
+  while (x.measureText(S.name).width > 470 && fs > 40) { fs -= 4; x.font = `800 ${fs}px ${F}`; }
+  x.fillText(S.name, 336, 380);
+  const d = new Date().toLocaleDateString("tr-TR", { day:"numeric", month:"long", year:"numeric" });
+  x.fillStyle = "#0f5a96"; x.font = `800 32px ${F}`; x.fillText(`Kaşif #${S.id}`, 338, 428);
+  x.fillStyle = "#6a7891"; x.font = `600 30px ${F}`; x.fillText(d, 338, 468);
+  x.textAlign = "center"; x.fillStyle = "#6a7891"; x.font = `600 34px ${F}`;
+  x.fillText(`${D.aquarium}'daki ${ST.length} bölgenin hepsini keşfetti!`, W/2, 560);
+  // damgalar: 3x3
   const imgs = await Promise.all(ST.map(st => svgImg(stampSVG(st, { date: S.badges[st.id] }))));
-  const perRow = Math.ceil(ST.length / 2), size = 150, gap = 18;
+  const size = 210, cols = 3, gapX = 64;
   ST.forEach((st, i) => {
-    const row = i < perRow ? 0 : 1, inRow = row === 0 ? perRow : ST.length - perRow, k = row === 0 ? i : i - perRow;
-    const total = inRow*size + (inRow-1)*gap, cx = (W-total)/2 + k*(size+gap) + size/2, cy = 944 + row*(size+8);
     if (!imgs[i]) return;
+    const col = i % cols, row = Math.floor(i / cols);
+    const cx = (W - (cols*size + (cols-1)*gapX))/2 + col*(size+gapX) + size/2, cy = 705 + row*212;
     x.save(); x.translate(cx, cy); x.rotate(ROT[i % ROT.length] * Math.PI / 180);
     x.drawImage(imgs[i], -size/2, -size/2, size, size); x.restore();
   });
-  const d = new Date().toLocaleDateString("tr-TR", { day:"numeric", month:"long", year:"numeric" });
-  x.fillStyle = "#10264d"; x.font = `800 32px ${F}`; x.fillText(d, W/2, 1204);
-  x.fillStyle = "#6a7891"; x.font = `600 28px ${F}`; x.fillText(`Kaşif #${S.id}`, W/2, 1238);
+  // final damgası sağ üstte, başlığa taşarak
+  const seal = await svgImg(finalSealSVG());
+  if (seal) { x.save(); x.translate(860, 250); x.rotate(-12 * Math.PI / 180); x.drawImage(seal, -130, -150, 260, 299); x.restore(); }
+  x.fillStyle = "#fff"; x.font = `800 34px ${F}`; x.fillText("Denizleri keşfetmeye devam! 🌊", W/2, H-46);
   return new Promise(r => c.toBlob(r, "image/png"));
 }
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
@@ -443,7 +462,7 @@ $("#btn-share").onclick = async () => {
   const file = new File([certBlob], `okyanus-kasifi-${S.id}.png`, { type:"image/png" });
   try {
     if (navigator.canShare && navigator.canShare({ files:[file] })) {
-      await navigator.share({ files:[file], title:"Okyanus Kaşifi Sertifikam", text:`${D.aquarium}'da Okyanus Kaşifi oldum!` });
+      await navigator.share({ files:[file], title:"Okyanus Kaşifi Pasaportum", text:`${D.aquarium}'da Okyanus Kaşifi oldum!` });
       return;
     }
   } catch(e){ if (e && e.name === "AbortError") return; }

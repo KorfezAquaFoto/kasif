@@ -182,8 +182,24 @@ function stampSVG(st, opts = {}){
     ${art(60, 61, .6)}`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="stamp-svg" aria-hidden="true">${grad}${body}</svg>`;
 }
+// Final damgası: 9 damga tamamlanınca pasaporta basılan büyük altın "Okyanus Kaşifi" damgası
+function finalSealSVG(){
+  const id = uid("fs");
+  const scal = Array.from({length: 30}, (_, i) => { const a = i * Math.PI / 15; return `<circle cx="${(100 + 86*Math.cos(a)).toFixed(1)}" cy="${(100 + 86*Math.sin(a)).toFixed(1)}" r="11" fill="#e39a12"/>`; }).join("");
+  const star = Array.from({length: 10}, (_, i) => { const r = i % 2 ? 13 : 30, a = -Math.PI/2 + i * Math.PI/5; return `${(100 + r*Math.cos(a)).toFixed(1)},${(98 + r*Math.sin(a)).toFixed(1)}`; }).join(" ");
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" class="final-seal-svg" aria-hidden="true">
+    <defs><radialGradient id="${id}" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#ffe9a0"/><stop offset=".55" stop-color="#f5bd3a"/><stop offset="1" stop-color="#d98c10"/></radialGradient>
+      <path id="${id}t" d="M38 100 A62 62 0 0 1 162 100"/><path id="${id}b" d="M30 100 A70 70 0 0 0 170 100"/></defs>
+    <path d="M62 160 L44 222 L66 208 L80 228 L92 168 Z M138 160 L156 222 L134 208 L120 228 L108 168 Z" fill="#c43328"/>
+    ${scal}<circle cx="100" cy="100" r="86" fill="url(#${id})"/>
+    <circle cx="100" cy="100" r="74" fill="none" stroke="#fff6d6" stroke-width="2.5" stroke-dasharray="4 4"/>
+    <circle cx="100" cy="98" r="40" fill="#10264d"/><polygon points="${star}" fill="#f5bd3a"/>
+    <text font-family='"Baloo 2",ui-rounded,system-ui,sans-serif' font-weight="800" font-size="21" fill="#5a3600" text-anchor="middle" letter-spacing="2"><textPath href="#${id}t" startOffset="50%">OKYANUS</textPath></text>
+    <text font-family='"Baloo 2",ui-rounded,system-ui,sans-serif' font-weight="800" font-size="21" fill="#5a3600" text-anchor="middle" letter-spacing="2"><textPath href="#${id}b" startOffset="50%">KAŞİFİ</textPath></text>
+  </svg>`;
+}
 function artSVG(key, cls = ""){
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="${cls}" aria-hidden="true">${ART[key]()}</svg>`;
 }
-window.ART = ART; window.stampSVG = stampSVG; window.artSVG = artSVG;
+window.ART = ART; window.stampSVG = stampSVG; window.finalSealSVG = finalSealSVG; window.artSVG = artSVG;
 })();
