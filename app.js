@@ -398,8 +398,48 @@ function openCert(){
   [seal, tool].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
   setTimeout(() => { cover.classList.add("gold"); if (navigator.vibrate) navigator.vibrate([60,40,120]); confetti(280, "#confetti2", "v-cert"); }, 560);
   $("#cert-img").removeAttribute("src");
-  drawCert().then(blob => { certBlob = blob; $("#cert-img").src = URL.createObjectURL(blob); });
+  setupSave();
+  drawCert().then(blob => {
+    certBlob = blob;
+    // data: adresi, resme basılı tutunca iPhone'da "Fotoğraflara Ekle", Android'de "Resmi indir" çıkmasını garantiler
+    const fr = new FileReader(); fr.onload = () => { $("#cert-img").src = fr.result; }; fr.readAsDataURL(blob);
+  });
 }
+
+// ---------- Kaydetme: telefona göre en kolay yol ----------
+// iPhone: paylaşma menüsündeki "Resmi Kaydet" doğrudan Fotoğraflar'a koyar (indirme Dosyalar'a gider).
+// Android: doğrudan indirme tek dokunuşla Galeri'ye koyar (paylaşma menüsünde kaydet çoğu zaman yok).
+const IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const ANDROID = /android/i.test(navigator.userAgent);
+function certFile(){ return new File([certBlob], `okyanus-kasifi-${S.id}.png`, { type:"image/png" }); }
+function canShareFile(){ try { return !!(navigator.canShare && certBlob && navigator.canShare({ files:[certFile()] })); } catch(e){ return false; } }
+function setupSave(){
+  $("#btn-save").textContent = IOS ? "📲 Fotoğraflarıma kaydet" : "📥 Telefonuma kaydet";
+  $("#btn-share").classList.toggle("hidden", !navigator.share);
+  $("#save-hint").innerHTML = IOS ? "Açılan menüde <b>“Resmi Kaydet”</b>e dokun. Ya da resme basılı tut → <b>“Fotoğraflara Ekle”</b>."
+    : ANDROID ? "Resim Galeri'ne kaydedilir. Ya da resme basılı tut → <b>“Resmi indir”</b>."
+    : "Resim bilgisayarına indirilir.";
+}
+function download(){
+  const a = document.createElement("a"); a.href = URL.createObjectURL(certBlob); a.download = `okyanus-kasifi-${S.id}.png`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => modal("🎉", "Kaydedildi!", ANDROID ? "Pasaportun Galeri'nde, İndirilenler klasöründe." : "Pasaportun İndirilenler klasöründe.", [{label:"Tamam"}]), 600);
+}
+async function shareFile(){
+  try { await navigator.share({ files:[certFile()], title:"Okyanus Kaşifi Pasaportum", text:`${D.aquarium}'da Okyanus Kaşifi oldum!` }); return true; }
+  catch(e){ return e && e.name === "AbortError"; }
+}
+$("#btn-save").onclick = async () => {
+  if (!certBlob) return;
+  if (IOS && canShareFile() && await shareFile()) return;
+  download();
+};
+$("#btn-share").onclick = async () => {
+  if (!certBlob) return;
+  if (canShareFile() && await shareFile()) return;
+  if (navigator.share) { try { await navigator.share({ title:"Okyanus Kaşifi", text:`${D.aquarium}'da Okyanus Kaşifi oldum!`, url: location.origin + location.pathname }); return; } catch(e){ if (e && e.name === "AbortError") return; } }
+  download();
+};
 function svgImg(svg){
   return new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null);
     i.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); });
@@ -457,18 +497,6 @@ async function drawCert(){
   return new Promise(r => c.toBlob(r, "image/png"));
 }
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
-$("#btn-share").onclick = async () => {
-  if (!certBlob) return;
-  const file = new File([certBlob], `okyanus-kasifi-${S.id}.png`, { type:"image/png" });
-  try {
-    if (navigator.canShare && navigator.canShare({ files:[file] })) {
-      await navigator.share({ files:[file], title:"Okyanus Kaşifi Pasaportum", text:`${D.aquarium}'da Okyanus Kaşifi oldum!` });
-      return;
-    }
-  } catch(e){ if (e && e.name === "AbortError") return; }
-  const a = document.createElement("a"); a.href = URL.createObjectURL(certBlob); a.download = file.name;
-  document.body.appendChild(a); a.click(); a.remove();
-};
 
 // ---------- Menü ----------
 function renderMenu(){ $("#howto-menu").innerHTML = howtoHTML(); $("#ver").textContent = `${D.aquarium} · ${D.season}`; }
