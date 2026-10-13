@@ -65,6 +65,7 @@ h1,h2,h3{margin:0;line-height:1.1;font-weight:800}
 
 /* ---------- Karşılama / pasaport kapağı ---------- */
 .cover-wrap{perspective:1400px;display:flex;justify-content:center;padding:18px 0 8px}
+.book-open{position:relative;width:min(250px,64vw);aspect-ratio:.7;transition:transform .9s cubic-bezier(.5,0,.2,1)}
 .idpage{position:absolute;inset:0;border-radius:6px 18px 18px 6px;background-color:var(--paper);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cg fill='none' stroke='%2338b6d8' stroke-opacity='.18' stroke-width='1.4'%3E%3Ccircle cx='14' cy='18' r='6'/%3E%3Ccircle cx='62' cy='12' r='3.5'/%3E%3Ccircle cx='48' cy='54' r='9'/%3E%3Ccircle cx='80' cy='70' r='4'/%3E%3Ccircle cx='18' cy='76' r='3'/%3E%3C/g%3E%3C/svg%3E");padding:12px 10px 10px 14px;color:var(--ink);opacity:0;transition:opacity .3s .2s;overflow:hidden;box-shadow:inset 10px 0 12px -8px rgba(0,0,0,.25),0 18px 34px rgba(0,0,0,.4)}
 .idpage{display:flex;flex-direction:column;justify-content:center}
 .idpage .hello{font-size:clamp(9px,3vw,11.5px)}
