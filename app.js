@@ -72,7 +72,10 @@ $("#btn-start").onclick = () => {
   // Kapak kitap gibi açılır, altında kaşif dostu ve "Merhaba" görünür
   $("#idpage-w").innerHTML = helloHTML();
   $("#ready-msg").textContent = `Pasaportun hazır, ${S.name}!`;
-  $("#in-name").blur(); window.scrollTo({ top: 0, behavior: "smooth" });
+  $("#in-name").blur(); window.scrollTo(0, 0);
+  // Açılırken pasaport ekranın ortasına kayar
+  const r = $(".cover-wrap").getBoundingClientRect();
+  $("#v-welcome").style.setProperty("--dy", Math.max(0, innerHeight / 2 - (r.top + r.height / 2) - 20) + "px");
   $("#v-welcome").classList.add("opening");
   setTimeout(() => {
     $("#v-welcome").classList.remove("opening");
