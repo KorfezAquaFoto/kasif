@@ -1,6 +1,6 @@
 // Çevrimdışı çalışma: ilk açılışta tüm dosyalar telefona kaydedilir.
 // İçerik değiştiğinde VERSION'ı artırın; telefonlar bir sonraki internet bağlantısında günceller.
-const VERSION = "kasif-v4";
+const VERSION = "kasif-v5";
 const FILES = [
   "./", "./index.html", "./styles.css", "./app.js", "./data.js", "./art.js",
   "./vendor/jsQR.js", "./vendor/qrcode.js", "./manifest.webmanifest",
@@ -28,6 +28,11 @@ self.addEventListener("fetch", e => {
   // Sayfa açılışları (QR'dan gelen ?s=KOD dahil) her zaman önbellekteki index.html ile karşılanır
   if (req.mode === "navigate" && !url.pathname.endsWith("qr-kodlari.html")) {
     e.respondWith(caches.match("./index.html").then(r => r || fetch(req)));
+    return;
+  }
+  // Poster sayfası her zaman güncel data.js/art.js ile çalışsın (internet yoksa önbellek)
+  if (url.pathname.endsWith("qr-kodlari.html") || req.referrer.includes("qr-kodlari.html")) {
+    e.respondWith(fetch(req, { cache: "no-store" }).catch(() => caches.match(req, { ignoreSearch: true })));
     return;
   }
   e.respondWith(
