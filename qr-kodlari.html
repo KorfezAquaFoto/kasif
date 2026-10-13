@@ -52,8 +52,8 @@
     d.innerHTML = `<span class="tag">${tag}</span><div class="em">${em}</div><h2>${title}</h2><p>${text}</p><div class="qr">${svg(url)}</div>` + (code ? `<span class="code">${code}</span>` : "");
     g.appendChild(d);
   }
-  card("entry", "GİRİŞ", artSVG("palyaco"), "Okyanus Kaşifi Ol!", "Telefonunun kamerasıyla okut, pasaportunu aç ve görevlere başla.", base, "");
-  KASIF.stations.forEach((s, i) => card("", `GÖREV ${i+1}`, stampSVG(s), s.title,
+  card("entry", "GİRİŞ", artSVG("vatoz"), "Okyanus Kaşifi Ol!", "Telefonunun kamerasıyla okut, pasaportunu aç ve görevlere başla.", base, "");
+  KASIF.stations.forEach((s, i) => card("", `GÖREV ${i+1} · ${KASIF.regions[s.region].label}`, stampSVG(s), s.title,
     s.quiz ? "Pasaportundaki “QR Tara” ile okut, soruyu bil, damgayı kap!" : "Görevi bitirince ekranda çıkan QR'ı okut.",
     base + "#s=" + s.code, s.code));
 </script>

@@ -53,7 +53,7 @@
     </div>
   </div>
   <div class="sheet">
-    <p class="sheet-lead">Akvaryumda saklanan QR kodları bul, soruları bil, <b>7 damgayı</b> topla!</p>
+    <p class="sheet-lead">Akvaryumda saklanan QR kodları bul, soruları bil, <b>9 damgayı</b> topla!</p>
     <label class="field">
       <span>Kaşif adın</span>
       <input id="in-name" maxlength="16" autocomplete="off" placeholder="Adını yaz" enterkeyhint="done">
@@ -80,6 +80,8 @@
     <div class="track"><div class="track-fill" id="bar"></div><span class="track-fish" id="track-fish">
       <svg viewBox="0 0 60 30"><path d="M8 15 C18 3 40 3 52 15 C40 27 18 27 8 15 Z M10 15 L0 5 L2 15 L0 25 Z" fill="#ff8a1f"/><circle cx="44" cy="13" r="2.5" fill="#111"/></svg></span></div>
     <p class="page-msg" id="progress-text"></p>
+    <div class="map" id="map"></div>
+    <p class="map-cap" id="map-cap"></p>
     <ul class="slots" id="slots"></ul>
   </div>
 
@@ -107,7 +109,7 @@
   <div class="manual">
     <p>Kamera çalışmıyor mu? QR'ın altındaki kodu yaz:</p>
     <form id="manual-form" class="row">
-      <input id="in-code" placeholder="Örn. KBK-3H8T" autocapitalize="characters" autocomplete="off">
+      <input id="in-code" placeholder="Örn. PRN-3T9F" autocapitalize="characters" autocomplete="off">
       <button class="btn btn-gold sm">Onayla</button>
     </form>
   </div>
@@ -137,7 +139,7 @@
     </div>
     <p class="rw-name" id="rw-name"></p>
     <h2 id="rw-title"></h2>
-    <div class="fact-card"><b>Biliyor muydun?</b><p id="rw-fact"></p></div>
+    <div class="fact-card"><b id="rw-fact-title">Biliyor muydun?</b><p id="rw-fact"></p></div>
     <p class="rw-count" id="rw-count"></p>
     <button class="btn btn-gold" id="rw-next">Devam</button>
   </div>
@@ -185,6 +187,7 @@
     <p class="eyebrow center" id="dr-name"></p>
     <h3 class="center" id="dr-title"></h3>
     <p class="center" id="dr-text"></p>
+    <p class="center where" id="dr-where"></p>
     <button class="btn btn-ghost" id="dr-close">Kapat</button>
   </div>
 </div>

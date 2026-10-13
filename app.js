@@ -4,7 +4,8 @@ const D = window.KASIF;
 const ST = D.stations;
 const KEY = "okyanus-kasifi-v1";
 const SALT = "korfez-aqua-kasif";      // kurtarma kodu sağlaması için
-const AVATARS = ["palyaco","ahtapot","kopekbaligi","pirana","muren","mercan"];
+const AVATARS = ["vatoz","kesis","orfoz","pirana","mersin","karagoz"];
+const REG = D.regions;
 const ROT = [-9, 7, -5, 10, -12, 6, -7, 8, -4, 11];
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -90,26 +91,63 @@ function renderHome(){
   $("#progress-text").textContent = n === 0 ? "Akvaryumdaki ilk QR kodu bul ve okut!"
     : n === t ? "Muhteşem! Artık gerçek bir okyanus kaşifisin." : `Harika gidiyorsun! ${t - n} damga kaldı.`;
   $("#done-banner").classList.toggle("hidden", n !== t);
+  renderMap();
+  // Pasaport sayfaları: kıtalar, körfez, özel bölgeler
   const ul = $("#slots"); ul.innerHTML = "";
-  ST.forEach((st, i) => {
-    const got = !!S.badges[st.id];
-    const li = document.createElement("li");
-    li.className = "slot " + (got ? "got" : "locked");
-    li.style.setProperty("--rot", ROT[i % ROT.length] + "deg");
-    li.innerHTML = `<div class="disc">${got ? stampSVG(st) : `<div class="sil">${artSVG(st.art)}</div>`}<span class="num">${got ? "✓" : i + 1}</span></div>
-      <b>${esc(got ? st.name : st.title)}</b><small>${got ? esc(st.title) : "Bul ve okut"}</small>`;
-    li.onclick = () => openDrawer(st, got);
-    ul.appendChild(li);
+  D.groups.forEach(g => {
+    const list = ST.filter(st => REG[st.region].kind === g.kind);
+    if (!list.length) return;
+    const h = document.createElement("li"); h.className = "group"; h.textContent = g.label; ul.appendChild(h);
+    list.forEach(st => {
+      const i = ST.indexOf(st), got = !!S.badges[st.id];
+      const li = document.createElement("li");
+      li.className = "slot " + (got ? "got" : "locked");
+      li.style.setProperty("--rot", ROT[i % ROT.length] + "deg");
+      li.innerHTML = `<div class="disc">${got ? stampSVG(st, { date: S.badges[st.id] }) : `<div class="sil">${artSVG(st.art)}</div>`}<span class="num">${got ? "✓" : i + 1}</span></div>
+        <b>${esc(got ? st.name : st.title)}</b><small>${esc(REG[st.region].label)}</small>`;
+      li.onclick = () => openDrawer(st, got);
+      ul.appendChild(li);
+    });
   });
+  S.last = null;
   renderInstall();
 }
 function openDrawer(st, got){
-  const art = $("#dr-art"); art.innerHTML = got ? stampSVG(st) : artSVG(st.art);
+  const art = $("#dr-art"); art.innerHTML = got ? stampSVG(st, { date: S.badges[st.id] }) : artSVG(st.art);
   art.classList.toggle("sil", !got);
-  $("#dr-name").textContent = got ? st.name : "Gizemli canlı";
+  $("#dr-name").textContent = REG[st.region].label + " · " + (got ? st.name : "Gizemli görev");
   $("#dr-title").textContent = st.title;
   $("#dr-text").textContent = got ? st.fact : "İpucu: " + st.hint;
+  $("#dr-where").textContent = got || !st.where ? "" : "QR'ı bul: " + st.where;
   $("#drawer").classList.remove("hidden");
+}
+
+// ---------- Kaşif haritası ----------
+// Basitleştirilmiş dünya haritası (x = boylam + 180, y = 80 − enlem). Damgası alınan kıta altın renge döner.
+const LAND = {
+  "guney-amerika": "M100 70 L105 69 L118 70 L130 80 L145 87 L140 102 L132 107 L122 118 L115 135 L108 130 L107 115 L110 98 L99 85 Z",
+  "avrupa": "M170 44 L171 37 L178 36 L175 32 L185 28 L188 23 L185 18 L195 11 L208 9 L230 12 L235 25 L225 35 L220 39 L208 39 L203 43 L195 42 L192 36 L185 37 L175 44 Z M176 30 L180 23 L183 22 L183 30 L179 31 Z",
+  "asya": "M206 40 L207 43 L216 44 L215 50 L223 67 L232 65 L238 58 L240 55 L247 56 L253 60 L257 72 L260 65 L268 58 L272 59 L278 64 L280 67 L284 79 L289 68 L288 59 L301 50 L302 40 L308 45 L310 37 L322 34 L320 26 L340 20 L360 14 L360 10 L320 7 L290 3 L260 7 L240 10 L230 12 L235 25 L225 35 L220 39 L208 39 Z M310 49 L314 46 L321 38 L322 35 L318 37 L312 45 Z M275 75 L286 82 L287 86 L283 86 L274 78 Z M289 80 L297 75 L299 82 L292 85 Z",
+  "afrika": "M163 59 L170 50 L174 45 L190 43 L200 48 L212 49 L215 52 L223 68 L231 68 L222 81 L220 95 L215 104 L208 113 L199 115 L192 97 L194 85 L189 76 L172 76 L163 66 Z M224 93 L230 95 L227 105 L223 102 Z",
+  "avustralya": "M294 102 L302 97 L310 92 L317 92 L322 91 L326 99 L333 106 L330 117 L321 118 L311 111 L296 115 Z"
+};
+const OTHER_LAND = "M12 14 L40 10 L85 8 L100 18 L120 25 L114 35 L99 55 L83 62 L93 67 L100 72 L88 65 L75 60 L63 48 L55 38 L55 30 L30 20 Z M120 2 L155 2 L160 8 L138 20 L125 12 Z";
+const IZMIT = [209.9, 39.2];
+function renderMap(){
+  const byReg = r => ST.find(st => st.region === r);
+  const lit = r => { const st = byReg(r); return st && S.badges[st.id]; };
+  const fresh = r => { const st = byReg(r); return st && S.last === st.id; };
+  const kitalar = Object.keys(LAND).filter(r => byReg(r));
+  const land = kitalar.map(r => `<path class="kita${lit(r) ? " lit" : ""}${fresh(r) ? " new" : ""}" data-r="${r}" d="${LAND[r]}"><title>${esc(REG[r].label)}</title></path>`).join("");
+  const pin = byReg("izmit") ? `<g class="pin${lit("izmit") ? " lit" : ""}${fresh("izmit") ? " new" : ""}" data-r="izmit">
+      <circle class="ring" cx="${IZMIT[0]}" cy="${IZMIT[1]}" r="6"/><circle class="dot" cx="${IZMIT[0]}" cy="${IZMIT[1]}" r="4.2"/><title>${esc(REG.izmit.label)}</title></g>` : "";
+  $("#map").innerHTML = `<svg viewBox="0 0 360 140" role="img" aria-label="Kaşif haritası">
+    <path class="lat" d="M0 80 H360 M0 56.5 H360 M0 103.5 H360"/>
+    <path class="other" d="${OTHER_LAND}"/>${land}${pin}</svg>`;
+  $("#map").querySelectorAll("[data-r]").forEach(el => el.onclick = () => { const st = byReg(el.dataset.r); openDrawer(st, !!S.badges[st.id]); });
+  const k = kitalar.filter(lit).length;
+  $("#map-cap").innerHTML = `<span>🌍 Dünya turun: <b>${k} / ${kitalar.length} kıta</b></span>` +
+    (byReg("izmit") ? `<span>📍 ${esc(REG.izmit.label)}: <b>${lit("izmit") ? "✓" : "?"}</b></span>` : "");
 }
 $("#dr-close").onclick = () => $("#drawer").classList.add("hidden");
 $("#drawer").onclick = e => { if (e.target.id === "drawer") $("#drawer").classList.add("hidden"); };
@@ -248,11 +286,14 @@ function openQuiz(st){
 // ---------- Damga ----------
 function award(st){
   S.badges[st.id] = Date.now(); save();
+  S.last = st.id;   // haritada yeni yanan bölge parlasın
   const stage = $("#rw-stamp"), ring = $("#ink-ring");
-  stage.innerHTML = stampSVG(st);
+  stage.innerHTML = stampSVG(st, { date: S.badges[st.id] });
   [stage, ring].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
-  $("#rw-name").textContent = st.name;
+  $("#rw-name").textContent = REG[st.region].label + " · " + st.name;
   $("#rw-title").textContent = st.title;
+  $("#rw-fact-title").textContent = st.factTitle || "Biliyor muydun?";
+  $(".fact-card").classList.toggle("eco", !!st.factTitle);
   $("#rw-fact").textContent = st.fact;
   const n = count(), t = ST.length;
   $("#rw-count").textContent = `⭐ ${n} / ${t} damga`;
@@ -319,7 +360,7 @@ async function drawCert(){
   x.fillText(`adlı kaşifimize, ${D.aquarium}'daki ${ST.length} damganın`, W/2, 796);
   x.fillText("hepsini topladığı için verilmiştir.", W/2, 844);
   // damgalar: 2 sıra
-  const imgs = await Promise.all(ST.map(st => svgImg(stampSVG(st))));
+  const imgs = await Promise.all(ST.map(st => svgImg(stampSVG(st, { date: S.badges[st.id] }))));
   const perRow = Math.ceil(ST.length / 2), size = 150, gap = 18;
   ST.forEach((st, i) => {
     const row = i < perRow ? 0 : 1, inRow = row === 0 ? perRow : ST.length - perRow, k = row === 0 ? i : i - perRow;
