@@ -69,8 +69,8 @@ $("#btn-start").onclick = () => {
   const name = $("#in-name").value.trim().slice(0,16) || "Kaşif";
   S = { v:1, id:newId(), name, avatar, badges:{}, created:Date.now() };
   save(); requestPersist();
-  // Kapak kitap gibi açılır, altındaki kimlik sayfası görünür
-  $("#idpage-w").innerHTML = `<div class="idcard">${idHTML()}</div>`;
+  // Kapak kitap gibi açılır, altında kaşif dostu ve "Merhaba" görünür
+  $("#idpage-w").innerHTML = helloHTML();
   $("#ready-msg").textContent = `Pasaportun hazır, ${S.name}!`;
   $("#in-name").blur(); window.scrollTo({ top: 0, behavior: "smooth" });
   $("#v-welcome").classList.add("opening");
@@ -81,99 +81,50 @@ $("#btn-start").onclick = () => {
   }, 2600);
 };
 
-// ---------- Kimlik sayfası ----------
-const FRIEND = { vatoz:"Vatoz", kesis:"Keşiş Yengeci", orfoz:"Orfoz", pirana:"Pirana", mersin:"Mersin Balığı", karagoz:"Karagöz" };
-// Nasıl oynanır adımları (Kaşif Kartım sayfası ve menü)
-const HOWTO = [["🔎", "İpucunu oku, canlıyı bul"], ["📷", "Yanındaki QR'ı <b>QR Tara</b> ile okut"], ["❓", "Soruyu bil"], ["⭐", "Damgan pasaportuna basılsın!"]];
+// ---------- Simgelerle nasıl oynanır ----------
+const FLOW = `<span>🔍</span><i>›</i><span>📷</span><i>›</i><span>❓</span><i>›</i><span>⭐</span>`;
+const HOWTO = [["🔍", "İpucunu oku, canlıyı bul"], ["📷", "Yanındaki QR'ı <b>QR Tara</b> ile okut"], ["❓", "Soruyu bil"], ["⭐", "Damgan pasaportuna basılsın!"]];
 const howtoHTML = () => HOWTO.map(([i, t]) => `<li><span>${i}</span><p>${t}</p></li>`).join("");
-function idHTML(){
-  const d = new Date(S.created || Date.now()), p = n => String(n).padStart(2, "0");
-  return `<p class="id-title">Kaşif Kartım</p>
-    <div class="id-body"><div class="id-photo">${av(S.avatar)}</div><div class="id-fields">
-      <div><small>Adım</small><b>${esc(S.name)}</b></div>
-      <div><small>Kaşif numaram</small><b>#${esc(S.id)}</b></div>
-      <div><small>Yola çıktığım gün</small><b>${p(d.getDate())}.${p(d.getMonth()+1)}.${d.getFullYear()}</b></div>
-    </div></div>
-    <p class="id-friend">Yol arkadaşım: <b>${FRIEND[S.avatar] || ""}</b></p>
-    <p class="id-note">Merhaba ${esc(S.name)}! ${D.aquarium}'da ${ST.length} damga seni bekliyor. Haydi keşfe çıkalım! 🐠</p>`;
+function helloHTML(){
+  return `<div class="hello"><div class="hello-av">${av(S.avatar)}</div><p class="hello-hi">Merhaba ${esc(S.name)}!</p>
+    <p class="hello-sub">${ST.length} damga seni bekliyor</p><div class="flow">${FLOW}</div></div>`;
 }
 
-// ---------- Ana ekran (damga sayfası) ----------
+// ---------- Ana ekran: hedef + 9 damga yeri ----------
+// Çocuğun ilk gördüğü yer oyunun kendisi: üstte aradığı canlı, altta tek sayfada 9 damga yeri.
+let target = null;   // aranan görev; boş bir yere dokununca değişir
 function renderHome(){
-  $("#me-av").innerHTML = av(S.avatar); $("#me-name").textContent = S.name; $("#me-id").textContent = "Kaşif #" + S.id;
+  $("#me-av").innerHTML = av(S.avatar); $("#me-name").textContent = S.name;
   const n = count(), t = ST.length;
-  $("#count").innerHTML = `${n}<small> / ${t} damga</small>`;
-  $("#stars").innerHTML = ST.map((st,i) => `<span class="${i < n ? "on" : ""}">⭐</span>`).join("");
-  const pct = n / t * 100;
-  $("#bar").style.width = pct + "%";
-  $("#track-fish").style.left = Math.max(4, Math.min(96, pct)) + "%";
-  $("#progress-text").textContent = n === 0 ? "Akvaryumdaki ilk QR kodu bul ve okut!"
-    : n === t ? "Muhteşem! Artık gerçek bir okyanus kaşifisin." : `Harika gidiyorsun! ${t - n} damga kaldı.`;
+  $("#me-count").textContent = `⭐ ${n}/${t}`;
   $("#done-banner").classList.toggle("hidden", n !== t);
-  renderMap();
-  renderNext();
-  renderBook();
+  if (!target || S.badges[target]) target = (ST.find(s => !S.badges[s.id]) || {}).id || null;
+  renderTarget(); renderGrid();
   $("#btn-scan").classList.toggle("pulse", n === 0);
   S.last = null;
   renderInstall();
 }
-
-// Sıradaki görev kartı: henüz alınmamış ilk damganın ipucu
-function renderNext(){
-  const st = ST.find(s => !S.badges[s.id]), box = $("#next-card");
+function renderTarget(){
+  const st = ST.find(s => s.id === target), box = $("#target");
   box.classList.toggle("hidden", !st); if (!st) return;
-  box.innerHTML = `<span class="nc-art">${artSVG(st.art)}</span><span><small>Sıradaki görevin</small><b>${esc(st.title)}</b>
-    <em>${esc(st.hint)}</em>${st.where ? `<i>📍 ${esc(st.where)}</i>` : ""}</span>`;
-  box.onclick = () => openDrawer(st, false);
+  box.innerHTML = `<div class="tg-art">${artSVG(st.art)}<b>?</b></div>
+    <div class="tg-txt"><p class="tg-k">🔍 Bunu bul!</p><p class="tg-hint">${esc(st.hint)}</p>
+    ${st.where ? `<p class="tg-where">📍 ${esc(st.where)}</p>` : ""}</div>`;
 }
-
-// ---------- Pasaport defteri ----------
-// Sayfalar: kimlik + her bölge türü için bir vize sayfası. Yana kaydırılır.
-let leafIdx = null;
-function leaves(){ return [null, ...D.groups.filter(g => ST.some(st => REG[st.region].kind === g.kind))]; }
-function leafOf(st){ return leaves().findIndex(g => g && g.kind === REG[st.region].kind); }
-function renderBook(){
-  const L = leaves(), book = $("#book");
-  book.innerHTML = L.map((g, pi) => {
-    const no = `<span class="pgno">— ${pi + 1} —</span>`;
-    if (!g) return `<section class="leaf id-leaf">${count() === ST.length ? `<span class="id-seal">${finalSealSVG()}</span>` : ""}<div class="idcard">${idHTML()}</div><p class="howto-t">Nasıl oynanır?</p><ol class="howto">${howtoHTML()}</ol>${no}</section>`;
-    const list = ST.filter(st => REG[st.region].kind === g.kind);
-    const got = list.filter(st => S.badges[st.id]).length;
-    return `<section class="leaf"><div class="leaf-hd"><span>${g.icon || ""} ${esc(g.label)}</span><span class="chip">${got} / ${list.length}</span></div>
-      <div class="spots n${list.length}">${list.map(st => {
-        const i = ST.indexOf(st), has = !!S.badges[st.id];
-        return `<button type="button" class="spot ${has ? "got" : "locked"}" data-id="${st.id}" style="--rot:${ROT[i % ROT.length]}deg">
-          <span class="disc">${has ? stampSVG(st, { date: S.badges[st.id] }) : `<span class="sil">${artSVG(st.art)}</span><span class="num">${i + 1}</span>`}</span>
-          <b>${esc(has ? st.name : st.title)}</b>${has ? "" : "<small>İpucu için dokun</small>"}</button>`;
-      }).join("")}</div>${no}</section>`;
+function renderGrid(){
+  $("#grid9").innerHTML = ST.map((st, i) => {
+    const has = !!S.badges[st.id];
+    return `<button type="button" class="cell ${has ? "got" : "locked"}${st.id === target ? " on" : ""}" data-id="${st.id}" style="--rot:${ROT[i % ROT.length]}deg" aria-label="${esc(has ? st.name : "Görev " + (i + 1))}">
+      ${has ? stampSVG(st, { date: S.badges[st.id] }) : `<span class="sil">${artSVG(st.art)}</span><span class="num">${i + 1}</span>`}</button>`;
   }).join("");
-  // Sekmeler: kaydırmayı bilmeyen çocuk dokunarak sayfa değiştirir
-  $("#book-tabs").innerHTML = L.map(g => {
-    if (!g) return `<button type="button" role="tab"><span class="ti">📇</span>Kartım</button>`;
-    const list = ST.filter(st => REG[st.region].kind === g.kind), got = list.filter(st => S.badges[st.id]).length;
-    return `<button type="button" role="tab"><span class="ti">${g.icon}</span>${esc(g.short || g.label)}<small>${got}/${list.length}</small></button>`;
-  }).join("");
-  $("#book-tabs").querySelectorAll("button").forEach((b, pi) => b.onclick = () => goLeaf(pi, true));
-  const last = S.last && ST.find(st => st.id === S.last);
-  if (last) leafIdx = leafOf(last);
-  else if (leafIdx === null) leafIdx = count() === 0 ? 0 : 1;
-  goLeaf(leafIdx, false);
+  $("#pp-seal").innerHTML = count() === ST.length ? finalSealSVG() : "";
 }
-function goLeaf(i, smooth){
-  const book = $("#book"), leaf = book.children[i]; if (!leaf) return;
-  book.scrollTo({ left: leaf.offsetLeft - book.offsetLeft - (book.clientWidth - leaf.clientWidth) / 2, behavior: smooth ? "smooth" : "auto" });
-  markDot(i);
-}
-function markDot(i){ leafIdx = i; $("#book-tabs").querySelectorAll("button").forEach((b, k) => { b.classList.toggle("on", k === i); b.setAttribute("aria-selected", k === i); }); }
-$("#book").addEventListener("scroll", () => {
-  const book = $("#book"), mid = book.scrollLeft + book.clientWidth / 2;
-  let best = 0, bd = 1e9;
-  [...book.children].forEach((c, k) => { const d = Math.abs(c.offsetLeft - book.offsetLeft + c.clientWidth / 2 - mid); if (d < bd) { bd = d; best = k; } });
-  if (best !== leafIdx) markDot(best);
-}, { passive: true });
-$("#book").addEventListener("click", e => {
-  const b = e.target.closest(".spot"); if (!b) return;
-  const st = ST.find(s => s.id === b.dataset.id); openDrawer(st, !!S.badges[st.id]);
+$("#grid9").addEventListener("click", e => {
+  const b = e.target.closest(".cell"); if (!b) return;
+  const st = ST.find(s => s.id === b.dataset.id);
+  if (S.badges[st.id]) return openDrawer(st, true);
+  target = st.id; renderTarget(); renderGrid();
+  $("#target").scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
 function openDrawer(st, got){
   const art = $("#dr-art"); art.innerHTML = got ? stampSVG(st, { date: S.badges[st.id] }) : artSVG(st.art);
@@ -184,38 +135,13 @@ function openDrawer(st, got){
   $("#dr-where").textContent = got || !st.where ? "" : "QR'ı bul: " + st.where;
   $("#drawer").classList.remove("hidden");
 }
-
-// ---------- Kaşif haritası ----------
-// Basitleştirilmiş dünya haritası (x = boylam + 180, y = 80 − enlem). Damgası alınan kıta altın renge döner.
-const LAND = {
-  "guney-amerika": "M100 70 L105 69 L118 70 L130 80 L145 87 L140 102 L132 107 L122 118 L115 135 L108 130 L107 115 L110 98 L99 85 Z",
-  "avrupa": "M170 44 L171 37 L178 36 L175 32 L185 28 L188 23 L185 18 L195 11 L208 9 L230 12 L235 25 L225 35 L220 39 L208 39 L203 43 L195 42 L192 36 L185 37 L175 44 Z M176 30 L180 23 L183 22 L183 30 L179 31 Z",
-  "asya": "M206 40 L207 43 L216 44 L215 50 L223 67 L232 65 L238 58 L240 55 L247 56 L253 60 L257 72 L260 65 L268 58 L272 59 L278 64 L280 67 L284 79 L289 68 L288 59 L301 50 L302 40 L308 45 L310 37 L322 34 L320 26 L340 20 L360 14 L360 10 L320 7 L290 3 L260 7 L240 10 L230 12 L235 25 L225 35 L220 39 L208 39 Z M310 49 L314 46 L321 38 L322 35 L318 37 L312 45 Z M275 75 L286 82 L287 86 L283 86 L274 78 Z M289 80 L297 75 L299 82 L292 85 Z",
-  "afrika": "M163 59 L170 50 L174 45 L190 43 L200 48 L212 49 L215 52 L223 68 L231 68 L222 81 L220 95 L215 104 L208 113 L199 115 L192 97 L194 85 L189 76 L172 76 L163 66 Z M224 93 L230 95 L227 105 L223 102 Z",
-  "avustralya": "M294 102 L302 97 L310 92 L317 92 L322 91 L326 99 L333 106 L330 117 L321 118 L311 111 L296 115 Z"
-};
-const OTHER_LAND = "M12 14 L40 10 L85 8 L100 18 L120 25 L114 35 L99 55 L83 62 L93 67 L100 72 L88 65 L75 60 L63 48 L55 38 L55 30 L30 20 Z M120 2 L155 2 L160 8 L138 20 L125 12 Z";
-const IZMIT = [209.9, 39.2];
-function renderMap(){
-  const byReg = r => ST.find(st => st.region === r);
-  const lit = r => { const st = byReg(r); return st && S.badges[st.id]; };
-  const fresh = r => { const st = byReg(r); return st && S.last === st.id; };
-  const kitalar = Object.keys(LAND).filter(r => byReg(r));
-  const land = kitalar.map(r => `<path class="kita${lit(r) ? " lit" : ""}${fresh(r) ? " new" : ""}" data-r="${r}" d="${LAND[r]}"><title>${esc(REG[r].label)}</title></path>`).join("");
-  const pin = byReg("izmit") ? `<g class="pin${lit("izmit") ? " lit" : ""}${fresh("izmit") ? " new" : ""}" data-r="izmit">
-      <circle class="ring" cx="${IZMIT[0]}" cy="${IZMIT[1]}" r="6"/><circle class="dot" cx="${IZMIT[0]}" cy="${IZMIT[1]}" r="4.2"/><title>${esc(REG.izmit.label)}</title></g>` : "";
-  $("#map").innerHTML = `<svg viewBox="0 0 360 140" role="img" aria-label="Kaşif haritası">
-    <path class="lat" d="M0 80 H360 M0 56.5 H360 M0 103.5 H360"/>
-    <path class="other" d="${OTHER_LAND}"/>${land}${pin}</svg>`;
-  $("#map").querySelectorAll("[data-r]").forEach(el => el.onclick = () => { const st = byReg(el.dataset.r); openDrawer(st, !!S.badges[st.id]); });
-  const k = kitalar.filter(lit).length;
-  $("#map-cap").innerHTML = `<span>🌍 Dünya turun: <b>${k} / ${kitalar.length} kıta</b></span>` +
-    (byReg("izmit") ? `<span>📍 ${esc(REG.izmit.label)}: <b>${lit("izmit") ? "✓" : "?"}</b></span>` : "");
-}
 $("#dr-close").onclick = () => $("#drawer").classList.add("hidden");
 $("#drawer").onclick = e => { if (e.target.id === "drawer") $("#drawer").classList.add("hidden"); };
 $("#btn-scan").onclick = () => show("v-scan");
 $("#btn-menu").onclick = () => show("v-menu");
+$("#btn-help").onclick = () => { $("#howto").innerHTML = howtoHTML(); $("#help").classList.remove("hidden"); };
+$("#help-close").onclick = () => $("#help").classList.add("hidden");
+$("#help").onclick = e => { if (e.target.id === "help") $("#help").classList.add("hidden"); };
 $("#btn-cert").onclick = () => openCert();
 
 // Ana ekrana ekleme ipucu (iPhone'da verinin silinmemesi için önemli)
@@ -499,9 +425,9 @@ async function drawCert(){
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#howto-menu").innerHTML = howtoHTML(); $("#ver").textContent = `${D.aquarium} · ${D.season}`; }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season}`; }
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
-  {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; leafIdx = null; renderWelcome(); show("v-welcome",false); }},
+  {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
   {label:"Vazgeç",cls:"btn-ghost"}]);
 
 // ---------- Başlangıç ve QR linkleri ----------

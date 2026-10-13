@@ -70,28 +70,16 @@
 <!-- ANA EKRAN -->
 <section id="v-home" class="view">
   <header class="topbar">
-    <div class="me"><span class="me-av" id="me-av"></span><div><b id="me-name"></b><small id="me-id"></small></div></div>
-    <button class="icon-btn" id="btn-menu" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div class="me"><span class="me-av" id="me-av"></span><b id="me-name"></b></div>
+    <div class="tb-right"><span class="pill" id="me-count"></span><button class="icon-btn help-btn" id="btn-help" aria-label="Nasıl oynanır?">?</button><button class="icon-btn" id="btn-menu" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
   </header>
 
-  <div class="page">
-    <div class="page-head">
-      <div><p class="eyebrow">Damga sayfam</p><h2 id="count"></h2></div>
-      <div class="stars" id="stars"></div>
-    </div>
-    <div class="track"><div class="track-fill" id="bar"></div><span class="track-fish" id="track-fish">
-      <svg viewBox="0 0 60 30"><path d="M8 15 C18 3 40 3 52 15 C40 27 18 27 8 15 Z M10 15 L0 5 L2 15 L0 25 Z" fill="#ff8a1f"/><circle cx="44" cy="13" r="2.5" fill="#111"/></svg></span></div>
-    <p class="page-msg" id="progress-text"></p>
-    <div class="map" id="map"></div>
-    <p class="map-cap" id="map-cap"></p>
+  <!-- Pasaport sayfası: aranan canlı + 9 damga yeri -->
+  <div class="page pp">
+    <div class="pp-seal" id="pp-seal"></div>
+    <div class="target hidden" id="target"></div>
+    <div class="grid9" id="grid9"></div>
   </div>
-
-  <!-- Sıradaki görev: çocuğu bir sonraki canlıya yönlendirir -->
-  <button type="button" class="next-card hidden" id="next-card"></button>
-
-  <!-- Pasaport defteri: sekmeler + sayfalar (kaydırılarak da gezilir) -->
-  <div class="tabs" id="book-tabs" role="tablist"></div>
-  <div class="book" id="book"></div>
 
   <div class="done-banner hidden" id="done-banner">
     <div class="trophy">🏆</div>
@@ -196,7 +184,6 @@
 <section id="v-menu" class="view">
   <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title">Kaşif çantam</b><span class="tb-sp"></span></header>
   <div class="menu">
-    <div class="paper"><h3>Nasıl oynanır?</h3><ol class="howto" id="howto-menu"></ol></div>
     <div class="paper">
       <h3>Baştan başla</h3>
       <p>Tüm damgalar bu telefondan silinir.</p>
@@ -215,6 +202,15 @@
     <p class="center" id="dr-text"></p>
     <p class="center where" id="dr-where"></p>
     <button class="btn btn-ghost" id="dr-close">Kapat</button>
+  </div>
+</div>
+
+<!-- Nasıl oynanır? (üstteki ? düğmesiyle açılır) -->
+<div class="drawer hidden" id="help">
+  <div class="drawer-box">
+    <h3 class="center">Nasıl oynanır?</h3>
+    <ol class="howto" id="howto"></ol>
+    <button class="btn btn-gold" id="help-close">Anladım!</button>
   </div>
 </div>
 
