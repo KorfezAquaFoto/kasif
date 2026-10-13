@@ -64,7 +64,6 @@
     <p class="field-label">Kaşif dostunu seç</p>
     <div class="avatars" id="avatars"></div>
     <button class="btn btn-gold" id="btn-start">Pasaportumu Aç</button>
-    <button class="link" id="btn-restore-open">Daha önce oynadım, damgalarımı geri getir</button>
   </div>
 </section>
 
@@ -87,9 +86,12 @@
     <p class="map-cap" id="map-cap"></p>
   </div>
 
-  <!-- Pasaport defteri: yana kaydırılan sayfalar -->
+  <!-- Sıradaki görev: çocuğu bir sonraki canlıya yönlendirir -->
+  <button type="button" class="next-card hidden" id="next-card"></button>
+
+  <!-- Pasaport defteri: sekmeler + sayfalar (kaydırılarak da gezilir) -->
+  <div class="tabs" id="book-tabs" role="tablist"></div>
   <div class="book" id="book"></div>
-  <div class="book-dots" id="book-dots"></div>
 
   <div class="done-banner hidden" id="done-banner">
     <div class="trophy">🏆</div>
@@ -174,17 +176,7 @@
 <section id="v-menu" class="view">
   <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title">Kaşif çantam</b><span class="tb-sp"></span></header>
   <div class="menu">
-    <div class="paper">
-      <h3>Damgalarımı sakla</h3>
-      <p>Bu QR'ın ekran görüntüsünü al. Bir sonraki gelişinde ya da telefon değiştirdiğinde okutursan damgaların geri gelir.</p>
-      <div class="rec-qr" id="rec-qr"></div>
-      <p class="mono center" id="rec-id"></p>
-    </div>
-    <div class="paper">
-      <h3>Damgalarımı geri getir</h3>
-      <p>Daha önce kaydettiğin kurtarma QR'ını okut.</p>
-      <button class="btn btn-ghost" id="btn-restore-scan">Kurtarma QR'ı okut</button>
-    </div>
+    <div class="paper"><h3>Nasıl oynanır?</h3><ol class="howto" id="howto-menu"></ol></div>
     <div class="paper">
       <h3>Baştan başla</h3>
       <p>Tüm damgalar bu telefondan silinir.</p>
@@ -219,7 +211,6 @@
 <script src="data.js"></script>
 <script src="art.js"></script>
 <script src="vendor/jsQR.js" defer></script>
-<script src="vendor/qrcode.js" defer></script>
 <script src="app.js" defer></script>
 </body>
 </html>

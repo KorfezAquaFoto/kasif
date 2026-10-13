@@ -3,7 +3,6 @@
 const D = window.KASIF;
 const ST = D.stations;
 const KEY = "okyanus-kasifi-v1";
-const SALT = "korfez-aqua-kasif";      // kurtarma kodu sağlaması için
 const AVATARS = ["vatoz","kesis","orfoz","pirana","mersin","karagoz"];
 const REG = D.regions;
 const ROT = [-9, 7, -5, 10, -12, 6, -7, 8, -4, 11];
@@ -81,10 +80,12 @@ $("#btn-start").onclick = () => {
     if (pending) { const p = pending; pending = null; setTimeout(() => handleCode(p), 350); }
   }, 2600);
 };
-$("#btn-restore-open").onclick = () => { restoreMode = true; show("v-scan"); };
 
 // ---------- Kimlik sayfası ----------
 const FRIEND = { vatoz:"Vatoz", kesis:"Keşiş Yengeci", orfoz:"Orfoz", pirana:"Pirana", mersin:"Mersin Balığı", karagoz:"Karagöz" };
+// Nasıl oynanır adımları (Kaşif Kartım sayfası ve menü)
+const HOWTO = [["🔎", "İpucunu oku, canlıyı bul"], ["📷", "Yanındaki QR'ı <b>QR Tara</b> ile okut"], ["❓", "Soruyu bil"], ["⭐", "Damgan pasaportuna basılsın!"]];
+const howtoHTML = () => HOWTO.map(([i, t]) => `<li><span>${i}</span><p>${t}</p></li>`).join("");
 function idHTML(){
   const d = new Date(S.created || Date.now()), p = n => String(n).padStart(2, "0");
   return `<p class="id-title">Kaşif Kartım</p>
@@ -110,9 +111,20 @@ function renderHome(){
     : n === t ? "Muhteşem! Artık gerçek bir okyanus kaşifisin." : `Harika gidiyorsun! ${t - n} damga kaldı.`;
   $("#done-banner").classList.toggle("hidden", n !== t);
   renderMap();
+  renderNext();
   renderBook();
+  $("#btn-scan").classList.toggle("pulse", n === 0);
   S.last = null;
   renderInstall();
+}
+
+// Sıradaki görev kartı: henüz alınmamış ilk damganın ipucu
+function renderNext(){
+  const st = ST.find(s => !S.badges[s.id]), box = $("#next-card");
+  box.classList.toggle("hidden", !st); if (!st) return;
+  box.innerHTML = `<span class="nc-art">${artSVG(st.art)}</span><span><small>Sıradaki görevin</small><b>${esc(st.title)}</b>
+    <em>${esc(st.hint)}</em>${st.where ? `<i>📍 ${esc(st.where)}</i>` : ""}</span>`;
+  box.onclick = () => openDrawer(st, false);
 }
 
 // ---------- Pasaport defteri ----------
@@ -124,7 +136,7 @@ function renderBook(){
   const L = leaves(), book = $("#book");
   book.innerHTML = L.map((g, pi) => {
     const no = `<span class="pgno">— ${pi + 1} —</span>`;
-    if (!g) return `<section class="leaf id-leaf"><div class="idcard">${idHTML()}</div><p class="swipe-hint">Damgaların için sayfayı kaydır 👉</p>${no}</section>`;
+    if (!g) return `<section class="leaf id-leaf"><div class="idcard">${idHTML()}</div><p class="howto-t">Nasıl oynanır?</p><ol class="howto">${howtoHTML()}</ol>${no}</section>`;
     const list = ST.filter(st => REG[st.region].kind === g.kind);
     const got = list.filter(st => S.badges[st.id]).length;
     return `<section class="leaf"><div class="leaf-hd"><span>${g.icon || ""} ${esc(g.label)}</span><span class="chip">${got} / ${list.length}</span></div>
@@ -132,11 +144,16 @@ function renderBook(){
         const i = ST.indexOf(st), has = !!S.badges[st.id];
         return `<button type="button" class="spot ${has ? "got" : "locked"}" data-id="${st.id}" style="--rot:${ROT[i % ROT.length]}deg">
           <span class="disc">${has ? stampSVG(st, { date: S.badges[st.id] }) : `<span class="sil">${artSVG(st.art)}</span><span class="num">${i + 1}</span>`}</span>
-          <b>${esc(has ? st.name : st.title)}</b></button>`;
+          <b>${esc(has ? st.name : st.title)}</b>${has ? "" : "<small>İpucu için dokun</small>"}</button>`;
       }).join("")}</div>${no}</section>`;
   }).join("");
-  $("#book-dots").innerHTML = L.map((g, pi) => `<button type="button" aria-label="Sayfa ${pi + 1}"></button>`).join("");
-  $("#book-dots").querySelectorAll("button").forEach((b, pi) => b.onclick = () => goLeaf(pi, true));
+  // Sekmeler: kaydırmayı bilmeyen çocuk dokunarak sayfa değiştirir
+  $("#book-tabs").innerHTML = L.map(g => {
+    if (!g) return `<button type="button" role="tab"><span class="ti">📇</span>Kartım</button>`;
+    const list = ST.filter(st => REG[st.region].kind === g.kind), got = list.filter(st => S.badges[st.id]).length;
+    return `<button type="button" role="tab"><span class="ti">${g.icon}</span>${esc(g.short || g.label)}<small>${got}/${list.length}</small></button>`;
+  }).join("");
+  $("#book-tabs").querySelectorAll("button").forEach((b, pi) => b.onclick = () => goLeaf(pi, true));
   const last = S.last && ST.find(st => st.id === S.last);
   if (last) leafIdx = leafOf(last);
   else if (leafIdx === null) leafIdx = count() === 0 ? 0 : 1;
@@ -147,7 +164,7 @@ function goLeaf(i, smooth){
   book.scrollTo({ left: leaf.offsetLeft - book.offsetLeft - (book.clientWidth - leaf.clientWidth) / 2, behavior: smooth ? "smooth" : "auto" });
   markDot(i);
 }
-function markDot(i){ leafIdx = i; $("#book-dots").querySelectorAll("button").forEach((b, k) => b.classList.toggle("on", k === i)); }
+function markDot(i){ leafIdx = i; $("#book-tabs").querySelectorAll("button").forEach((b, k) => { b.classList.toggle("on", k === i); b.setAttribute("aria-selected", k === i); }); }
 $("#book").addEventListener("scroll", () => {
   const book = $("#book"), mid = book.scrollLeft + book.clientWidth / 2;
   let best = 0, bd = 1e9;
@@ -197,7 +214,7 @@ function renderMap(){
 }
 $("#dr-close").onclick = () => $("#drawer").classList.add("hidden");
 $("#drawer").onclick = e => { if (e.target.id === "drawer") $("#drawer").classList.add("hidden"); };
-$("#btn-scan").onclick = () => { restoreMode = false; show("v-scan"); };
+$("#btn-scan").onclick = () => show("v-scan");
 $("#btn-menu").onclick = () => show("v-menu");
 $("#btn-cert").onclick = () => openCert();
 
@@ -221,11 +238,10 @@ function renderInstall(){
 function requestPersist(){ try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){} }
 
 // ---------- Kamera / QR okuma ----------
-let stream = null, raf = 0, detector = null, restoreMode = false, busy = false;
+let stream = null, raf = 0, detector = null, busy = false;
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 async function startCam(){
-  $("#scan-title").textContent = restoreMode ? "Kurtarma QR'ını okut" : "QR kodu çerçeveye getir";
   const msg = $("#cam-msg"); msg.classList.add("hidden"); busy = false;
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     msg.textContent = "Bu tarayıcı kameraya izin vermiyor. Kodu aşağıya yazabilirsin."; msg.classList.remove("hidden"); return;
@@ -279,8 +295,7 @@ $("#manual-form").onsubmit = e => {
 // QR içeriğini çöz: istasyon kodu, kurtarma kodu ya da giriş QR'ı
 function parse(text){
   const t = String(text).trim();
-  let m = t.match(/[#?&]r=([A-Za-z0-9_\-]+)/); if (m) return { type:"restore", value:m[1] };
-  m = t.match(/[#?&]s=([A-Za-z0-9\-]+)/);     if (m) return { type:"code", value:m[1].toUpperCase() };
+  let m = t.match(/[#?&]s=([A-Za-z0-9\-]+)/);     if (m) return { type:"code", value:m[1].toUpperCase() };
   m = t.toUpperCase().replace(/\s/g,"").match(/^([A-Z]{3})-?([A-Z0-9]{4})$/); if (m) return { type:"code", value:`${m[1]}-${m[2]}` };
   try { const u = new URL(t); if (u.origin === location.origin) return { type:"entry" }; } catch(e){}
   return { type:"unknown" };
@@ -289,8 +304,6 @@ const goHome = () => show(S ? "v-home" : "v-welcome", false);
 const retry = () => show("v-scan", false);
 function handleText(text){
   const p = parse(text);
-  if (p.type === "restore") return doRestore(p.value);
-  if (restoreMode) return modal("🤔","Bu bir kurtarma QR'ı değil","Kaydettiğin kurtarma QR'ını okutmalısın.",[{label:"Tekrar dene",onClick:retry},{label:"Vazgeç",cls:"btn-ghost",onClick:goHome}]);
   if (!S) return goHome();
   if (p.type === "code") return handleCode(p.value);
   if (p.type === "entry") return modal("🚪","Bu giriş QR'ı","Pasaportun zaten açık! Şimdi akvaryumdaki görev QR'larını bul.",[{label:"Tamam",onClick:goHome}]);
@@ -320,7 +333,8 @@ function openQuiz(st){
         setTimeout(() => award(st), 800);
       } else {
         el.classList.add("wrong"); el.disabled = true;
-        msg.textContent = "Olmadı! Tabelaya bir daha bak ve tekrar dene."; msg.style.color = "var(--bad)";
+        // Kaybetmek yok: yanlış cevapta yön gösteren ipucu, istediği kadar deneyebilir
+        msg.textContent = "Neredeyse! 💡 İpucu: " + (st.quiz.clue || "Tabelaya bir daha bak."); msg.style.color = "var(--sea2)";
         if (navigator.vibrate) navigator.vibrate([40,40,40]);
       }
     };
@@ -437,44 +451,8 @@ $("#btn-share").onclick = async () => {
   document.body.appendChild(a); a.click(); a.remove();
 };
 
-// ---------- Kurtarma kodu ----------
-function b64u(s){ return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
-function unb64u(s){ s = s.replace(/-/g,"+").replace(/_/g,"/"); while (s.length % 4) s += "="; return decodeURIComponent(escape(atob(s))); }
-function sum(s){ let h = 2166136261; for (const ch of s + SALT) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36).slice(0,5); }
-function recoveryPayload(){
-  const got = ST.filter(st => S.badges[st.id]).map(st => st.id).join(",");
-  const body = [S.id, S.name, S.avatar, got].join("|");
-  return b64u(body + "|" + sum(body));
-}
-function recoveryUrl(){ return location.origin + location.pathname + "#r=" + recoveryPayload(); }
-function renderMenu(){
-  const qr = qrcode(0, "M"); qr.addData(recoveryUrl()); qr.make();
-  $("#rec-qr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
-  $("#rec-id").textContent = `${S.name} · Kaşif #${S.id} · ${count()}/${ST.length} damga`;
-  $("#ver").textContent = `${D.aquarium} · ${D.season}`;
-}
-function doRestore(payload){
-  restoreMode = false;
-  let parts;
-  try { parts = unb64u(payload).split("|"); } catch(e){ parts = []; }
-  const [id, name, avt, got, chk] = parts;
-  if (parts.length !== 5 || sum([id,name,avt,got].join("|")) !== chk) {
-    return modal("⚠️","Kurtarma kodu bozuk","Bu QR okunamadı. Ekran görüntüsünün net olduğundan emin ol.",[{label:"Tamam",onClick:goHome}]);
-  }
-  const ids = got ? got.split(",") : [];
-  const apply = () => {
-    const badges = S && S.id === id ? S.badges : {};
-    ST.forEach(st => { if (ids.includes(st.id) && !badges[st.id]) badges[st.id] = Date.now(); });
-    S = { v:1, id, name, avatar: AVATARS.includes(avt) ? avt : AVATARS[0], badges, created:(S && S.created) || Date.now() };
-    save(); requestPersist(); stack = [];
-    modal(S.avatar,"Damgaların geri geldi!",`Tekrar hoş geldin ${name}! ${count()} damgan pasaportunda.`,[{label:"Damga sayfam",onClick:() => show("v-home",false)}]);
-  };
-  if (S && S.id !== id && count() > 0) {
-    modal("🔄","Pasaport değişsin mi?",`Bu telefondaki ${S.name} pasaportu yerine ${name} pasaportu yüklenecek.`,
-      [{label:"Evet, yükle",onClick:apply},{label:"Vazgeç",cls:"btn-ghost",onClick:goHome}]);
-  } else apply();
-}
-$("#btn-restore-scan").onclick = () => { restoreMode = true; show("v-scan"); };
+// ---------- Menü ----------
+function renderMenu(){ $("#howto-menu").innerHTML = howtoHTML(); $("#ver").textContent = `${D.aquarium} · ${D.season}`; }
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; leafIdx = null; renderWelcome(); show("v-welcome",false); }},
   {label:"Vazgeç",cls:"btn-ghost"}]);
@@ -485,7 +463,6 @@ function readHash(){
   const h = location.hash; if (!h || h.length < 3) return;
   window.history.replaceState(null, "", location.pathname + location.search);
   const p = parse(h);
-  if (p.type === "restore") return doRestore(p.value);
   if (p.type === "code") { if (S) handleCode(p.value); else pending = p.value; }
 }
 window.addEventListener("hashchange", readHash);
