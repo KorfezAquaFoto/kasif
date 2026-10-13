@@ -323,14 +323,14 @@ async function drawCert(){
   const perRow = Math.ceil(ST.length / 2), size = 150, gap = 18;
   ST.forEach((st, i) => {
     const row = i < perRow ? 0 : 1, inRow = row === 0 ? perRow : ST.length - perRow, k = row === 0 ? i : i - perRow;
-    const total = inRow*size + (inRow-1)*gap, cx = (W-total)/2 + k*(size+gap) + size/2, cy = 958 + row*(size+10);
+    const total = inRow*size + (inRow-1)*gap, cx = (W-total)/2 + k*(size+gap) + size/2, cy = 944 + row*(size+8);
     if (!imgs[i]) return;
     x.save(); x.translate(cx, cy); x.rotate(ROT[i % ROT.length] * Math.PI / 180);
     x.drawImage(imgs[i], -size/2, -size/2, size, size); x.restore();
   });
   const d = new Date().toLocaleDateString("tr-TR", { day:"numeric", month:"long", year:"numeric" });
-  x.fillStyle = "#10264d"; x.font = `800 32px ${F}`; x.fillText(d, W/2, 1230);
-  x.fillStyle = "#6a7891"; x.font = `600 28px ${F}`; x.fillText(`Kaşif #${S.id}`, W/2, 1268);
+  x.fillStyle = "#10264d"; x.font = `800 32px ${F}`; x.fillText(d, W/2, 1204);
+  x.fillStyle = "#6a7891"; x.font = `600 28px ${F}`; x.fillText(`Kaşif #${S.id}`, W/2, 1238);
   return new Promise(r => c.toBlob(r, "image/png"));
 }
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
