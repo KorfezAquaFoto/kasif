@@ -388,7 +388,7 @@ h1,h2,h3,.btn,.pill,.tb-title,.me b{font-weight:700}
 #v-welcome.opening::before{content:"";position:absolute;inset:10% 0;background:radial-gradient(ellipse at center,#7fe3ff35,transparent 65%);z-index:-1;pointer-events:none}
 #v-welcome.opening::after{content:"✦  ✧  ✦";position:absolute;top:12%;left:0;right:0;text-align:center;font-size:30px;letter-spacing:32px;color:#ffe28a;pointer-events:none;animation:sparkle 1.8s ease-in-out infinite}
 .opening .sheet{display:none}
-.opening .cover-wrap{flex:0;width:100%;min-height:0;padding:0;transform:none;display:flex;justify-content:center;align-items:center}
+.opening .cover-wrap{flex:none;width:100%;min-height:0;padding:0;transform:none;display:flex;justify-content:center;align-items:center}
 .opening .book-open{width:min(220px,40vw,calc(var(--app-height)*.40));height:auto;max-width:none;aspect-ratio:.7;transform:translateX(45%)}
 .opening .ready-msg{position:relative;height:auto;margin:0;max-width:95%;padding:12px 18px;background:#fff8ec;color:#10264d;border:2px solid #f5bd3a;border-radius:24px;box-shadow:0 6px 0 #073361,0 12px 30px #0003;transform:none;font-size:19px;line-height:1.4;opacity:1;transition:opacity .4s}
 .opening .idpage{border:2px solid #efd597}.opening .hello-hi{font-weight:700}.opening .hello-av{box-shadow:0 5px 0 #b7d6e9}.opening .flow{font-size:1.3em}

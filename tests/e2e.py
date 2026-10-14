@@ -45,6 +45,8 @@ async def main():
       await pg.fill('#in-name','Kaşif');await pg.click('#btn-start');await pg.wait_for_timeout(1200)
       opening=await pg.locator('.opening .book-open').bounding_box()
       assert opening and abs(opening['y']+opening['height']/2-height/2) < height*.15,(prefix,opening)
+      ready=await pg.locator('#ready-msg').bounding_box()
+      assert ready and opening['y']+opening['height'] <= ready['y']+2,(prefix,'opening overlap',opening,ready)
       await pg.screenshot(path=str(OUT/(prefix+'-opening.png')))
       await pg.wait_for_timeout(1600)
       await fits(pg,prefix+'-home')
