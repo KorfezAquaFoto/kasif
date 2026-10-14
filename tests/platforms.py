@@ -52,6 +52,7 @@ async def main():
   await ctx.add_init_script('''window.__denySave=true;const original=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==='okyanus-kasifi-v1'&&window.__denySave)throw new DOMException('Blocked','QuotaExceededError');return original.call(this,k,v)}''')
   pg=await ctx.new_page();await pg.goto(B);await pg.fill('#in-name','Kaşif');await pg.click('#btn-start');await pg.locator('#modal:not(.hidden)').wait_for()
   assert 'kaydedilemedi' in await pg.locator('#modal-title').inner_text()
+  await pg.wait_for_timeout(600)
   await pg.screenshot(path=str(OUT/'storage-warning.png'))
   await pg.get_by_role('button',name='Oynamaya devam et',exact=True).click();await pg.locator('#v-home.active').wait_for()
   await pg.evaluate('window.__denySave=false');await pg.click('#btn-menu');await pg.click('#save-retry')
