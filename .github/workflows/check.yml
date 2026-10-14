@@ -5,20 +5,49 @@ permissions:
 jobs:
   mobile-flow:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install playwright pillow fonttools brotli
-      - run: python tests/prepare_font.py
-      - run: python -m playwright install --with-deps chromium webkit
-      - run: python tests/responsive.py
-      - run: python tests/platforms.py
+      - run: pip install playwright pillow
+      - run: python -m playwright install --with-deps chromium
       - run: python tests/e2e.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: telefon-ekranlari
+          name: gorev-ekranlari
+          path: tests/out/*.png
+  mobile-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install playwright pillow
+      - run: python -m playwright install --with-deps chromium
+      - run: python tests/responsive.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: telefon-yerlesimleri
+          path: tests/out/*.png
+  browser-platforms:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install playwright pillow
+      - run: python -m playwright install --with-deps chromium webkit
+      - run: python tests/platforms.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tarayici-ve-kayit-kontrolleri
           path: tests/out/*.png
