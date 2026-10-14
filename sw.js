@@ -1,8 +1,8 @@
 // Çevrimdışı çalışma: ilk açılışta tüm dosyalar telefona kaydedilir.
 // İçerik değiştiğinde VERSION'ı artırın; telefonlar bir sonraki internet bağlantısında günceller.
-const VERSION = "kasif-v19";
+const VERSION = "kasif-v20";
 const FILES = [
-  "./", "./Logo.png", "./index.html", "./styles.css", "./app.js", "./data.js", "./art.js",
+  "./", "./KörfezAqua Logo/Korfez_Logo_yatay_1000x232px-e1785397178582.png", "./index.html", "./styles.css", "./app.js", "./data.js", "./art.js",
   "./vendor/jsQR.js", "./vendor/qrcode.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png", "./icons/apple-touch-icon.png",
   "./fonts/dynapuff-variable.ttf", "./fonts/baloo-2-latin-600-normal.woff2", "./fonts/baloo-2-latin-ext-600-normal.woff2",

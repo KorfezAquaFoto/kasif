@@ -508,3 +508,14 @@ h1,h2,h3,.btn,.pill,.me b,.tb-title,.pp-title,.hello-hi{font-family:var(--displa
 @media(max-height:520px){.welcome-brand{height:46px;margin-bottom:5px}.passport-inner>.brand-logo{height:32px}.final-cover .passport-inner>.brand-logo{height:25px}#learn-region{font-size:17px;grid-template-columns:20px minmax(0,1fr) auto;gap:5px}.region-counter{font-size:13px;padding:4px}}
 @media(orientation:landscape) and (max-height:520px){.welcome-brand{height:42px;width:185px}#learn-region{grid-template-columns:1fr auto}.region-symbol{display:none}.region-counter{font-size:13px}#learn-region{font-size:17px}}
 
+
+/* Şeffaf yatay marka, doğrudan okyanus ve pasaport zemini üzerinde. */
+.brand-logo,.welcome-brand .brand-logo,.passport-inner>.brand-logo,.final-cover .passport-inner>.brand-logo{background:transparent;border:0;border-radius:0;padding:0;box-shadow:none;overflow:visible}
+.brand-logo img{display:block;width:100%;height:100%;object-fit:contain}
+.welcome-brand{width:min(275px,78vw);height:64px;filter:none;margin:0 auto 10px}
+.passport-inner>.brand-logo{width:90%;height:min(5dvh,38px);min-height:22px}
+.final-cover .passport-inner>.brand-logo{width:100%;height:40px;min-height:22px}
+#v-welcome .field>span,#v-welcome .field-label{display:block;width:100%;text-align:center}
+@media(max-height:680px){.welcome-brand{height:52px;margin-bottom:7px}.passport-inner>.brand-logo{height:30px}.final-cover .passport-inner>.brand-logo{height:30px}}
+@media(max-height:520px){.welcome-brand{height:42px;margin-bottom:5px}.passport-inner>.brand-logo,.final-cover .passport-inner>.brand-logo{height:25px}}
+@media(orientation:landscape) and (max-height:520px){.welcome-brand{width:230px;height:42px}}

@@ -495,7 +495,7 @@ function svgImg(svg){
 }
 let logoImagePromise=null;
 function brandImage(){
-  if(!logoImagePromise)logoImagePromise=new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(new Error("Logo yüklenemedi"));i.src="Logo.png";});
+  if(!logoImagePromise)logoImagePromise=new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(new Error("Logo yüklenemedi"));i.src="KörfezAqua Logo/Korfez_Logo_yatay_1000x232px-e1785397178582.png";});
   return logoImagePromise;
 }
 
@@ -522,8 +522,7 @@ async function drawCert(){
   x.textAlign = "left";
   x.fillStyle = "#7a4a00"; x.font = `700 24px ${F}`; x.fillText("KEŞİF PASAPORTU", 120, 110);
   const brand=await brandImage();
-  rr(x,760,70,235,145,15);x.fillStyle="#ffffff";x.fill();
-  x.drawImage(brand,888,1426,2724,1695,773,80,209,130);
+  x.drawImage(brand,390,1265,300,69.6);
   x.fillStyle = "#10264d"; x.font = `700 58px ${F}`; x.fillText("Okyanus Kaşifi", 120, 186);
   x.fillStyle = "#7a4a00"; x.font = `600 34px ${F}`; x.fillText("pasaportu tamamlandı!", 120, 226);
   // kaşif kartı
@@ -557,7 +556,7 @@ async function drawCert(){
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v19`; renderInstall(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v20`; renderInstall(); }
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
   {label:"Vazgeç",cls:"btn-ghost"}]);
