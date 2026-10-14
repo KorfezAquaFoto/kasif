@@ -7,11 +7,15 @@ B='http://127.0.0.1:8767/'
 KEY='okyanus-kasifi-v1'
 SEED={'v':1,'id':'1234','name':'Kaşif','avatar':'vatoz','badges':{},'created':1}
 async def bounds(pg,label):
- await pg.wait_for_timeout(150)
+ await pg.wait_for_timeout(350)
  result=await pg.evaluate('''()=>{
   const v=document.querySelector('.view.active'),vr=v.getBoundingClientRect();
   return [...v.querySelectorAll('button,input,#hint-copy,.quick-tip')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.height&&(r.top<vr.top-2||r.bottom>vr.bottom-4||r.left<vr.left-2||r.right>vr.right+2)}).map(e=>e.id||e.className);
  }''')
+ if result:
+  print('PLATFORM_FAIL_BASE64:'+base64.b64encode(await pg.screenshot(type='jpeg',quality=75)).decode(),flush=True)
+  extra=await pg.evaluate('({height:innerHeight,visual:visualViewport.height,app:getComputedStyle(document.documentElement).getPropertyValue("--app-height"),scrollY,layout:document.documentElement.dataset.layout})')
+  print('PLATFORM_BOUNDS:'+str(extra),flush=True)
  assert not result,(label,result)
 async def main():
  server=http.server.ThreadingHTTPServer(('127.0.0.1',8767),functools.partial(http.server.SimpleHTTPRequestHandler,directory=str(ROOT)))

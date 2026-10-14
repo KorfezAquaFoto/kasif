@@ -389,6 +389,7 @@ function fitViewport(){
   root.dataset.layout=h<530?'tiny':h<690?'short':'roomy';
   root.dataset.narrow=w<360?'true':'false';
   root.classList.toggle('keyboard-open',h<400 && document.activeElement.matches('input'));
+  if(!document.activeElement.matches('input'))window.scrollTo(0,0);
   scheduleFit();
 }
 window.addEventListener('resize',fitViewport);
