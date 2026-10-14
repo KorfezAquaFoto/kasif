@@ -603,3 +603,4 @@ html[data-layout=tiny] .learn-card h2{font-size:23px}
 }
 
 .hint-subject{padding-bottom:4px}.hint-subject>div:last-child{flex:1;min-width:0}
+.view[data-density=minimal] .hint-subject{display:none}.view[data-density=minimal] .guide-bubble p{line-height:1.28}.view[data-density=minimal] .guide-bubble{padding:7px}.view[data-density=minimal] .hint-card{padding:8px}html[data-narrow=true][data-layout=tiny] .hint-pager b{font-size:18px}html[data-narrow=true][data-layout=tiny] .hint-actions .btn{font-size:14px;padding:7px}
