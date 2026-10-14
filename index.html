@@ -74,12 +74,18 @@
     <div class="tb-right"><span class="pill" id="me-count"></span><button class="icon-btn help-btn" id="btn-help" aria-label="Nasıl oynanır?">?</button><button class="icon-btn" id="btn-menu" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
   </header>
 
-  <!-- Pasaport sayfası: aranan canlı + 9 damga yeri -->
-  <div class="page pp">
-    <div class="pp-seal" id="pp-seal"></div>
-    <div class="target hidden" id="target"></div>
-    <div class="grid9" id="grid9"></div>
+  <!-- Macera yolu: Başla'dan Hazine'ye zikzak yol, üstünde 9 durak -->
+  <div class="road" id="road">
+    <svg class="road-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <polyline class="road-bed" points="18,97 18,79 82,79 82,51 18,51 18,23 82,23 82,4"/>
+      <polyline class="road-line" points="18,97 18,79 82,79 82,51 18,51 18,23 82,23 82,4"/>
+    </svg>
+    <span class="road-start">🚩 Başla</span>
+    <button type="button" class="road-end" id="road-end" aria-label="Hazine"><span class="chest">🎁</span><b>Hazine</b></button>
+    <div id="road-nodes"></div>
   </div>
+  <!-- Kaşif dostunun ipucu balonu -->
+  <div class="target hidden" id="target"></div>
 
   <div class="done-banner hidden" id="done-banner">
     <div class="trophy">🏆</div>

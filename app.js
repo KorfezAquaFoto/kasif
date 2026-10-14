@@ -93,16 +93,18 @@ function helloHTML(){
     <p class="hello-sub">${ST.length} damga seni bekliyor</p><div class="flow">${FLOW}</div></div>`;
 }
 
-// ---------- Ana ekran: hedef + 9 damga yeri ----------
-// Çocuğun ilk gördüğü yer oyunun kendisi: üstte aradığı canlı, altta tek sayfada 9 damga yeri.
-let target = null;   // aranan görev; boş bir yere dokununca değişir
+// ---------- Ana ekran: macera yolu ----------
+// Çocuğun ilk gördüğü yer oyunun kendisi: Başla'dan Hazine'ye zikzak bir yol, üstünde 9 durak.
+// Kaşif dostu aranan durağın üstünde durur; ipucu alttaki konuşma balonunda.
+const ROAD = [[18,79],[50,79],[82,79],[82,51],[50,51],[18,51],[18,23],[50,23],[82,23]];   // % konumlar, 3 sıra zikzak
+let target = null;   // aranan görev; boş bir durağa dokununca değişir
 function renderHome(){
   $("#me-av").innerHTML = av(S.avatar); $("#me-name").textContent = S.name;
   const n = count(), t = ST.length;
   $("#me-count").textContent = `⭐ ${n}/${t}`;
   $("#done-banner").classList.toggle("hidden", n !== t);
   if (!target || S.badges[target]) target = (ST.find(s => !S.badges[s.id]) || {}).id || null;
-  renderTarget(); renderGrid();
+  renderTarget(); renderRoad();
   $("#btn-scan").classList.toggle("pulse", n === 0);
   S.last = null;
   renderInstall();
@@ -110,25 +112,28 @@ function renderHome(){
 function renderTarget(){
   const st = ST.find(s => s.id === target), box = $("#target");
   box.classList.toggle("hidden", !st); if (!st) return;
-  box.innerHTML = `<div class="tg-art">${artSVG(st.art)}<b>?</b></div>
-    <div class="tg-txt"><p class="tg-k">🔍 Bunu bul!</p><p class="tg-hint">${esc(st.hint)}</p>
-    ${st.where ? `<p class="tg-where">📍 ${esc(st.where)}</p>` : ""}</div>`;
+  box.innerHTML = `<span class="tg-av">${av(S.avatar)}</span><div class="tg-txt"><p class="tg-k">🔍 Beni bul! <small>${ST.indexOf(st) + 1}. durak</small></p>
+    <p class="tg-hint">${esc(st.hint)}</p>${st.where ? `<p class="tg-where">📍 ${esc(st.where)}</p>` : ""}</div>`;
 }
-function renderGrid(){
-  $("#grid9").innerHTML = ST.map((st, i) => {
-    const has = !!S.badges[st.id];
-    return `<button type="button" class="cell ${has ? "got" : "locked"}${st.id === target ? " on" : ""}" data-id="${st.id}" style="--rot:${ROT[i % ROT.length]}deg" aria-label="${esc(has ? st.name : "Görev " + (i + 1))}">
-      ${has ? stampSVG(st, { date: S.badges[st.id] }) : `<span class="sil">${artSVG(st.art)}</span><span class="num">${i + 1}</span>`}</button>`;
+function renderRoad(){
+  const done = count() === ST.length;
+  $("#road-nodes").innerHTML = ST.map((st, i) => {
+    const [x, y] = ROAD[i] || [50, 50], has = !!S.badges[st.id], on = st.id === target;
+    return `<button type="button" class="stop ${has ? "got" : "locked"}${on ? " on" : ""}" data-id="${st.id}" style="left:${x}%;top:${y}%;--rot:${ROT[i % ROT.length]}deg" aria-label="${esc(has ? st.name : (i + 1) + ". durak")}">
+      ${has ? stampSVG(st, { date: S.badges[st.id] }) : `<span class="sil">${artSVG(st.art)}</span>`}<span class="num">${i + 1}</span>
+      ${on ? `<span class="me-pin">${av(S.avatar)}</span>` : ""}</button>`;
   }).join("");
-  $("#pp-seal").innerHTML = count() === ST.length ? finalSealSVG() : "";
+  $("#road-end").classList.toggle("done", done);
+  $("#road-end").querySelector(".chest").innerHTML = done ? finalSealSVG() : "🎁";
 }
-$("#grid9").addEventListener("click", e => {
-  const b = e.target.closest(".cell"); if (!b) return;
+$("#road-nodes").addEventListener("click", e => {
+  const b = e.target.closest(".stop"); if (!b) return;
   const st = ST.find(s => s.id === b.dataset.id);
   if (S.badges[st.id]) return openDrawer(st, true);
-  target = st.id; renderTarget(); renderGrid();
-  $("#target").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  target = st.id; renderTarget(); renderRoad();
 });
+$("#road-end").onclick = () => count() === ST.length ? openCert()
+  : modal("🎁", "Hazine burada!", `${ST.length} damganın hepsini topla, hazineyi aç!`, [{ label: "Tamam" }]);
 function openDrawer(st, got){
   const art = $("#dr-art"); art.innerHTML = got ? stampSVG(st, { date: S.badges[st.id] }) : artSVG(st.art);
   art.classList.toggle("sil", !got);
