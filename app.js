@@ -550,7 +550,6 @@ async function drawCert(){
   // final damgası sağ üstte, başlığa taşarak
   const seal = await svgImg(finalSealSVG());
   if (seal) { x.save(); x.translate(900, 390); x.rotate(-8 * Math.PI / 180); x.drawImage(seal, -90, -104, 180, 207); x.restore(); }
-  x.fillStyle = "#fff"; x.font = `700 34px ${F}`; x.fillText("Denizleri keşfetmeye devam! 🌊", W/2, H-46);
   return new Promise(r => c.toBlob(r, "image/png"));
 }
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
