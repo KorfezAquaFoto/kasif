@@ -12,6 +12,7 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 // ---------- Kayıt ----------
+let storageAlertShown = false;
 let S = load();
 function load(){
   try{
@@ -20,7 +21,18 @@ function load(){
     return s || null;
   }catch(e){ return null; }
 }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function save(){
+  try {
+    localStorage.setItem(KEY,JSON.stringify(S));
+    document.querySelector('#save-warning')?.classList.add('hidden');document.querySelector('#save-retry')?.classList.add('hidden');storageAlertShown=false;return true;
+  } catch(e) {
+    document.querySelector('#save-warning')?.classList.remove('hidden');
+    if(!storageAlertShown){storageAlertShown=true;setTimeout(()=>modal('⚠️','İlerlemen kaydedilemedi','Bu telefonda kayıt yapılamadı. Sayfayı kapatırsan damgaların kaybolabilir. İzinleri kontrol edip yeniden deneyebilirsin.',[
+      {label:'Tekrar dene',onClick:()=>{storageAlertShown=false;save();}},
+      {label:'Oynamaya devam et',cls:'btn-ghost'}]),0);}
+    return false;
+  }
+}
 function count(){ return S ? ST.filter(st => S.badges[st.id]).length : 0; }
 function newId(){ return String(1000 + Math.floor(Math.random()*9000)); }
 const av = key => artSVG(AVATARS.includes(key) ? key : AVATARS[0]);
@@ -70,6 +82,7 @@ function renderWelcome(){
     b.onclick = () => { avatar = a; renderWelcome(); }; box.appendChild(b);
   });
 }
+$("#in-name").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();e.currentTarget.blur();}});
 $("#btn-start").onclick = () => {
   const name = $("#in-name").value.trim().slice(0,16) || "Kaşif";
   S = { v:1, id:newId(), name, avatar, badges:{}, created:Date.now() };
@@ -359,11 +372,13 @@ document.querySelectorAll("[data-listen]").forEach(b => b.onclick = () => {
 function fitContent(){
   const v=document.querySelector('.view.active');if(!v)return;
   v.removeAttribute('data-density');
+  v.classList.remove('text-overflow');
   const card=v.querySelector('.learn-card,.hint-card');
   if(card){
     const crowded=()=>card.scrollHeight>card.clientHeight+2;
     if(crowded())v.dataset.density='compact';
     if(crowded())v.dataset.density='minimal';
+    v.classList.toggle('text-overflow',crowded());
   }
 }
 let fitFrame=0;
@@ -579,7 +594,8 @@ async function drawCert(){
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v22`; renderInstall(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v23`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall(); }
+$("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
   {label:"Vazgeç",cls:"btn-ghost"}]);

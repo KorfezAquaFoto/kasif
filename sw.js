@@ -1,11 +1,11 @@
 // Çevrimdışı çalışma: ilk açılışta tüm dosyalar telefona kaydedilir.
 // İçerik değiştiğinde VERSION'ı artırın; telefonlar bir sonraki internet bağlantısında günceller.
-const VERSION = "kasif-v22";
+const VERSION = "kasif-v23";
 const FILES = [
   "./", "./logo2.png", "./index.html", "./styles.css", "./app.js", "./data.js", "./art.js",
-  "./vendor/jsQR.js", "./vendor/qrcode.js", "./manifest.webmanifest",
-  "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png", "./icons/apple-touch-icon.png",
-  "./fonts/dynapuff-variable.ttf", "./fonts/baloo-2-latin-600-normal.woff2", "./fonts/baloo-2-latin-ext-600-normal.woff2",
+  "./vendor/jsQR.js", "./manifest.webmanifest",
+  "./icons/icon-192.png", "./icons/apple-touch-icon.png",
+  "./fonts/dynapuff-variable.woff2", "./fonts/baloo-2-latin-600-normal.woff2", "./fonts/baloo-2-latin-ext-600-normal.woff2",
   "./fonts/baloo-2-latin-800-normal.woff2", "./fonts/baloo-2-latin-ext-800-normal.woff2"
 ];
 
@@ -15,7 +15,7 @@ self.addEventListener("install", e => {
 
 self.addEventListener("activate", e => {
   e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k))))
+    caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith("kasif-") && k !== VERSION).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });

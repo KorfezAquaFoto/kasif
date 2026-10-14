@@ -64,8 +64,6 @@ h1,h2,h3{margin:0;line-height:1.1;font-weight:800}
 .icon-btn svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 
 /* ---------- Karşılama / pasaport kapağı ---------- */
-.cover-wrap{perspective:1400px;display:flex;justify-content:center;padding:18px 0 8px}
-.book-open{position:relative;width:min(250px,64vw);aspect-ratio:.7;transition:transform .9s cubic-bezier(.5,0,.2,1)}
 .idpage{position:absolute;inset:0;border-radius:6px 18px 18px 6px;background-color:var(--paper);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cg fill='none' stroke='%2338b6d8' stroke-opacity='.18' stroke-width='1.4'%3E%3Ccircle cx='14' cy='18' r='6'/%3E%3Ccircle cx='62' cy='12' r='3.5'/%3E%3Ccircle cx='48' cy='54' r='9'/%3E%3Ccircle cx='80' cy='70' r='4'/%3E%3Ccircle cx='18' cy='76' r='3'/%3E%3C/g%3E%3C/svg%3E");padding:12px 10px 10px 14px;color:var(--ink);opacity:0;transition:opacity .3s .2s;overflow:hidden;box-shadow:inset 10px 0 12px -8px rgba(0,0,0,.25),0 18px 34px rgba(0,0,0,.4)}
 .idpage{display:flex;flex-direction:column;justify-content:center}
 .idpage .hello{font-size:clamp(9px,3vw,11.5px)}
@@ -77,7 +75,6 @@ h1,h2,h3{margin:0;line-height:1.1;font-weight:800}
 .opening .idpage{opacity:1}
 .opening .passport{animation:openbook 1.1s .15s cubic-bezier(.6,0,.3,1) forwards}
 .opening .sheet{opacity:0;transform:translateY(40px);pointer-events:none}
-.sheet{transition:opacity .35s,transform .35s}
 .passport{position:absolute;inset:0;transform-style:preserve-3d;border-radius:8px 18px 18px 8px;
   background:radial-gradient(120% 80% at 70% 20%,#1d4a8a 0%,#123266 45%,#0b2148 100%);
   box-shadow:inset 10px 0 12px -6px rgba(0,0,0,.55),inset -2px 0 0 rgba(255,255,255,.08),0 22px 40px rgba(0,0,0,.45);
@@ -92,17 +89,8 @@ h1,h2,h3{margin:0;line-height:1.1;font-weight:800}
 .pp-emblem{width:62%;color:var(--gold);filter:drop-shadow(0 1px 0 rgba(0,0,0,.4))}
 .pp-title{font-size:20px;letter-spacing:.06em;line-height:1.05;text-shadow:0 1px 0 rgba(0,0,0,.4)}
 .pp-title span{font-size:15px;letter-spacing:.3em}
-.sheet{background:var(--paper);color:var(--ink);border-radius:26px;padding:20px 18px 18px;margin-top:14px;box-shadow:0 18px 40px rgba(0,0,0,.3)}
-.sheet-lead{margin:0 0 14px;text-align:center;color:var(--muted);font-size:16px}
-.sheet-lead b{color:var(--ink)}
-.field{display:block;margin-bottom:12px}
-.field span,.field-label{display:block;font-weight:800;font-size:14px;margin:0 0 6px 4px;color:var(--sea)}
 input{width:100%;font:inherit;font-size:19px;padding:12px 16px;border-radius:16px;border:2px solid #e4d6b8;background:#fff;color:var(--ink);outline:none}
 input:focus{border-color:var(--sea2)}
-.avatars{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:18px}
-.avatars button{aspect-ratio:1;border-radius:50%;border:3px solid transparent;background:#e3f0fb;cursor:pointer;padding:3px;transition:transform .15s}
-.avatars button svg{width:100%;height:100%;display:block}
-.avatars button.sel{border-color:var(--gold2);background:#fff1cc;transform:scale(1.12)}
 
 /* ---------- Üst bar ---------- */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;min-height:46px}
@@ -279,7 +267,6 @@ body.scan-mode .ocean{filter:brightness(.4)}
 .pill{white-space:nowrap}
 .me{min-width:0}
 .me b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:42vw}
-.cover-wrap{transition:transform .9s cubic-bezier(.5,0,.2,1)}
 .opening .cover-wrap{transform:translateY(var(--dy,0px))}
 .opening .ready-msg{transform:translateY(var(--dy,0px))}
 
@@ -331,12 +318,6 @@ button{touch-action:manipulation}
 .task-progress{display:flex;justify-content:center;gap:6px;flex-shrink:0}
 .task-progress span{font-size:12px;flex:1;text-align:center;border-radius:99px;padding:5px 4px;background:#ffffff16;color:#c4dbef}
 .task-progress .active{background:var(--gold);color:#4a2d00;font-weight:800}
-.learn-card{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:18px}
-.learn-card h2{font-size:30px}.learn-art{width:clamp(90px,25vh,190px);height:clamp(90px,25vh,190px);flex-shrink:1;min-height:50px}.learn-art svg{width:100%;height:100%}
-#learn-copy{width:100%}.intro-facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-.intro-facts li{display:flex;align-items:center;gap:12px;background:var(--paper2);border-radius:16px;padding:12px;font-size:17px;line-height:1.35}
-.intro-facts li span{font-size:24px;flex:none}.observe-text{font-size:21px;text-align:center;line-height:1.4;margin:0}.observe-note{text-align:center;font-size:14px;color:var(--muted);margin:10px 0 0}
-.learn-where{font-size:14px;color:var(--sea2);margin:0;text-align:center}
 #learn-next{flex-shrink:0;min-height:52px}
 /* Yol, dokuz durak ve eylem düğmeleri bir ekrandadır. */
 #v-home .road{flex:1;min-height:0;height:auto;margin:46px 0 4px}
@@ -350,8 +331,6 @@ button{touch-action:manipulation}
 #install,#offline-ok{display:none!important}.done-banner{margin:0;padding:10px;flex-shrink:0}.done-banner .trophy{font-size:26px}
 .me-av{width:42px;height:42px}.me b{font-size:18px;max-width:28vw}.pill{font-size:16px;padding:4px 10px}.tb-right{gap:6px}
 /* Açılış: kitap küçülür, isim ve seçimler okunur kalır. */
-#v-welcome{justify-content:center;gap:0}.cover-wrap{flex:1;min-height:0;padding:4px 0;align-items:center}.book-open{height:min(34dvh,270px);width:auto;max-width:60vw;aspect-ratio:.7}
-.sheet{flex-shrink:0;margin-top:8px;padding:14px 16px;border-radius:22px}.sheet-lead{font-size:15px;margin-bottom:9px}.field{margin-bottom:8px}.avatars{margin-bottom:12px;gap:6px}
 .pp-brand{font-size:11px}.pp-title{font-size:17px}.pp-title span{font-size:12px}.passport-inner{padding:10px 6px}.ready-msg{font-size:18px}
 /* QR ve elle kod alanı, klavye açıkken de görünür kalır. */
 .cam{flex:1;min-height:60px;aspect-ratio:auto}.manual{margin-top:0;flex-shrink:0;font-size:14px}.manual input{min-width:0}.row{align-items:center}.cam-msg{font-size:14px}
@@ -372,17 +351,17 @@ button{touch-action:manipulation}
 .final .btn{min-height:48px;padding:11px;flex-shrink:0}.final .note{font-size:13px;margin:0}.btn:disabled{opacity:.6;cursor:wait}
 .drawer,.modal{max-height:var(--app-height)}.drawer-box{max-height:calc(var(--app-height) - 50px);padding:16px 18px calc(var(--safe-b) + 16px)}.drawer-art{width:100px;height:100px;margin:-45px auto 4px}.drawer-box p{font-size:16px;margin:8px 0 12px}.drawer-box h3{font-size:23px}
 .menu{min-height:0}.menu .install{margin:0;font-size:14px}
-@media(max-height:680px){.view.active{gap:7px}.view{padding-left:12px;padding-right:12px}.learn-card{gap:8px;padding:12px}.learn-card h2{font-size:26px}.learn-art{width:130px;height:130px}.intro-facts{gap:7px}.intro-facts li{padding:9px;font-size:16px}.observe-text{font-size:19px}.quiz-art{height:90px;width:90px}.quiz h2{font-size:21px;margin-bottom:10px}.quiz .paper{padding:24px 12px 12px}.opt{font-size:16px;min-height:49px;padding:8px 10px}.quiz-msg{font-size:14px}.btn{font-size:17px;padding:12px}.fact-card p{font-size:16px}.reward h2{font-size:24px}.rw-page{height:185px}.stamp-stage{height:135px;width:135px}.sheet{padding:10px 14px}.sheet-lead{font-size:14px}.book-open{height:28dvh}.field span,.field-label{font-size:13px;margin-bottom:3px}.avatars{margin-bottom:9px}input{padding:9px 12px;font-size:17px}.final-stage{min-height:200px;height:240px}.final-cover{width:150px;height:210px;margin-left:-75px}.final-seal{top:125px;width:105px;margin-left:-52px}.final-tool{top:70px}.final-cover .pp-title{font-size:15px}.final-cover .pp-title span{font-size:11px}.final-h{font-size:22px}.final-p{font-size:15px}}
-@media(max-height:520px){.cover-wrap{display:none}.sheet{margin:0}.learn-art,.quiz-art{display:none}.learn-card{gap:7px}.intro-facts li{font-size:15px;padding:8px}.task-progress span{font-size:11px}.rw-page{height:110px}.stamp-stage{width:78px;height:78px;margin:0 auto}.leaf-hd{font-size:11px}.reward{gap:5px}.reward h2{font-size:21px}.fact-card{padding:8px 12px}.fact-card p{font-size:14px}.fact-card b{font-size:12px}.rw-name{display:none}.rw-count{font-size:14px}.road{margin-top:35px!important}.target{padding:7px 9px}.tg-where{font-size:12px}.tg-k{font-size:16px}.topbar{min-height:44px}.drawer-art{display:none}.drawer-box p{font-size:14px}.drawer-box h3{font-size:20px}.final-stage{height:170px;min-height:170px}.final-cover{width:115px;height:160px;margin-left:-57px}.final-cover .pp-brand{font-size:9px}.final-cover .pp-title{font-size:12px}.final-cover .pp-title span{font-size:9px}.final-seal{top:100px;width:80px;margin-left:-40px}.final-h{font-size:19px}.final-p{font-size:14px}.final{gap:8px}#help .howto{font-size:15px}}
-@media(orientation:landscape) and (max-height:520px){.view{max-width:620px}.learn-card{padding:8px}.intro-facts{grid-template-columns:1fr 1fr}.learn-where{font-size:12px}.learn-card h2{font-size:22px}.quiz h2{font-size:19px}.options{grid-template-columns:repeat(3,1fr)}.opt{font-size:14px;gap:6px;padding:8px}.quiz .paper{padding:12px}.quiz-msg{margin-top:8px}.reward .rw-page{height:92px;max-width:200px}.reward .fact-card{padding:6px 12px}.reward-head{display:none}.final-stage{display:none}.sheet{max-width:430px;margin:auto}.drawer-box{max-width:620px}.stop{width:min(48px,10vw)}.me-pin{display:none}}
+@media(max-height:680px){.view.active{gap:7px}.view{padding-left:12px;padding-right:12px}.quiz-art{height:90px;width:90px}.quiz h2{font-size:21px;margin-bottom:10px}.quiz .paper{padding:24px 12px 12px}.opt{font-size:16px;min-height:49px;padding:8px 10px}.quiz-msg{font-size:14px}.btn{font-size:17px;padding:12px}.fact-card p{font-size:16px}.reward h2{font-size:24px}.rw-page{height:185px}.stamp-stage{height:135px;width:135px}input{padding:9px 12px;font-size:17px}.final-stage{min-height:200px;height:240px}.final-cover{width:150px;height:210px;margin-left:-75px}.final-seal{top:125px;width:105px;margin-left:-52px}.final-tool{top:70px}.final-cover .pp-title{font-size:15px}.final-cover .pp-title span{font-size:11px}.final-h{font-size:22px}.final-p{font-size:15px}}
+@media(max-height:520px){.quiz-art{display:none}.task-progress span{font-size:11px}.rw-page{height:110px}.stamp-stage{width:78px;height:78px;margin:0 auto}.leaf-hd{font-size:11px}.reward{gap:5px}.reward h2{font-size:21px}.fact-card{padding:8px 12px}.fact-card p{font-size:14px}.fact-card b{font-size:12px}.rw-name{display:none}.rw-count{font-size:14px}.road{margin-top:35px!important}.target{padding:7px 9px}.tg-where{font-size:12px}.tg-k{font-size:16px}.topbar{min-height:44px}.drawer-art{display:none}.drawer-box p{font-size:14px}.drawer-box h3{font-size:20px}.final-stage{height:170px;min-height:170px}.final-cover{width:115px;height:160px;margin-left:-57px}.final-cover .pp-brand{font-size:9px}.final-cover .pp-title{font-size:12px}.final-cover .pp-title span{font-size:9px}.final-seal{top:100px;width:80px;margin-left:-40px}.final-h{font-size:19px}.final-p{font-size:14px}.final{gap:8px}#help .howto{font-size:15px}}
+@media(orientation:landscape) and (max-height:520px){.view{max-width:620px}.quiz h2{font-size:19px}.options{grid-template-columns:repeat(3,1fr)}.opt{font-size:14px;gap:6px;padding:8px}.quiz .paper{padding:12px}.quiz-msg{margin-top:8px}.reward .rw-page{height:92px;max-width:200px}.reward .fact-card{padding:6px 12px}.reward-head{display:none}.final-stage{display:none}.drawer-box{max-width:620px}.stop{width:min(48px,10vw)}.me-pin{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.big-stamp,.final-seal{opacity:1}.opening .idpage{opacity:1}}
 
 /* v15: oyuncu tipografi, merkezde kitap açılışı ve belirgin keşif kartı. */
-@font-face{font-family:"DynaPuff";font-style:normal;font-weight:400 700;font-display:swap;src:url("fonts/dynapuff-variable.ttf") format("truetype")}
+@font-face{font-family:"DynaPuff";font-style:normal;font-weight:400 700;font-display:swap;src:url("fonts/dynapuff-variable.woff2") format("woff2")}
 :root{--font:"DynaPuff",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif}
 body{font-weight:500;line-height:1.45}
 h1,h2,h3,.btn,.pill,.tb-title,.me b{font-weight:700}
-.btn{letter-spacing:0;font-size:18px}.eyebrow,.label{letter-spacing:.06em}.intro-facts li{font-size:16px;line-height:1.5}.opt{font-size:16px;line-height:1.35;font-weight:600}.quiz h2{font-size:22px}.quiz-msg{font-weight:500;font-size:14px}.learn-card h2{font-size:28px}.observe-text{font-size:19px}.fact-card p{font-size:16px;line-height:1.5}.pp-title{letter-spacing:.015em}.pp-title span{letter-spacing:.12em}
+.btn{letter-spacing:0;font-size:18px}.eyebrow,.label{letter-spacing:.06em}.opt{font-size:16px;line-height:1.35;font-weight:600}.quiz h2{font-size:22px}.quiz-msg{font-weight:500;font-size:14px}.fact-card p{font-size:16px;line-height:1.5}.pp-title{letter-spacing:.015em}.pp-title span{letter-spacing:.12em}
 /* Açılış boyunca form yerini kitap sahnesine bırakır. */
 #v-welcome.opening{justify-content:center;align-items:center;gap:18px;isolation:isolate}
 #v-welcome.opening::before{content:"";position:absolute;inset:10% 0;background:radial-gradient(ellipse at center,#7fe3ff35,transparent 65%);z-index:-1;pointer-events:none}
@@ -403,17 +382,16 @@ h1,h2,h3,.btn,.pill,.tb-title,.me b{font-weight:700}
 .target .tg-where{font-size:14px;line-height:1.4;margin:0;color:#244d70;font-weight:500}
 #target-learn{width:100%;min-height:46px;padding:11px 10px;font-size:17px;border-radius:16px;box-shadow:0 4px 0 #ad6c00;position:relative}
 #v-home .road{container-type:size}.stop{width:min(70px,19vw,23cqh)}
-.road-start{font-size:11px}.me b{font-size:17px}.pill{font-size:15px}.learn-where{font-size:13px;line-height:1.4}.learn-card{gap:10px}
-@media(max-height:680px){.target{padding:10px 12px;gap:7px}.target-art{width:44px;height:44px}.target-heading{min-height:44px;gap:10px}.target .tg-k{font-size:22px}.target .tg-where{font-size:13px}.target-kicker{font-size:9px}#target-learn{min-height:44px;padding:9px;font-size:16px}.intro-facts li{font-size:15px}.quiz h2{font-size:20px}.opt{font-size:15px}.learn-card h2{font-size:25px}.observe-text{font-size:18px}.fact-card p{font-size:15px}.sheet-lead{font-size:13px}.opening .ready-msg{font-size:17px;padding:10px 14px}}
-@media(max-height:520px){.target{padding:8px 10px;gap:5px}.target .tg-k{font-size:19px}.target .tg-where{font-size:12px}.target-art{width:38px;height:38px}.target-heading{min-height:38px}.target-kicker{font-size:9px}#target-learn{font-size:14px;min-height:42px;padding:8px}.opening .cover-wrap{display:flex}.opening .ready-msg{font-size:15px}.opening::after{display:none}.intro-facts li{font-size:14px}.observe-text{font-size:17px}}
+.road-start{font-size:11px}.me b{font-size:17px}.pill{font-size:15px}
+@media(max-height:680px){.target{padding:10px 12px;gap:7px}.target-art{width:44px;height:44px}.target-heading{min-height:44px;gap:10px}.target .tg-k{font-size:22px}.target .tg-where{font-size:13px}.target-kicker{font-size:9px}#target-learn{min-height:44px;padding:9px;font-size:16px}.quiz h2{font-size:20px}.opt{font-size:15px}.fact-card p{font-size:15px}.opening .ready-msg{font-size:17px;padding:10px 14px}}
+@media(max-height:520px){.target{padding:8px 10px;gap:5px}.target .tg-k{font-size:19px}.target .tg-where{font-size:12px}.target-art{width:38px;height:38px}.target-heading{min-height:38px}.target-kicker{font-size:9px}#target-learn{font-size:14px;min-height:42px;padding:8px}.opening .cover-wrap{display:flex}.opening .ready-msg{font-size:15px}.opening::after{display:none}}
 @media(orientation:landscape) and (max-height:520px){#v-home.active{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:44px minmax(0,1fr) 48px;gap:8px}#v-home .topbar{grid-column:1/-1;grid-row:1}#v-home .road{grid-column:1;grid-row:2;margin:36px 4px 6px!important}#v-home .target,#v-home .done-banner{grid-column:2;grid-row:2;align-self:center}#v-home .fab-wrap{grid-column:1/-1;grid-row:3}.stop{width:min(46px,23cqh)}.target-art{width:42px;height:42px}.target .tg-k{font-size:21px}.target .tg-where{font-size:13px}.options{gap:7px}.opt{font-size:13px}.quiz h2{font-size:18px}.fact-card p{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.opening::after{animation:none}.opening .passport{animation:openbook .01s forwards!important}}
 
 /* DynaPuff kısa başlıklarda; bilgi ve yönlendirmelerde okunur Baloo. */
 :root{--font:"Baloo 2",ui-rounded,system-ui,sans-serif;--display-font:"DynaPuff",ui-rounded,system-ui,sans-serif}
 body{font-weight:600}
-h1,h2,h3,.btn,.pill,.me b,.tb-title,.pp-title,.hello-hi{font-family:var(--display-font)}
-.intro-facts li{font-size:18px;font-weight:600;line-height:1.4}.observe-text{font-size:21px;font-weight:600}.opt{font-size:18px}.quiz-msg{font-size:16px;font-weight:600}.fact-card p{font-size:18px;line-height:1.4}
+h1,h2,h3,.btn,.pill,.me b,.tb-title,.pp-title,.hello-hi{font-family:var(--display-font)}.opt{font-size:18px}.quiz-msg{font-size:16px;font-weight:600}.fact-card p{font-size:18px;line-height:1.4}
 /* Renk ve simge birlikte durum bildirir. */
 .stop.locked{background:#eaf4f7;border:2px solid #aac8d2;box-shadow:0 4px 0 #07336280}
 .stop .sil{inset:9%;opacity:.78}.stop .sil svg{filter:none;opacity:1}
@@ -430,95 +408,44 @@ h1,h2,h3,.btn,.pill,.me b,.tb-title,.pp-title,.hello-hi{font-family:var(--displa
 .location-cue{display:flex;align-items:center;gap:9px;background:#e2eff7;border:1px solid #c5dfec;border-radius:14px;padding:9px 10px;text-align:left;color:#234d6a;line-height:1.3}
 .target .tg-where{font-size:16px;font-weight:600;line-height:1.3}
 .cue-icon{flex:none;width:30px;height:30px;border-radius:9px;background:#fff8ec;display:grid;place-items:center;color:#0f5a96}
-.cue-icon svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.learn-where{font-size:15px;width:100%}.learn-card{gap:10px}#target-learn svg{width:22px;height:22px;flex-shrink:0}
-@media(max-height:680px){.target-art{width:48px;height:48px}.target .tg-where{font-size:15px}.target-kicker{font-size:10px}.location-cue{padding:7px 8px;gap:8px}.cue-icon{width:26px;height:26px}.cue-icon svg{width:21px;height:21px}.intro-facts li{font-size:17px}.observe-text{font-size:19px}.opt{font-size:17px}.fact-card p{font-size:17px}.learn-where{font-size:14px}.stop .num{width:25px;height:25px;font-size:14px}.here-pin{top:-31px;font-size:11px}}
-@media(max-height:520px){.target-art{width:40px;height:40px}.target-step{width:23px;height:23px;font-size:13px}.target .tg-where{font-size:14px}.location-cue{padding:5px 7px}.here-pin{font-size:10px;top:-28px}.stop-done{width:21px;height:21px;font-size:14px}.intro-facts li{font-size:16px}.observe-text{font-size:18px}.opt{font-size:15px}.fact-card p{font-size:15px}.learn-where{font-size:13px}}
+.cue-icon svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}#target-learn svg{width:22px;height:22px;flex-shrink:0}
+@media(max-height:680px){.target-art{width:48px;height:48px}.target .tg-where{font-size:15px}.target-kicker{font-size:10px}.location-cue{padding:7px 8px;gap:8px}.cue-icon{width:26px;height:26px}.cue-icon svg{width:21px;height:21px}.opt{font-size:17px}.fact-card p{font-size:17px}.stop .num{width:25px;height:25px;font-size:14px}.here-pin{top:-31px;font-size:11px}}
+@media(max-height:520px){.target-art{width:40px;height:40px}.target-step{width:23px;height:23px;font-size:13px}.target .tg-where{font-size:14px}.location-cue{padding:5px 7px}.here-pin{font-size:10px;top:-28px}.stop-done{width:21px;height:21px;font-size:14px}.opt{font-size:15px}.fact-card p{font-size:15px}}
 @media(orientation:landscape) and (max-height:520px){.target .tg-where{font-size:14px}.opt{font-size:15px}.here-pin{font-size:10px;top:-26px;padding:2px 6px}.stop .num{width:22px;height:22px;font-size:12px}.target-art{width:44px;height:44px}.stop.on{transform:translate(-50%,-50%) scale(1.04)}}
 
 /* İki açık ana eylem: QR okut veya bölüm ipucunu aç. */
 .fab-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
 .fab-wrap .btn{min-height:50px;width:100%;font-size:17px;padding:11px 8px;gap:7px}
 .fab-hints{box-shadow:0 5px 0 #abcbe2,0 10px 22px #0003}
-.hint-pager{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid #ffffff30;border-radius:20px;background:#ffffff12;flex-shrink:0}
-.hint-pager>div{text-align:center;min-width:0;display:flex;flex-direction:column;gap:2px}
-.hint-pager span{font-size:12px;color:#cce7f4}.hint-pager b{font-family:var(--display-font);font-size:21px;line-height:1.15}.hint-pager small{font-size:12px;color:#cce7f4}
-.hint-pager button:disabled{opacity:.3;cursor:default}
-.hint-card{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:20px}
-.hint-subject{display:flex;align-items:center;justify-content:center;gap:14px}.hint-subject>div:last-child{min-width:0}.hint-subject h2{font-size:26px;line-height:1.15;margin-top:4px}
-.hint-art{flex:none;width:100px;height:100px;background:#e5f1f7;border:2px solid #d0e3ed;border-radius:28px;padding:5px}.hint-art svg{width:100%;height:100%}
-.hint-earned{font-size:14px;color:#237846;margin:6px 0 0;line-height:1.2}
-.hint-levels{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.hint-levels button{font:inherit;font-weight:800;font-size:16px;line-height:1.2;border:2px solid #c7deeb;background:#e5f1f7;color:#24566f;min-height:48px;border-radius:14px;padding:8px;cursor:pointer}
-.hint-levels button[aria-pressed=true]{border-color:#e1a421;background:#fff0bd;color:#624100}
-.guide-bubble{display:flex;align-items:flex-start;gap:12px;border-radius:20px;background:#e2eff7;border:2px solid #c9e1ef;padding:14px}
-.guide-avatar{flex:none;width:52px;height:52px;border:2px solid #e2bc55;border-radius:50%;background:#fff8ec;padding:4px}.guide-avatar svg{width:100%;height:100%}
-.guide-bubble b{font-size:17px;color:#0f5a96;line-height:1.3}.guide-bubble p{font-size:20px;color:#1b3c52;margin:5px 0 0;line-height:1.4;font-weight:600}
-.hint-footnote{font-size:14px;color:#6a7891;line-height:1.35;margin:0;text-align:center}
-#hint-go{flex-shrink:0}
-@media(max-height:680px){.hint-pager{padding:8px 10px}.hint-pager b{font-size:19px}.hint-card{padding:14px;gap:12px}.hint-art{width:78px;height:78px;border-radius:22px}.hint-subject{gap:10px}.hint-subject h2{font-size:23px}.guide-bubble{padding:12px;gap:9px}.guide-avatar{width:42px;height:42px}.guide-bubble b{font-size:16px}.guide-bubble p{font-size:18px}.hint-levels button{font-size:15px}.hint-footnote{font-size:13px}.fab-wrap .btn{min-height:48px;font-size:16px}}
-@media(max-height:520px){.hint-card{padding:12px;gap:8px}.hint-art{width:58px;height:58px;border-radius:16px}.hint-subject h2{font-size:21px}.hint-pager{padding:6px 8px}.hint-pager b{font-size:17px}.hint-pager span,.hint-pager small{font-size:11px}.guide-bubble{padding:9px}.guide-bubble p{font-size:16px}.guide-bubble b{font-size:14px}.guide-avatar{width:35px;height:35px}.hint-levels button{min-height:44px;font-size:14px}.hint-footnote{display:none}}
-@media(orientation:landscape) and (max-height:520px){.hint-card{display:grid;grid-template-columns:1fr 1.35fr;grid-template-rows:auto 1fr;align-items:center;gap:8px 12px}.hint-subject{grid-column:1;grid-row:1/-1}.hint-levels{grid-column:2;grid-row:1}.guide-bubble{grid-column:2;grid-row:2}.hint-art{width:65px;height:65px}.hint-subject h2{font-size:19px}.guide-avatar{display:none}.hint-earned{font-size:12px}.hint-pager{padding:4px 12px}.hint-pager>div{flex-direction:row;align-items:center;gap:12px}.hint-pager span{display:none}.fab-wrap .btn{min-height:48px}}
+@media(max-height:680px){.fab-wrap .btn{min-height:48px;font-size:16px}}
 
-.quick-tip{font-size:23px;line-height:1.45;margin:0;padding:18px;background:#e2eff7;border:1px solid #c5dfec;border-radius:20px;text-align:left;color:#193b54;font-weight:600}
-.hint-card{gap:18px}.hint-subject{flex-direction:column;text-align:center}.hint-art{width:min(24dvh,150px);height:min(24dvh,150px)}
-.guide-bubble{align-items:center}.guide-bubble p{font-size:21px;line-height:1.45}.guide-bubble b{font-size:15px}.hint-pager b{font-size:22px}
-@media(max-height:680px){.quick-tip{font-size:21px;padding:14px}.hint-card{gap:14px}.hint-art{width:110px;height:110px}.guide-bubble p{font-size:19px}.hint-subject h2{font-size:23px}}
-@media(max-height:520px){.quick-tip{font-size:19px;padding:12px}.hint-subject{flex-direction:row;text-align:left}.hint-art{width:65px;height:65px}.hint-card{gap:10px}.guide-bubble p{font-size:17px}.hint-pager b{font-size:18px}}
-@media(orientation:landscape) and (max-height:520px){.hint-card{grid-template-rows:1fr;grid-template-columns:1fr 1.4fr}.hint-subject{grid-column:1;grid-row:1;flex-direction:column;text-align:center}.guide-bubble{grid-column:2;grid-row:1}.hint-art{width:80px;height:80px}.guide-bubble p{font-size:18px}.quick-tip{font-size:20px}}
+@media(orientation:landscape) and (max-height:520px){.fab-wrap .btn{min-height:48px}}
 
-.guide-content{display:contents}.guide-bubble{display:grid;grid-template-columns:52px 1fr;gap:8px 12px}.guide-avatar{grid-column:1;grid-row:1}.guide-bubble b{grid-column:2;grid-row:1;align-self:center}.guide-bubble p{grid-column:1/-1;grid-row:2;margin:0}
-@media(max-height:680px){.hint-subject{flex-direction:row;text-align:left}.hint-art{width:72px;height:72px}.hint-subject h2{font-size:22px}.guide-bubble{grid-template-columns:40px 1fr;padding:10px;gap:6px 9px}.guide-avatar{width:40px;height:40px}.guide-bubble p{font-size:18px;line-height:1.35}.hint-card{gap:12px}}
-@media(max-height:520px){.hint-art{width:58px;height:58px}.hint-subject h2{font-size:20px}.guide-bubble{grid-template-columns:32px 1fr;padding:8px}.guide-avatar{width:32px;height:32px}.guide-bubble p{font-size:16px;line-height:1.35}}
-@media(orientation:landscape) and (max-height:520px){.hint-subject{flex-direction:column;text-align:center}.hint-art{width:68px;height:68px}.guide-bubble{grid-template-columns:1fr;gap:5px}.guide-bubble b{grid-column:1;grid-row:1}.guide-bubble p{grid-column:1;grid-row:2;font-size:18px}.guide-avatar{display:none}}
+
+
+
+
+
 
 /* Bölüm adı kartın başında; ipucu, güçlü bir başlığı olan tek temiz kart. */
-.learn-card{display:grid;grid-template-rows:auto auto minmax(45px,1fr) auto;justify-items:center;align-items:center;gap:12px;padding:18px}
-#learn-region{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 12px;background:#0b4f70;color:#fff8ec;border:2px solid #73bccd;border-radius:17px;box-shadow:0 4px 0 #07354c;letter-spacing:0;font-family:var(--display-font);font-size:23px;line-height:1.2;text-transform:none;text-align:center}
-.region-symbol{flex:none;width:27px;height:27px;color:#a4dfeb}.region-symbol svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5}
-.learn-card h2{font-size:29px;margin:3px 0 0}.learn-art{width:min(200px,50vw);height:100%;max-height:200px;min-height:0;min-width:0}.learn-art svg{display:block;width:100%;height:100%;filter:drop-shadow(0 7px 0 #abcbd63d)}
-#learn-copy{align-self:end;width:100%}
-.quick-tip{background:#fffefa;border:2px solid #e7c97a;border-radius:22px;padding:15px 17px;text-align:left;box-shadow:0 5px 0 #d7c39a65;font-size:21px;line-height:1.4}
-.tip-heading{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-family:var(--display-font);font-size:15px;color:#735215;line-height:1.2}
-.tip-heading>span{display:grid;place-items:center;width:29px;height:29px;flex:none;border-radius:9px;background:#ffedb5}.tip-heading svg{width:22px;height:22px;fill:none;stroke:#8b631a;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.quick-tip p{margin:0}.tip-fact{display:block;color:#126884;font-weight:800}.tip-instruction{display:block;margin-top:8px;color:#1b344b;font-weight:600}
-.guide-bubble .tip-fact{color:#126884}.guide-bubble .tip-instruction{margin-top:8px}
-.hint-pager b{font-size:26px;line-height:1.2}.hint-pager{background:#0b4f70;border:2px solid #73bccd;box-shadow:0 4px 0 #07354c}.hint-pager span{color:#a8d6e5}.hint-pager small{color:#cce7f4}
-@media(max-height:680px){.learn-card{padding:12px;gap:10px}#learn-region{font-size:21px;padding:9px 10px;gap:8px}.region-symbol{width:24px;height:24px}.learn-card h2{font-size:25px}.quick-tip{font-size:20px;padding:12px 14px;line-height:1.35}.tip-heading{font-size:14px;margin-bottom:8px}.tip-heading>span{width:25px;height:25px}.tip-instruction{margin-top:7px}.hint-pager b{font-size:23px}}
-@media(max-height:520px){.learn-card{grid-template-rows:auto auto minmax(0,1fr) auto;padding:10px;gap:7px}#learn-region{font-size:18px;padding:7px 9px}.region-symbol{width:22px;height:22px}.learn-card h2{font-size:22px}.learn-art{display:none}.quick-tip{font-size:18px;padding:10px 12px}.tip-heading{font-size:13px;margin-bottom:6px}.tip-heading>span{width:23px;height:23px}.hint-pager b{font-size:20px}}
-@media(orientation:landscape) and (max-height:520px){.learn-card{grid-template-columns:1fr 1.5fr;grid-template-rows:auto 1fr;gap:8px 16px}#learn-region{grid-column:1;grid-row:1;align-self:end;font-size:18px}.learn-card h2{grid-column:1;grid-row:2;align-self:start}.learn-art{display:none}#learn-copy{grid-column:2;grid-row:1/-1;align-self:center}.quick-tip{font-size:19px;line-height:1.3}.hint-pager b{font-size:22px}}
 
-.hint-actions{display:grid;gap:9px;flex-shrink:0}.hint-actions .btn{min-height:48px;padding:11px 10px;font-size:17px}.hint-actions #hint-home{min-height:44px;font-family:var(--font);font-size:17px;padding:9px 10px}
-@media(max-height:680px){.hint-card{gap:10px;padding:12px}.hint-art{width:60px;height:60px}.hint-subject h2{font-size:21px}.guide-bubble p{font-size:17px;line-height:1.3}.guide-bubble b{font-size:14px}.guide-bubble{padding:9px;grid-template-columns:32px 1fr;gap:5px 8px}.guide-avatar{width:32px;height:32px}.hint-pager{padding:7px 9px}.hint-pager b{font-size:21px}.hint-actions{gap:7px}.hint-actions .btn{min-height:46px;font-size:16px;padding:10px}.hint-actions #hint-home{min-height:42px;font-size:16px;padding:8px}}
-@media(max-height:520px){.hint-actions{grid-template-columns:1fr 1fr;gap:8px}.hint-actions .btn,.hint-actions #hint-home{min-height:44px;font-size:14px;padding:8px;line-height:1.25}.hint-art{width:52px;height:52px}.guide-bubble p{font-size:16px}.hint-pager b{font-size:19px}}
-@media(orientation:landscape) and (max-height:520px){.hint-actions{grid-template-columns:1fr 1fr}.hint-actions .btn,.hint-actions #hint-home{min-height:46px;font-size:16px}.guide-bubble{grid-template-columns:1fr}.guide-bubble p{font-size:18px}.hint-pager b{font-size:22px}}
+
+
+
+
+
 
 /* Orijinal Logo.png aynı kalır; yalnızca çevresindeki beyaz boşluğu görünümde gizleriz. */
-.brand-logo{background:white;border-radius:10px;overflow:hidden;border:1px solid #c8e2e6;display:block;width:100%;height:100%;flex-shrink:0}
-.brand-logo svg{width:100%;height:100%;display:block}
-.welcome-brand{width:min(230px,75vw);height:80px;flex-shrink:0;margin:0 auto 8px;filter:drop-shadow(0 5px 8px #001b3b55)}
-.welcome-brand .brand-logo{border-radius:16px;padding:3px}
-.passport-inner>.brand-logo{width:85%;height:min(6.5dvh,55px);min-height:25px;flex-shrink:1;padding:2px;border-radius:7px}
-.final-cover .passport-inner>.brand-logo{width:100%;height:58px;flex-shrink:1;min-height:22px}
 .opening .welcome-brand{display:none}
-#learn-region{display:grid;grid-template-columns:27px minmax(0,1fr) auto;gap:8px;text-align:center}
-.region-counter{font-family:var(--font);font-size:16px;font-weight:800;white-space:nowrap;border-radius:10px;background:#d5f1ed;color:#104a5c;padding:5px 7px;line-height:1.2;letter-spacing:0}
-.region-name{min-width:0}
-@media(max-height:680px){.welcome-brand{height:62px;margin-bottom:5px}.passport-inner>.brand-logo{height:38px}.final-cover .passport-inner>.brand-logo{height:40px}#learn-region{font-size:19px;grid-template-columns:22px minmax(0,1fr) auto;gap:6px;padding:8px}.region-counter{font-size:14px;padding:4px 6px}}
-@media(max-height:520px){.welcome-brand{height:46px;margin-bottom:5px}.passport-inner>.brand-logo{height:32px}.final-cover .passport-inner>.brand-logo{height:25px}#learn-region{font-size:17px;grid-template-columns:20px minmax(0,1fr) auto;gap:5px}.region-counter{font-size:13px;padding:4px}}
-@media(orientation:landscape) and (max-height:520px){.welcome-brand{height:42px;width:185px}#learn-region{grid-template-columns:1fr auto}.region-symbol{display:none}.region-counter{font-size:13px}#learn-region{font-size:17px}}
+
+
+
 
 
 /* Şeffaf yatay marka, doğrudan okyanus ve pasaport zemini üzerinde. */
-.brand-logo,.welcome-brand .brand-logo,.passport-inner>.brand-logo,.final-cover .passport-inner>.brand-logo{background:transparent;border:0;border-radius:0;padding:0;box-shadow:none;overflow:visible}
-.brand-logo img{display:block;width:100%;height:100%;object-fit:contain}
-.welcome-brand{width:min(275px,78vw);height:64px;filter:none;margin:0 auto 10px}
-.passport-inner>.brand-logo{width:90%;height:min(5dvh,38px);min-height:22px}
-.final-cover .passport-inner>.brand-logo{width:100%;height:40px;min-height:22px}
-#v-welcome .field>span,#v-welcome .field-label{display:block;width:100%;text-align:center}
-@media(max-height:680px){.welcome-brand{height:52px;margin-bottom:7px}.passport-inner>.brand-logo{height:30px}.final-cover .passport-inner>.brand-logo{height:30px}}
-@media(max-height:520px){.welcome-brand{height:42px;margin-bottom:5px}.passport-inner>.brand-logo,.final-cover .passport-inner>.brand-logo{height:25px}}
-@media(orientation:landscape) and (max-height:520px){.welcome-brand{width:230px;height:42px}}
+
+
+
 /* Görünür ekran yüksekliği: tarayıcı çubukları ve klavye dahil. */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .view{min-width:0}.view>*{min-width:0}.topbar .tb-title{min-width:0;text-align:center}
@@ -530,80 +457,87 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .final-cover .passport-inner{justify-content:flex-start;gap:8px;padding-top:14px}
 .final-cover .pp-emblem{width:50%;max-height:85px;flex-shrink:1}
 .final-cover.gold{background:radial-gradient(120% 90% at 30% 20%,#256b9f,#123266 65%,#0b2148)}
-.welcome-brand{height:clamp(54px,12dvh,95px);width:min(220px,68vw);margin:0 auto 6px}
 #v-welcome:not(.opening){gap:0}
 #v-welcome:not(.opening) .cover-wrap{overflow:hidden;min-height:0}
 #v-welcome:not(.opening) .book-open{height:min(100%,calc(var(--app-height)*.29),240px);max-width:55vw}
-.sheet{width:100%;padding:12px 14px;margin-top:6px}
-.field>span,.field-label{margin-left:0;font-size:15px}
-.avatars{grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin:8px 0 12px}
-.avatars button{min-width:0;min-height:44px;max-width:64px;width:100%;justify-self:center}
-.avatars button.sel{transform:none;box-shadow:0 0 0 2px #f5bd3a55}
-.sheet input{min-height:46px;font-size:18px}
-.sheet .btn{min-height:48px}
-html[data-narrow=true] .avatars{grid-template-columns:repeat(3,48px);justify-content:center;gap:7px 22px}
-html[data-narrow=true] .sheet{padding:10px 12px}
-html[data-narrow=true] .sheet-lead{font-size:13px;margin-bottom:7px}
 html[data-narrow=true] #v-welcome:not(.opening) .book-open{max-height:150px}
-.learn-card{grid-template-rows:auto auto minmax(0,1fr) auto;gap:10px;padding:14px}
-.quick-tip{font-size:clamp(18px,4.8vw,21px);line-height:1.35;padding:13px 14px}
-.tip-instruction{margin-top:7px}.tip-heading{margin-bottom:8px}
-.learn-art{flex:none;min-height:0;max-height:180px}
-.hint-card{display:flex;flex-direction:column;justify-content:center;gap:12px;padding:14px}
-.hint-subject{flex-direction:row;text-align:left;gap:12px;flex-shrink:0;width:100%}
-.hint-subject h2{font-size:clamp(20px,5.5vw,25px);line-height:1.15;overflow-wrap:break-word}
-.hint-art{width:clamp(52px,13vw,85px);height:clamp(52px,13vw,85px);flex:none}
-.guide-bubble{width:100%;padding:12px;gap:7px 10px}
-.guide-bubble p{font-size:clamp(18px,4.8vw,21px);line-height:1.35;overflow-wrap:break-word}
-.guide-bubble b{overflow-wrap:anywhere}
-.hint-pager{flex-shrink:0}.hint-pager>div{min-width:0}.hint-pager b{font-size:clamp(19px,5.8vw,26px)}
-.hint-actions .btn{min-height:48px;font-size:16px;line-height:1.25}
 html[data-layout=short] .view.active,html[data-layout=tiny] .view.active{gap:7px}
-html[data-layout=short] .welcome-brand{height:62px}
-html[data-layout=short] .learn-card{padding:12px;gap:8px}
-html[data-layout=short] .hint-card{padding:12px;gap:10px}
-html[data-layout=short] .guide-avatar{width:32px;height:32px}
-html[data-layout=short] .guide-bubble{grid-template-columns:32px 1fr}
 html[data-layout=tiny] .view{padding:calc(var(--safe-t) + 6px) 10px calc(var(--safe-b) + 8px)}
-html[data-layout=tiny] .welcome-brand{height:54px}
 html[data-layout=tiny] #v-welcome:not(.opening) .cover-wrap{display:none}
-html[data-layout=tiny] .sheet{margin-top:0;padding:10px 12px}
-html[data-layout=tiny] .sheet-lead{font-size:13px;margin-bottom:6px}
-html[data-layout=tiny] .sheet .field{margin-bottom:6px}
-html[data-layout=tiny] .hint-actions{grid-template-columns:1fr 1fr;gap:8px}
-html[data-layout=tiny] .hint-actions .btn{font-family:var(--font);min-height:48px;padding:8px;font-size:15px}
-html[data-layout=tiny] .hint-pager{padding:5px 7px}
-html[data-layout=tiny] #hint-group,html[data-layout=tiny] .hint-earned{display:none}
-html[data-layout=tiny] .hint-card{padding:10px;gap:8px}
-html[data-layout=tiny] .guide-avatar,html[data-layout=tiny] #hint-greeting{display:none}
-html[data-layout=tiny] .guide-bubble{display:block;padding:10px}
-html[data-layout=tiny] .guide-content{display:contents}
-html[data-layout=tiny] .hint-art{width:48px;height:48px;border-radius:14px}
-html[data-layout=tiny] .hint-subject{gap:9px}
-html[data-layout=tiny] .learn-art{display:none}
-html[data-layout=tiny] .learn-card{grid-template-rows:auto auto 1fr auto;padding:10px;gap:7px}
-html[data-layout=tiny] #learn-region{font-size:17px;grid-template-columns:20px minmax(0,1fr) auto;padding:7px}
-html[data-layout=tiny] .learn-card h2{font-size:23px}
-.view[data-density=compact] .hint-art{width:48px;height:48px}
-.view[data-density=compact] .guide-avatar,.view[data-density=compact] #hint-greeting,.view[data-density=compact] .hint-earned{display:none}
-.view[data-density=compact] .guide-bubble{display:block}
-.view[data-density=compact] .learn-art{max-height:60px}
-.view[data-density=minimal] .hint-art,.view[data-density=minimal] .guide-avatar,.view[data-density=minimal] #hint-greeting,.view[data-density=minimal] .hint-earned,.view[data-density=minimal] #hint-name,.view[data-density=minimal] .learn-art{display:none}
-.view[data-density=minimal] .hint-card{gap:7px;padding:9px}
-.view[data-density=minimal] .guide-bubble{display:block;padding:9px}
-.view[data-density=minimal] .learn-card{grid-template-rows:auto auto 0 auto;gap:7px}
-.keyboard-open .welcome-brand,.keyboard-open #v-welcome .cover-wrap,.keyboard-open .sheet-lead{display:none}
-.keyboard-open #v-welcome .sheet{max-height:100%;overflow-y:auto}
-@media(orientation:landscape) and (max-height:520px){
- .welcome-brand{display:none}html[data-narrow=false] .avatars{grid-template-columns:repeat(6,44px);justify-content:center}
- .hint-card{display:grid;grid-template-columns:1fr 1.5fr;gap:12px;align-items:center}
- .hint-subject{flex-direction:column;text-align:center}.guide-bubble{display:block}
- .learn-card{grid-template-columns:1fr 1.5fr;grid-template-rows:auto 1fr}
- html[data-layout=tiny] #learn-region{grid-template-columns:minmax(0,1fr) auto}
-}
 
-.hint-subject{padding-bottom:4px}.hint-subject>div:last-child{flex:1;min-width:0}
-.view[data-density=minimal] .hint-subject{display:none}.view[data-density=minimal] .guide-bubble p{line-height:1.28}.view[data-density=minimal] .guide-bubble{padding:7px}.view[data-density=minimal] .hint-card{padding:8px}html[data-narrow=true][data-layout=tiny] .hint-pager b{font-size:18px}html[data-narrow=true][data-layout=tiny] .hint-actions .btn{font-size:14px;padding:7px}
 .final-cover.gold .passport-inner{border-color:#ffffffb3}
 html[data-layout=tiny] #v-home .road{margin:5px 0!important;min-height:144px}html[data-layout=tiny] #road-nodes{height:100%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:6px;place-items:center}html[data-layout=tiny] #v-home .stop{position:relative;left:auto!important;top:auto!important;width:44px;height:44px;transform:none}html[data-layout=tiny] #v-home .road-svg,html[data-layout=tiny] #v-home .road-start,html[data-layout=tiny] #v-home .road-end,html[data-layout=tiny] #v-home .here-pin,html[data-layout=tiny] #v-home .me-pin,html[data-layout=tiny] #v-home .tg-where,html[data-layout=tiny] #v-home .target-kicker{display:none}html[data-layout=tiny] #v-home .target{padding:8px;gap:5px}html[data-layout=tiny] #v-home .target-heading{min-height:32px}html[data-layout=tiny] #v-home .target-art{width:32px;height:32px}html[data-layout=tiny] #v-home .tg-k{font-size:20px}html[data-layout=tiny] #target-learn{min-height:44px;padding:8px;font-size:15px}html[data-layout=tiny] #v-home .fab-wrap .btn{min-height:44px;padding:8px;font-size:14px}
 html[data-layout=short] #v-welcome:not(.opening) .passport-inner{inset:6px 6px 6px 10px;padding:3px;gap:4px}html[data-layout=short] #v-welcome:not(.opening) .passport .pp-title{font-size:11px;line-height:1.1}html[data-layout=short] #v-welcome:not(.opening) .passport .pp-title span{font-size:8px}html[data-layout=short] #v-welcome:not(.opening) .passport .pp-emblem{width:65%;height:45%;flex-shrink:0}
+
+/* Giriş: okunur başlık, sade pasaport amblemi, dokunulabilir dostlar. */
+#v-welcome{justify-content:center;gap:0}
+.welcome-brand{width:min(200px,65vw);height:clamp(54px,10dvh,80px);margin:0 auto 5px;flex-shrink:0}
+.brand-logo{display:block;width:100%;height:100%;background:transparent;border:0;padding:0}
+.brand-logo svg{display:block;width:100%;height:100%}
+.welcome-title{flex-shrink:0;text-align:center;font-size:25px;line-height:1.2;margin:0 0 4px}
+.welcome-title span{display:block;font-size:17px;letter-spacing:.05em;color:#cde8f4}
+.cover-wrap{perspective:1400px;display:flex;flex:1;min-height:0;padding:4px 0;align-items:center;justify-content:center;overflow:hidden}
+.book-open{position:relative;height:min(100%,calc(var(--app-height)*.29),240px);width:auto;max-width:55vw;aspect-ratio:.7;transition:transform .9s cubic-bezier(.5,0,.2,1)}
+#v-welcome .passport-inner{justify-content:center;padding:6px;gap:0}
+#v-welcome .pp-emblem{width:75%;height:75%;flex:none}
+.opening .welcome-brand,.opening .welcome-title{display:none}
+.sheet{width:100%;flex-shrink:0;background:var(--paper);color:var(--ink);border-radius:22px;padding:12px 14px;margin-top:6px;box-shadow:0 18px 40px #0005;transition:opacity .35s,transform .35s}
+.sheet-lead{font-size:15px;line-height:1.35;text-align:center;color:var(--muted);margin:0 0 9px}.sheet-lead b{color:var(--ink)}
+.field{display:block;margin:0 0 8px}.field>span,.field-label{display:block;text-align:center;color:var(--sea);font-size:15px;font-weight:800;margin:0 0 4px}
+.sheet input{min-height:46px;font-size:18px}.sheet .btn{min-height:48px}
+.avatars{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin:8px 0 12px}
+.avatars button{min-width:0;min-height:44px;max-width:64px;width:100%;aspect-ratio:1;border:3px solid transparent;border-radius:50%;background:#e3f0fb;padding:3px;cursor:pointer;justify-self:center}
+.avatars button svg{display:block;width:100%;height:100%}.avatars button.sel{border-color:var(--gold2);background:#fff1cc;box-shadow:0 0 0 2px #f5bd3a55}
+html[data-narrow=true] .avatars{grid-template-columns:repeat(3,48px);justify-content:center;gap:7px 22px}
+html[data-narrow=true] .sheet{padding:10px 12px}html[data-narrow=true] .sheet-lead{font-size:13px;margin-bottom:7px}
+html[data-narrow=true] #v-welcome:not(.opening) .book-open{max-height:150px}
+/* Görev hazırlığı: bölge ve tek bilgi/yönlendirme kartı. */
+.learn-card{flex:1;min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;justify-items:center;align-items:center;gap:10px;padding:14px}
+.learn-card h2{font-size:29px;margin:3px 0 0;text-align:center}
+#learn-region{display:grid;grid-template-columns:27px minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;padding:11px 12px;background:#0b4f70;color:#fff8ec;border:2px solid #73bccd;border-radius:17px;box-shadow:0 4px 0 #07354c;letter-spacing:0;font-family:var(--display-font);font-size:23px;line-height:1.2;text-transform:none;text-align:center;margin:0}
+.region-symbol{width:27px;height:27px;color:#a4dfeb}.region-symbol svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5}
+.region-name{min-width:0}.region-counter{font-family:var(--font);font-size:16px;font-weight:800;white-space:nowrap;border-radius:10px;background:#d5f1ed;color:#104a5c;padding:5px 7px;line-height:1.2}
+.learn-art{width:min(200px,50vw);height:100%;max-height:180px;min-height:0;min-width:0}.learn-art svg{display:block;width:100%;height:100%;filter:drop-shadow(0 7px 0 #abcbd63d)}
+#learn-copy{width:100%;align-self:end}
+.quick-tip{background:#fffefa;border:2px solid #e7c97a;border-radius:22px;padding:13px 14px;text-align:left;box-shadow:0 5px 0 #d7c39a65;font-size:clamp(18px,4.8vw,21px);line-height:1.35;color:#193b54;font-weight:600;margin:0}
+.tip-heading{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-family:var(--display-font);font-size:15px;color:#735215;line-height:1.2}
+.tip-heading>span{display:grid;place-items:center;width:29px;height:29px;flex:none;border-radius:9px;background:#ffedb5}.tip-heading svg{width:22px;height:22px;fill:none;stroke:#8b631a;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.quick-tip p{margin:0}.tip-fact{display:block;color:#126884;font-weight:800}.tip-instruction{display:block;margin-top:7px;color:#1b344b;font-weight:600}
+/* İpuçları: yer varsa büyük çizim; alan daralınca metin önceliklidir. */
+.hint-pager{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:2px solid #73bccd;border-radius:20px;background:#0b4f70;box-shadow:0 4px 0 #07354c;flex-shrink:0}
+.hint-pager>div{min-width:0;text-align:center;display:flex;flex-direction:column;gap:2px}.hint-pager span,.hint-pager small{font-size:12px;color:#cce7f4}.hint-pager b{font-family:var(--display-font);font-size:clamp(19px,5.8vw,26px);line-height:1.2}.hint-pager button:disabled{opacity:.3;cursor:default}
+.hint-card{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:14px}
+.hint-subject{display:flex;align-items:center;justify-content:center;flex-direction:row;text-align:left;gap:12px;flex-shrink:0;width:100%;padding-bottom:4px}.hint-subject>div:last-child{flex:1;min-width:0}.hint-subject h2{font-size:clamp(20px,5.5vw,25px);line-height:1.15;overflow-wrap:break-word;margin-top:4px}
+.hint-art{width:clamp(52px,13vw,85px);height:clamp(52px,13vw,85px);flex:none;background:#e5f1f7;border:2px solid #d0e3ed;border-radius:22px;padding:5px}.hint-art svg{width:100%;height:100%;display:block}
+.hint-earned{font-size:14px;color:#237846;margin:6px 0 0;line-height:1.2}
+.guide-bubble{display:grid;grid-template-columns:52px 1fr;width:100%;padding:12px;gap:7px 10px;border-radius:20px;background:#e2eff7;border:2px solid #c9e1ef;align-items:center}
+.guide-content{display:contents}.guide-avatar{width:52px;height:52px;grid-column:1;grid-row:1;border:2px solid #e2bc55;border-radius:50%;background:#fff8ec;padding:4px}.guide-avatar svg{width:100%;height:100%}
+.guide-bubble b{grid-column:2;grid-row:1;font-size:15px;line-height:1.3;color:#0f5a96;overflow-wrap:anywhere}.guide-bubble p{grid-column:1/-1;grid-row:2;margin:0;font-size:clamp(18px,4.8vw,21px);line-height:1.35;overflow-wrap:break-word;color:#1b3c52;font-weight:600}
+.hint-actions{display:grid;gap:9px;flex-shrink:0}.hint-actions .btn{min-height:48px;padding:11px 10px;font-size:16px;line-height:1.25}.hint-actions #hint-home{font-family:var(--font)}
+html[data-layout=roomy] .hint-subject{flex-direction:column;text-align:center;gap:10px}html[data-layout=roomy] .hint-art{width:min(20dvh,140px);height:min(20dvh,140px);border-radius:28px}
+/* Gerçek görünür alanın kısa ve çok kısa varyantları. */
+html[data-layout=short] .view.active,html[data-layout=tiny] .view.active{gap:7px}
+html[data-layout=short] .welcome-brand{height:62px}html[data-layout=short] .welcome-title{font-size:22px}html[data-layout=short] .welcome-title span{font-size:15px}
+html[data-layout=short] .learn-card{padding:12px;gap:8px}html[data-layout=short] .learn-card h2{font-size:25px}html[data-layout=short] #learn-region{font-size:19px;padding:8px;grid-template-columns:22px minmax(0,1fr) auto;gap:6px}html[data-layout=short] .region-counter{font-size:14px;padding:4px 6px}
+html[data-layout=short] .hint-card{padding:12px;gap:10px}html[data-layout=short] .guide-avatar{width:32px;height:32px}html[data-layout=short] .guide-bubble{grid-template-columns:32px 1fr}
+html[data-layout=tiny] .view{padding:calc(var(--safe-t) + 6px) 10px calc(var(--safe-b) + 8px)}html[data-layout=tiny] .welcome-brand{height:54px}html[data-layout=tiny] .welcome-title{font-size:20px}html[data-layout=tiny] .welcome-title span{font-size:14px}
+html[data-layout=tiny] #v-welcome:not(.opening) .cover-wrap{display:none}html[data-layout=tiny] .sheet{margin-top:0;padding:10px 12px}html[data-layout=tiny] .sheet-lead{font-size:13px;margin-bottom:6px}html[data-layout=tiny] .sheet .field{margin-bottom:6px}
+html[data-layout=tiny] .hint-actions{grid-template-columns:1fr 1fr;gap:8px}html[data-layout=tiny] .hint-actions .btn{font-family:var(--font);min-height:48px;padding:8px;font-size:15px}
+html[data-layout=tiny] .hint-pager{padding:5px 7px}html[data-layout=tiny] #hint-group,html[data-layout=tiny] .hint-earned{display:none}
+html[data-layout=tiny] .hint-card{padding:10px;gap:8px}html[data-layout=tiny] .guide-avatar,html[data-layout=tiny] #hint-greeting{display:none}html[data-layout=tiny] .guide-bubble{display:block;padding:10px}html[data-layout=tiny] .hint-art{width:48px;height:48px;border-radius:14px}html[data-layout=tiny] .hint-subject{gap:9px}
+html[data-layout=tiny] .learn-art{display:none}html[data-layout=tiny] .learn-card{grid-template-rows:auto auto 1fr auto;padding:10px;gap:7px}html[data-layout=tiny] #learn-region{font-size:17px;grid-template-columns:20px minmax(0,1fr) auto;padding:7px}html[data-layout=tiny] .learn-card h2{font-size:23px}
+.view[data-density=compact] .hint-art{width:48px;height:48px}.view[data-density=compact] .guide-avatar,.view[data-density=compact] #hint-greeting,.view[data-density=compact] .hint-earned{display:none}.view[data-density=compact] .guide-bubble{display:block}.view[data-density=compact] .learn-art{max-height:60px}
+.view[data-density=minimal] .hint-subject,.view[data-density=minimal] .guide-avatar,.view[data-density=minimal] #hint-greeting,.view[data-density=minimal] .learn-art{display:none}.view[data-density=minimal] .hint-card{gap:7px;padding:8px}.view[data-density=minimal] .guide-bubble{display:block;padding:7px}.view[data-density=minimal] .guide-bubble p{line-height:1.28}.view[data-density=minimal] .learn-card{grid-template-rows:auto auto 0 auto;gap:7px}
+html[data-narrow=true][data-layout=tiny] .hint-pager b{font-size:18px}html[data-narrow=true][data-layout=tiny] .hint-actions .btn{font-size:14px;padding:7px}
+.keyboard-open .welcome-brand,.keyboard-open .welcome-title,.keyboard-open #v-welcome .cover-wrap,.keyboard-open .sheet-lead{display:none}.keyboard-open #v-welcome .sheet{max-height:100%;overflow-y:auto}
+@media(orientation:landscape) and (max-height:520px){
+ .welcome-brand,.welcome-title{display:none}.sheet{max-width:430px;margin:auto}html[data-narrow=false] .avatars{grid-template-columns:repeat(6,44px);justify-content:center}
+ .hint-card{display:grid;grid-template-columns:1fr 1.5fr;gap:12px;align-items:center}.hint-subject{flex-direction:column;text-align:center}.guide-bubble{display:block}
+ .learn-card{grid-template-columns:1fr 1.5fr;grid-template-rows:auto 1fr}#learn-region{grid-column:1;grid-row:1;align-self:end}.learn-card h2{grid-column:1;grid-row:2;align-self:start}#learn-copy{grid-column:2;grid-row:1/-1;align-self:center}html[data-layout=tiny] #learn-region{grid-template-columns:minmax(0,1fr) auto}.region-symbol{display:none}
+}
+/* Kaydı ve damga başlığını okunur tut. */
+.leaf-hd{font-size:13px;line-height:1.3;color:#0b4f70;font-weight:800}.leaf-hd span{color:inherit}
+#save-warning{flex:none;margin:0;padding:7px 10px;border:1px solid #e7c97a;background:#fff3bf;color:#624100;border-radius:12px;font-size:13px;line-height:1.3}
+.view.text-overflow .hint-card,.view.text-overflow .learn-card{overflow-y:auto;overscroll-behavior:contain;justify-content:flex-start}
+.view.text-overflow .learn-card{display:flex;align-items:stretch}
+.view.text-overflow .learn-card>*{flex-shrink:0}

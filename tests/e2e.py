@@ -86,7 +86,9 @@ async def main():
       assert 'İpucu' in await pg.locator('#quiz-msg').inner_text()
       await fits(pg,prefix+'-hint')
       await pg.click('#quiz-opts .opt:nth-child(2)');await pg.wait_for_timeout(1100)
+      await pg.wait_for_timeout(1300)
       await fits(pg,prefix+'-reward')
+      assert await pg.locator('.leaf-hd').evaluate('(e)=>getComputedStyle(e).color')=='rgb(11, 79, 112)'
       for selector in ['.rw-page','.stamp-stage']:
         bounds=await pg.locator(selector).bounding_box()
         assert abs(bounds['x']+bounds['width']/2-width/2)<2,(prefix,selector,bounds)
