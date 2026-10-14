@@ -86,7 +86,11 @@ async def main():
       assert 'İpucu' in await pg.locator('#quiz-msg').inner_text()
       await fits(pg,prefix+'-hint')
       await pg.click('#quiz-opts .opt:nth-child(2)');await pg.wait_for_timeout(1100)
-      await fits(pg,prefix+'-reward');await pg.click('#rw-next')
+      await fits(pg,prefix+'-reward')
+      for selector in ['.rw-page','.stamp-stage']:
+        bounds=await pg.locator(selector).bounding_box()
+        assert abs(bounds['x']+bounds['width']/2-width/2)<2,(prefix,selector,bounds)
+      await pg.click('#rw-next')
       assert await pg.locator('.stop.got .stop-done').count() == 1
       stations=await pg.evaluate('KASIF.stations.map(s=>({code:s.code,answer:s.quiz.answer}))')
       # QR bağlantıları da bilgiden başlar; kodları değiştirmeden tüm görevler tamamlanır.
@@ -148,6 +152,8 @@ async def main():
   print('VISUAL_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
   im=Image.open(OUT/'art-gallery.png').convert('RGB');im.thumbnail((600,600));data=io.BytesIO();im.save(data,format='JPEG',quality=75)
   print('ART_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
+  im=Image.open(OUT/'390x844-reward.png').convert('RGB');im.thumbnail((390,844));data=io.BytesIO();im.save(data,format='JPEG',quality=80)
+  print('STAMP_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
   server.shutdown()
   print('PASS: 5 ekran boyutu, 9 görev, bilgi/gözlem, QR, final, kayıt ve çevrimdışı açılış')
 

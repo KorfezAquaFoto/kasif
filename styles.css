@@ -362,7 +362,7 @@ button{touch-action:manipulation}
 /* Damga ve öğrenilen tek cümle. */
 .reward-view.active{height:var(--app-height);overflow:hidden;padding:calc(var(--safe-t) + 10px) 16px calc(var(--safe-b) + 12px)}
 .reward{height:100%;width:100%;min-height:0;padding:0;display:flex;flex-direction:column;justify-content:center;gap:9px}
-.reward-head{display:flex;justify-content:space-between;align-items:center}.kicker{margin:0}.rw-page{width:100%;height:min(32dvh,240px);min-height:110px;margin:0;flex-shrink:1;padding:10px}
+.reward-head{display:flex;justify-content:space-between;align-items:center}.kicker{margin:0}.rw-page{width:100%;height:min(32dvh,240px);min-height:110px;margin:0 auto;flex-shrink:1;padding:10px}
 .stamp-stage{height:min(23dvh,170px);width:min(23dvh,170px);margin:8px auto 0}.rw-tool{top:20px}.rw-name{font-size:12px;margin:0}.reward h2{font-size:27px;margin:0}.fact-card{padding:12px 14px}.fact-card p{font-size:17px;margin:4px 0 0}.rw-count{margin:0;font-size:16px}.reward .btn{margin-top:0;flex-shrink:0}
 /* Final iki aşamalıdır: altın kapak, sonra pasaport resmi. */
 .final{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:12px}.final-stage{height:min(45dvh,330px);margin:0;flex-shrink:1;min-height:230px}.final-h{font-size:25px}.final-p{font-size:16px}.final img{display:none;min-height:0;width:100%;object-fit:contain;border-radius:16px;margin:0;box-shadow:none;background:transparent}
