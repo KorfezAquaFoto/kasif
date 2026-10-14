@@ -38,6 +38,8 @@ async def main():
       await pg.evaluate('document.fonts.load(\'600 16px "DynaPuff"\', "ÇĞİÖŞÜçğıöşü")')
       assert await pg.evaluate('document.fonts.check(\'600 16px "DynaPuff"\')')
       await pg.evaluate('document.fonts.ready')
+      assert await pg.evaluate("async()=>{const i=new Image();i.src='Logo.png';await i.decode();return i.naturalWidth}")==4500
+      assert await pg.locator('#v-welcome .brand-logo').count()==2
       prefix=f'{width}x{height}'
       await fits(pg,prefix+'-welcome')
       await pg.fill('#in-name','Kaşif');await pg.click('#btn-start');await pg.wait_for_timeout(1200)
@@ -58,7 +60,8 @@ async def main():
       await pg.reload();await pg.locator('#v-learn.active').wait_for()
       assert await pg.locator('#learn-heading').inner_text()=='Tanış ve bul'
       assert await pg.locator('.quick-tip').count()==1
-      assert await pg.locator('#learn-region').inner_text()=='GÜNEY AMERİKA'
+      assert 'GÜNEY AMERİKA' in await pg.locator('#learn-region').inner_text()
+      assert await pg.locator('.region-counter').inner_text()=='1 / 9'
       assert await pg.locator('.tip-fact').count()==1
       await pg.click('#learn-next');await pg.locator('#v-scan.active').wait_for()
       await fits(pg,prefix+'-scan')
@@ -134,8 +137,8 @@ async def main():
   # Küçük bir görsel kontrol şeridi, test günlüğünden incelenebilir.
   import base64, io
   from PIL import Image
-  names=['390x844-home.png','390x844-hints.png','390x844-learn.png','390x844-reward.png']
-  sheet=Image.new('RGB',(1000,542),'#0b3c6e')
+  names=['390x844-welcome.png','390x844-opening.png','390x844-learn.png','390x844-hints.png','390x844-passport.png']
+  sheet=Image.new('RGB',(1250,542),'#0b3c6e')
   for i,name in enumerate(names):
     im=Image.open(OUT/name).convert('RGB');im.thumbnail((250,542));sheet.paste(im,(i*250,0))
   data=io.BytesIO();sheet.save(data,format='JPEG',quality=65)

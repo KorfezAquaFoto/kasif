@@ -60,7 +60,7 @@ function modal(ico, title, text, buttons = [{label:"Tamam"}]){
 // ---------- Karşılama ----------
 let avatar = AVATARS[0];
 function renderWelcome(){
-  $("[data-aq]").textContent = D.aquarium;
+  document.querySelectorAll("[data-aq]").forEach(el=>el.textContent=D.aquarium);
   document.querySelectorAll(".sheet-lead b").forEach(b => b.textContent = ST.length + " damgayı");
   const box = $("#avatars"); box.innerHTML = "";
   AVATARS.forEach(a => {
@@ -321,7 +321,7 @@ function renderLesson(){
   // Eski iki aşamalı kayıtları tek hazırlık ekranına taşı.
   S.flow.step="find";save();
   $("#learn-heading").textContent="Tanış ve bul";
-  $("#learn-region").innerHTML=`<span class="region-symbol">${globeIcon}</span><span>${esc(REG[st.region].label.toLocaleUpperCase("tr-TR"))}</span>`;
+  $("#learn-region").innerHTML=`<span class="region-symbol">${globeIcon}</span><span class="region-name">${esc(REG[st.region].label.toLocaleUpperCase("tr-TR"))}</span><span class="region-counter" aria-label="${ST.indexOf(st)+1}. görev, toplam ${ST.length} görev">${ST.indexOf(st)+1} / ${ST.length}</span>`;
   $("#learn-name").textContent=st.name;
   $("#learn-art").innerHTML=artSVG(st.art);
   $("#learn-copy").innerHTML=`<div class="quick-tip"><div class="tip-heading"><span>${bulbIcon}</span>Keşif ipucun</div><p>${tipMarkup(st)}</p></div>`;
@@ -493,6 +493,12 @@ function svgImg(svg){
   return new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null);
     i.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); });
 }
+let logoImagePromise=null;
+function brandImage(){
+  if(!logoImagePromise)logoImagePromise=new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(new Error("Logo yüklenemedi"));i.src="Logo.png";});
+  return logoImagePromise;
+}
+
 // Dolu pasaport sayfası (1080x1350): altın başlık, kaşif kartı, 9 damga, final damgası
 async function drawCert(){
   const F = '"DynaPuff",ui-rounded,system-ui,sans-serif';
@@ -514,8 +520,11 @@ async function drawCert(){
   x.fillStyle = gg; x.fillRect(60,50,W-120,190);
   x.restore();
   x.textAlign = "left";
-  x.fillStyle = "#7a4a00"; x.font = `700 32px ${F}`; x.fillText(D.aquarium.toLocaleUpperCase("tr-TR"), 120, 118);
-  x.fillStyle = "#10264d"; x.font = `700 64px ${F}`; x.fillText("Okyanus Kaşifi", 120, 186);
+  x.fillStyle = "#7a4a00"; x.font = `700 24px ${F}`; x.fillText("KEŞİF PASAPORTU", 120, 110);
+  const brand=await brandImage();
+  rr(x,760,70,235,145,15);x.fillStyle="#ffffff";x.fill();
+  x.drawImage(brand,888,1426,2724,1695,773,80,209,130);
+  x.fillStyle = "#10264d"; x.font = `700 58px ${F}`; x.fillText("Okyanus Kaşifi", 120, 186);
   x.fillStyle = "#7a4a00"; x.font = `600 34px ${F}`; x.fillText("pasaportu tamamlandı!", 120, 226);
   // kaşif kartı
   const avImg = await svgImg(artSVG(S.avatar));
@@ -541,14 +550,14 @@ async function drawCert(){
   });
   // final damgası sağ üstte, başlığa taşarak
   const seal = await svgImg(finalSealSVG());
-  if (seal) { x.save(); x.translate(860, 250); x.rotate(-12 * Math.PI / 180); x.drawImage(seal, -130, -150, 260, 299); x.restore(); }
+  if (seal) { x.save(); x.translate(900, 390); x.rotate(-8 * Math.PI / 180); x.drawImage(seal, -90, -104, 180, 207); x.restore(); }
   x.fillStyle = "#fff"; x.font = `700 34px ${F}`; x.fillText("Denizleri keşfetmeye devam! 🌊", W/2, H-46);
   return new Promise(r => c.toBlob(r, "image/png"));
 }
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v18`; renderInstall(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v19`; renderInstall(); }
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
   {label:"Vazgeç",cls:"btn-ghost"}]);

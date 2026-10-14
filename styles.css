@@ -493,3 +493,18 @@ h1,h2,h3,.btn,.pill,.me b,.tb-title,.pp-title,.hello-hi{font-family:var(--displa
 @media(max-height:520px){.hint-actions{grid-template-columns:1fr 1fr;gap:8px}.hint-actions .btn,.hint-actions #hint-home{min-height:44px;font-size:14px;padding:8px;line-height:1.25}.hint-art{width:52px;height:52px}.guide-bubble p{font-size:16px}.hint-pager b{font-size:19px}}
 @media(orientation:landscape) and (max-height:520px){.hint-actions{grid-template-columns:1fr 1fr}.hint-actions .btn,.hint-actions #hint-home{min-height:46px;font-size:16px}.guide-bubble{grid-template-columns:1fr}.guide-bubble p{font-size:18px}.hint-pager b{font-size:22px}}
 
+/* Orijinal Logo.png aynı kalır; yalnızca çevresindeki beyaz boşluğu görünümde gizleriz. */
+.brand-logo{background:white;border-radius:10px;overflow:hidden;border:1px solid #c8e2e6;display:block;width:100%;height:100%;flex-shrink:0}
+.brand-logo svg{width:100%;height:100%;display:block}
+.welcome-brand{width:min(230px,75vw);height:80px;flex-shrink:0;margin:0 auto 8px;filter:drop-shadow(0 5px 8px #001b3b55)}
+.welcome-brand .brand-logo{border-radius:16px;padding:3px}
+.passport-inner>.brand-logo{width:85%;height:min(6.5dvh,55px);min-height:25px;flex-shrink:1;padding:2px;border-radius:7px}
+.final-cover .passport-inner>.brand-logo{width:100%;height:58px;flex-shrink:1;min-height:22px}
+.opening .welcome-brand{display:none}
+#learn-region{display:grid;grid-template-columns:27px minmax(0,1fr) auto;gap:8px;text-align:center}
+.region-counter{font-family:var(--font);font-size:16px;font-weight:800;white-space:nowrap;border-radius:10px;background:#d5f1ed;color:#104a5c;padding:5px 7px;line-height:1.2;letter-spacing:0}
+.region-name{min-width:0}
+@media(max-height:680px){.welcome-brand{height:62px;margin-bottom:5px}.passport-inner>.brand-logo{height:38px}.final-cover .passport-inner>.brand-logo{height:40px}#learn-region{font-size:19px;grid-template-columns:22px minmax(0,1fr) auto;gap:6px;padding:8px}.region-counter{font-size:14px;padding:4px 6px}}
+@media(max-height:520px){.welcome-brand{height:46px;margin-bottom:5px}.passport-inner>.brand-logo{height:32px}.final-cover .passport-inner>.brand-logo{height:25px}#learn-region{font-size:17px;grid-template-columns:20px minmax(0,1fr) auto;gap:5px}.region-counter{font-size:13px;padding:4px}}
+@media(orientation:landscape) and (max-height:520px){.welcome-brand{height:42px;width:185px}#learn-region{grid-template-columns:1fr auto}.region-symbol{display:none}.region-counter{font-size:13px}#learn-region{font-size:17px}}
+
