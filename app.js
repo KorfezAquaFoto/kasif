@@ -392,9 +392,14 @@ function fitViewport(){
   if(!document.activeElement.matches('input'))window.scrollTo(0,0);
   scheduleFit();
 }
-window.addEventListener('resize',fitViewport);
-if(window.visualViewport)visualViewport.addEventListener('resize',fitViewport);
-document.addEventListener('focusin',fitViewport);document.addEventListener('focusout',fitViewport);
+let viewportTimer=0;
+function refreshViewport(){
+  fitViewport();clearTimeout(viewportTimer);
+  requestAnimationFrame(fitViewport);viewportTimer=setTimeout(fitViewport,120);
+}
+window.addEventListener('resize',refreshViewport);
+if(window.visualViewport){visualViewport.addEventListener('resize',refreshViewport);visualViewport.addEventListener('scroll',refreshViewport);}
+document.addEventListener('focusin',refreshViewport);document.addEventListener('focusout',refreshViewport);
 new MutationObserver(scheduleFit).observe(document.body,{childList:true,subtree:true,characterData:true});
 document.fonts.ready.then(scheduleFit);fitViewport();
 
