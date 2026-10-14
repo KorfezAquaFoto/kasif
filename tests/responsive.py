@@ -12,7 +12,7 @@ async def check(pg,label):
       const issues=[];
       for(const e of all){const r=e.getBoundingClientRect(),s=getComputedStyle(e);if(!r.width||!r.height||s.display==='none')continue;
         if(r.top<vr.top-2||r.bottom>vr.bottom-5||r.left<vr.left-2||r.right>vr.right+2)issues.push(e.id||e.className);
-        if(e.scrollHeight>e.clientHeight+2||e.scrollWidth>e.clientWidth+2)issues.push('clipped '+(e.id||e.className));
+        if(e.scrollHeight>e.clientHeight+2||e.scrollWidth>e.clientWidth+2)issues.push('clipped '+(e.id||e.className)+' '+JSON.stringify({sh:e.scrollHeight,ch:e.clientHeight,sw:e.scrollWidth,cw:e.clientWidth}));
       }
       for(const id of ['hint-copy','learn-copy']){const e=v.querySelector('#'+id);if(!e)continue;const r=e.getBoundingClientRect();const card=e.closest('.paper').getBoundingClientRect();if(r.bottom>card.bottom-5)issues.push('card clipped '+id);}
       const av=[...v.querySelectorAll('#avatars button')].map(e=>e.getBoundingClientRect());
@@ -21,6 +21,9 @@ async def check(pg,label):
       if(subject&&bubble&&subject.getBoundingClientRect().bottom>bubble.getBoundingClientRect().top+1)issues.push('hint overlap');
       return {issues,overflow:v.scrollHeight>v.clientHeight+2};
     }''')
+    if result['issues'] or result['overflow']:
+      import base64
+      print('FAIL_QA_BASE64:'+base64.b64encode(await pg.screenshot(type='jpeg',quality=75)).decode(),flush=True)
     assert not result['issues'] and not result['overflow'],(label,result)
 
 async def main():

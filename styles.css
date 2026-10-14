@@ -602,3 +602,4 @@ html[data-layout=tiny] .learn-card h2{font-size:23px}
  html[data-layout=tiny] #learn-region{grid-template-columns:minmax(0,1fr) auto}
 }
 
+.hint-subject{padding-bottom:4px}.hint-subject>div:last-child{flex:1;min-width:0}
