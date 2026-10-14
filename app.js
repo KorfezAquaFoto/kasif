@@ -181,6 +181,15 @@ function renderInstall(){
 }
 function requestPersist(){ try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){} }
 
+// Tek ipucunun içindeki bilgiyi ve bakılacak ayrıntıyı görsel olarak ayır.
+function tipMarkup(st){
+  const split=st.tip.indexOf(". ");
+  if(split<0)return `<span class="tip-instruction">${esc(st.tip)}</span>`;
+  return `<span class="tip-fact">${esc(st.tip.slice(0,split+1))}</span><span class="tip-instruction">${esc(st.tip.slice(split+2))}</span>`;
+}
+const bulbIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M8 14a7 7 0 1 1 8 0q-1 1-1 3H9q0-2-1-3Z"/></svg>';
+const globeIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M5 7h14M5 17h14"/></svg>';
+
 // ---------- Bölüm ve kıta ipuçları ----------
 let hintIndex = 0;
 function hintStation(){return ST[hintIndex];}
@@ -198,11 +207,12 @@ function renderHints(){
   $("#hint-earned").textContent=S.badges[st.id] ? "✓ Bu damga sende!" : "Bu bölümdeki keşfin";
   $("#hint-guide").innerHTML=av(S.avatar);
   $("#hint-greeting").textContent=`${S.name}, keşfe hazır mısın?`;
-  $("#hint-copy").textContent=st.tip;
+  $("#hint-copy").innerHTML=tipMarkup(st);
   $("#hint-prev").disabled=hintIndex===0;$("#hint-next").disabled=hintIndex===ST.length-1;
   $("#hint-go").textContent=S.badges[st.id] ? "Öğrendiklerime bak →" : "Buldum, QR’ını tara →";
 }
 $("#btn-hints").onclick=openHints;
+$("#hint-home").onclick=()=>{stack=[];show("v-home",false);};
 $("#hint-prev").onclick=()=>{if(hintIndex>0){hintIndex--;stopSpeech();renderHints();}};
 $("#hint-next").onclick=()=>{if(hintIndex<ST.length-1){hintIndex++;stopSpeech();renderHints();}};
 $("#hint-go").onclick=()=>{
@@ -311,10 +321,10 @@ function renderLesson(){
   // Eski iki aşamalı kayıtları tek hazırlık ekranına taşı.
   S.flow.step="find";save();
   $("#learn-heading").textContent="Tanış ve bul";
-  $("#learn-region").textContent=REG[st.region].label+" · "+(ST.indexOf(st)+1)+" / "+ST.length;
+  $("#learn-region").innerHTML=`<span class="region-symbol">${globeIcon}</span><span>${esc(REG[st.region].label.toLocaleUpperCase("tr-TR"))}</span>`;
   $("#learn-name").textContent=st.name;
   $("#learn-art").innerHTML=artSVG(st.art);
-  $("#learn-copy").innerHTML=`<p class="quick-tip">${esc(st.tip)}</p>`;
+  $("#learn-copy").innerHTML=`<div class="quick-tip"><div class="tip-heading"><span>${bulbIcon}</span>Keşif ipucun</div><p>${tipMarkup(st)}</p></div>`;
   $("#learn-next").textContent=S.flow.verified ? "Haydi soruyu çöz →" : "Buldum, QR’ını tara →";
 }
 $("#learn-next").onclick=()=>{
@@ -538,7 +548,7 @@ async function drawCert(){
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v17`; renderInstall(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v18`; renderInstall(); }
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
   {label:"Vazgeç",cls:"btn-ghost"}]);

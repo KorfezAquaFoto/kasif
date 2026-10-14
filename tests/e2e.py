@@ -58,6 +58,8 @@ async def main():
       await pg.reload();await pg.locator('#v-learn.active').wait_for()
       assert await pg.locator('#learn-heading').inner_text()=='Tanış ve bul'
       assert await pg.locator('.quick-tip').count()==1
+      assert await pg.locator('#learn-region').inner_text()=='GÜNEY AMERİKA'
+      assert await pg.locator('.tip-fact').count()==1
       await pg.click('#learn-next');await pg.locator('#v-scan.active').wait_for()
       await fits(pg,prefix+'-scan')
       await pg.click('#v-scan [data-back]');await pg.click('#learn-back')
@@ -66,12 +68,12 @@ async def main():
       stations=await pg.evaluate('KASIF.stations.map(s=>({region:s.region,tip:s.tip}))')
       for i,st in enumerate(stations):
         assert await pg.locator('#hint-region').inner_text()==await pg.evaluate('KASIF.regions['+repr(st['region'])+'].label')
-        assert await pg.locator('#hint-copy').inner_text()==st['tip']
+        assert ' '.join((await pg.locator('#hint-copy').inner_text()).split())==' '.join(st['tip'].split())
         assert len(st['tip'].split())<=30
         await fits(pg,prefix+'-hint-region-'+str(i),False)
         if i<8: await pg.click('#hint-next')
       assert await pg.locator('#hint-next').is_disabled()
-      await pg.click('#v-hints [data-back]');await pg.click('#btn-hints');await pg.click('#hint-go')
+      await pg.click('#hint-home');await pg.locator('#v-home.active').wait_for();await pg.click('#btn-hints');await pg.click('#hint-go')
       await pg.fill('#in-code','PRN-3T9F');await pg.click('#manual-form button')
       await pg.locator('#v-quiz.active').wait_for();await fits(pg,prefix+'-quiz')
       await pg.click('#quiz-opts .opt:nth-child(1)')
