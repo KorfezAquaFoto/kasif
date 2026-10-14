@@ -293,8 +293,9 @@ $("#learn-back").onclick = () => {
   else show("v-home", false);
 };
 // Ses kullanıcı istediğinde başlar; ekran değişince durur.
-let speaking = false;
+let speaking = false, speechGeneration = 0;
 function stopSpeech(){
+  speechGeneration++;
   if ("speechSynthesis" in window) speechSynthesis.cancel(); speaking=false;
   document.querySelectorAll("[data-listen]").forEach(b => {b.textContent="♪ Dinle";b.setAttribute("aria-pressed","false");});
 }
@@ -308,7 +309,9 @@ document.querySelectorAll("[data-listen]").forEach(b => b.onclick = () => {
   if (!("speechSynthesis" in window)) return;
   const u = new SpeechSynthesisUtterance(spokenText()); u.lang="tr-TR";u.rate=.9;
   const voice=speechSynthesis.getVoices().find(v=>v.lang.startsWith("tr"));if(voice)u.voice=voice;
-  u.onend=stopSpeech;u.onerror=()=>{stopSpeech();modal("♪","Ses açılamadı","Bu cihazda Türkçe ses kullanılamıyor. Bilgileri ekrandan okuyabilirsin.");};
+  const ticket=++speechGeneration;
+  u.onend=()=>{if(ticket===speechGeneration)stopSpeech();};
+  u.onerror=e=>{if(ticket!==speechGeneration || e.error==="canceled" || e.error==="interrupted")return;stopSpeech();modal("♪","Ses açılamadı","Bu cihazda Türkçe ses kullanılamıyor. Bilgileri ekrandan okuyabilirsin.");};
   speaking=true;b.textContent="■ Durdur";b.setAttribute("aria-pressed","true");speechSynthesis.speak(u);
 });
 // Klavye ve tarayıcı çubukları dahil görünür yüksekliği kullan.

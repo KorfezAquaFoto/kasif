@@ -82,6 +82,17 @@ async def main():
         return jsQR(x.getImageData(0,0,c.width,c.height).data,c.width,c.height)?.data;
       }''',code)
       assert decoded and decoded.endswith('#s='+code),(code,decoded)
+    # Ses iptal edilince yanlışlıkla hata penceresi açılmamalı.
+    await pg.fill('#in-name','Kaşif');await pg.click('#btn-start');await pg.wait_for_timeout(2800)
+    await pg.click('#target-learn')
+    await pg.evaluate('''() => {
+      let active=null;
+      Object.defineProperty(window,'speechSynthesis',{configurable:true,value:{
+        getVoices:()=>[],speak:u=>{active=u;},cancel:()=>{const u=active;active=null;if(u)setTimeout(()=>u.onerror({error:'interrupted'}),0);}
+      }});
+    }''')
+    await pg.click('#v-learn [data-listen]');await pg.click('#learn-next');await pg.wait_for_timeout(100)
+    assert await pg.locator('#modal').evaluate("e=>e.classList.contains('hidden')")
     await br.close()
   server.shutdown()
   print('PASS: 5 ekran boyutu, 9 görev, bilgi/gözlem, QR, final, kayıt ve çevrimdışı açılış')
