@@ -211,6 +211,7 @@ function openHints(){
   stack=["v-home"];show("v-hints",false);
 }
 function renderHints(){
+  $(".hint-card").scrollTop=0;
   const st=hintStation(), reg=REG[st.region], group=D.groups.find(g=>g.kind===reg.kind);
   $("#hint-group").textContent=group ? group.label : "Keşif bölümü";
   $("#hint-region").textContent=reg.label;
@@ -330,6 +331,7 @@ function resumeTask(){
   lesson = st; stack = ["v-home"]; show("v-learn", false); renderLesson();
 }
 function renderLesson(){
+  $(".learn-card").scrollTop=0;
   stopSpeech();const st=lesson;
   // Eski iki aşamalı kayıtları tek hazırlık ekranına taşı.
   S.flow.step="find";save();

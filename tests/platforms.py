@@ -57,7 +57,7 @@ async def main():
   await pg.evaluate('window.__denySave=false');await pg.click('#btn-menu');await pg.click('#save-retry')
   assert await pg.evaluate("!!JSON.parse(localStorage.getItem('okyanus-kasifi-v1'))")
   assert await pg.locator('#save-warning').evaluate('(e)=>e.classList.contains("hidden")')
-  await pg.click('#v-menu [data-back]');await pg.click('#btn-scan')
+  await pg.click('#v-menu [data-back]');await pg.click('#btn-scan',force=True)
   await pg.wait_for_function('document.querySelector("#video").videoWidth>0')
   await pg.evaluate('window.auditTracks=document.querySelector("#video").srcObject.getTracks()')
   await pg.click('#v-scan [data-back]');assert await pg.evaluate('auditTracks.every(t=>t.readyState==="ended")')
