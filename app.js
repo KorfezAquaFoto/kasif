@@ -375,7 +375,10 @@ function fitContent(){
   v.classList.remove('text-overflow');
   const card=v.querySelector('.learn-card,.hint-card');
   if(card){
-    const crowded=()=>card.scrollHeight>card.clientHeight+2;
+    const crowded=()=>{
+      const copy=card.querySelector('#learn-copy,#hint-copy'),r=card.getBoundingClientRect(),c=copy?.getBoundingClientRect();
+      return card.scrollHeight>card.clientHeight+2 || (c && (c.bottom>r.bottom-8 || c.top<r.top+8));
+    };
     if(crowded())v.dataset.density='compact';
     if(crowded())v.dataset.density='minimal';
     v.classList.toggle('text-overflow',crowded());
