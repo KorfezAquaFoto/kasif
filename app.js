@@ -75,9 +75,7 @@ $("#btn-start").onclick = () => {
   $("#idpage-w").innerHTML = helloHTML();
   $("#ready-msg").textContent = `Pasaportun hazır, ${S.name}!`;
   $("#in-name").blur(); window.scrollTo(0, 0);
-  // Açılırken pasaport ekranın ortasına kayar
-  const r = $(".cover-wrap").getBoundingClientRect();
-  $("#v-welcome").style.setProperty("--dy", Math.max(0, innerHeight / 2 - (r.top + r.height / 2) - 20) + "px");
+  // Açılış kendi merkezlenmiş sahnesini kullanır; klavye kapanırken konum ölçmeyiz.
   $("#v-welcome").classList.add("opening");
   setTimeout(() => {
     $("#v-welcome").classList.remove("opening");
@@ -114,7 +112,7 @@ function renderHome(){
 function renderTarget(){
   const st = ST.find(s => s.id === target), box = $("#target");
   box.classList.toggle("hidden", !st); if (!st) return;
-  box.innerHTML = `<div class="tg-txt"><p class="tg-k">${esc(st.name)} <small>${ST.indexOf(st) + 1}. durak</small></p><p class="tg-where">📍 ${esc(st.where || REG[st.region].label)}</p></div><button class="btn btn-ghost sm" id="target-learn">${S.flow && S.flow.id === st.id ? "Devam et →" : "Tanış →"}</button>`;
+  box.innerHTML = `<div class="target-heading"><span class="target-art" aria-hidden="true">${artSVG(st.art)}</span><div class="tg-txt"><p class="target-kicker">SIRADAKİ KEŞFİN · ${ST.indexOf(st) + 1} / ${ST.length}</p><h2 class="tg-k">${esc(st.name)}</h2></div></div><p class="tg-where">${esc(st.where || REG[st.region].label)}</p><button class="btn btn-gold" id="target-learn">${S.flow && S.flow.id === st.id ? "Kaldığın yerden devam et →" : "Tanış ve keşfet →"}</button>`;
   $("#target-learn").onclick = () => {
     if (S.flow && S.flow.id === st.id) resumeTask(); else openLesson(st, false);
   };
@@ -144,7 +142,7 @@ function openDrawer(st, got){
   $("#dr-name").textContent = REG[st.region].label + " · " + (got ? st.name : "Gizemli görev");
   $("#dr-title").textContent = st.title;
   $("#dr-text").textContent = got ? st.fact : "İpucu: " + st.hint;
-  $("#dr-where").textContent = got || !st.where ? "" : "QR'ı bul: " + st.where;
+  $("#dr-where").textContent = got || !st.where ? "" : st.where;
   $("#drawer").classList.remove("hidden");
 }
 $("#dr-close").onclick = () => $("#drawer").classList.add("hidden");
@@ -280,7 +278,7 @@ function renderLesson(){
   $("#phase-learn").classList.toggle("active", !observing);
   $("#phase-observe").classList.toggle("active", observing);
   $("#learn-copy").innerHTML = observing ? `<p class="observe-text">${esc(st.observe)}</p><p class="observe-note">Acele etme. Hazır olduğunda devam et.</p>` : `<ul class="intro-facts">${st.intro.map((t,i)=>`<li><span aria-hidden="true">${i ? "✦" : "🌊"}</span>${esc(t)}</li>`).join("")}</ul>`;
-  $("#learn-where").textContent = "📍 " + st.where;
+  $("#learn-where").textContent = st.where;
   $("#learn-next").textContent = !observing ? "Haydi yakından bakalım →" : S.flow.verified ? "Hazırım, soruyu aç →" : "Buldum, QR’ını tara →";
 }
 $("#learn-next").onclick = () => {
@@ -454,8 +452,8 @@ function svgImg(svg){
 }
 // Dolu pasaport sayfası (1080x1350): altın başlık, kaşif kartı, 9 damga, final damgası
 async function drawCert(){
-  const F = '"Baloo 2",ui-rounded,system-ui,sans-serif';
-  try { await Promise.all([document.fonts.load(`800 40px "Baloo 2"`, "ŞĞİ"), document.fonts.load(`600 40px "Baloo 2"`, "ŞĞİ")]); } catch(e){}
+  const F = '"DynaPuff",ui-rounded,system-ui,sans-serif';
+  try { await Promise.all([document.fonts.load(`700 40px "DynaPuff"`, "ŞĞİ"), document.fonts.load(`600 40px "DynaPuff"`, "ŞĞİ")]); } catch(e){}
   const W = 1080, H = 1350, c = document.createElement("canvas"); c.width = W; c.height = H;
   const x = c.getContext("2d");
   const g = x.createLinearGradient(0,0,0,H); g.addColorStop(0,"#1677b8"); g.addColorStop(.5,"#0b3c6e"); g.addColorStop(1,"#061f40");
@@ -473,18 +471,18 @@ async function drawCert(){
   x.fillStyle = gg; x.fillRect(60,50,W-120,190);
   x.restore();
   x.textAlign = "left";
-  x.fillStyle = "#7a4a00"; x.font = `800 32px ${F}`; x.fillText(D.aquarium.toLocaleUpperCase("tr-TR"), 120, 118);
-  x.fillStyle = "#10264d"; x.font = `800 64px ${F}`; x.fillText("Okyanus Kaşifi", 120, 186);
+  x.fillStyle = "#7a4a00"; x.font = `700 32px ${F}`; x.fillText(D.aquarium.toLocaleUpperCase("tr-TR"), 120, 118);
+  x.fillStyle = "#10264d"; x.font = `700 64px ${F}`; x.fillText("Okyanus Kaşifi", 120, 186);
   x.fillStyle = "#7a4a00"; x.font = `600 34px ${F}`; x.fillText("pasaportu tamamlandı!", 120, 226);
   // kaşif kartı
   const avImg = await svgImg(artSVG(S.avatar));
   x.beginPath(); x.arc(210, 380, 96, 0, 7); x.fillStyle = "#e3f0fb"; x.fill(); x.lineWidth = 10; x.strokeStyle = "#f5bd3a"; x.stroke();
   if (avImg) x.drawImage(avImg, 130, 300, 160, 160);
-  x.fillStyle = "#10264d"; let fs = 80; x.font = `800 ${fs}px ${F}`;
-  while (x.measureText(S.name).width > 470 && fs > 40) { fs -= 4; x.font = `800 ${fs}px ${F}`; }
+  x.fillStyle = "#10264d"; let fs = 80; x.font = `700 ${fs}px ${F}`;
+  while (x.measureText(S.name).width > 470 && fs > 40) { fs -= 4; x.font = `700 ${fs}px ${F}`; }
   x.fillText(S.name, 336, 380);
   const d = new Date().toLocaleDateString("tr-TR", { day:"numeric", month:"long", year:"numeric" });
-  x.fillStyle = "#0f5a96"; x.font = `800 32px ${F}`; x.fillText(`Kaşif #${S.id}`, 338, 428);
+  x.fillStyle = "#0f5a96"; x.font = `700 32px ${F}`; x.fillText(`Kaşif #${S.id}`, 338, 428);
   x.fillStyle = "#6a7891"; x.font = `600 30px ${F}`; x.fillText(d, 338, 468);
   x.textAlign = "center"; x.fillStyle = "#6a7891"; x.font = `600 34px ${F}`;
   x.fillText(`${D.aquarium}'daki ${ST.length} bölgenin hepsini keşfetti!`, W/2, 560);
@@ -501,13 +499,13 @@ async function drawCert(){
   // final damgası sağ üstte, başlığa taşarak
   const seal = await svgImg(finalSealSVG());
   if (seal) { x.save(); x.translate(860, 250); x.rotate(-12 * Math.PI / 180); x.drawImage(seal, -130, -150, 260, 299); x.restore(); }
-  x.fillStyle = "#fff"; x.font = `800 34px ${F}`; x.fillText("Denizleri keşfetmeye devam! 🌊", W/2, H-46);
+  x.fillStyle = "#fff"; x.font = `700 34px ${F}`; x.fillText("Denizleri keşfetmeye devam! 🌊", W/2, H-46);
   return new Promise(r => c.toBlob(r, "image/png"));
 }
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v14`; renderInstall(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v15`; renderInstall(); }
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
   {label:"Vazgeç",cls:"btn-ghost"}]);

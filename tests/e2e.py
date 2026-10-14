@@ -5,7 +5,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'tests' / 'out'; OUT.mkdir(exist_ok=True)
 B = os.environ.get('BASE', 'http://127.0.0.1:8765/')
 
-async def fits(pg, label):
+async def fits(pg, label, shot=True):
     await pg.wait_for_timeout(150)
     result = await pg.evaluate('''() => {
       const v=document.querySelector('.view.active'), r=v.getBoundingClientRect();
@@ -16,14 +16,17 @@ async def fits(pg, label):
       return {bad,overflow:v.scrollHeight>v.clientHeight+2,body:document.documentElement.scrollHeight>innerHeight+2};
     }''')
     assert not result['bad'] and not result['overflow'] and not result['body'], (label,result)
-    await pg.screenshot(path=str(OUT / (label+'.png')))
+    if shot: await pg.screenshot(path=str(OUT / (label+'.png')))
 
-async def lesson_to_quiz(pg):
+async def lesson_to_quiz(pg, label='task'):
     await pg.locator('#v-learn.active').wait_for()
+    await fits(pg,label+'-learn',False)
     await pg.click('#learn-next')
     assert await pg.locator('#learn-heading').inner_text() == 'Yakından bak'
+    await fits(pg,label+'-observe',False)
     await pg.click('#learn-next')
     await pg.locator('#v-quiz.active').wait_for()
+    await fits(pg,label+'-quiz',False)
 
 async def main():
   handler=functools.partial(http.server.SimpleHTTPRequestHandler,directory=str(ROOT))
@@ -35,10 +38,20 @@ async def main():
       ctx=await br.new_context(viewport={'width':width,'height':height},has_touch=True)
       pg=await ctx.new_page();errors=[];pg.on('pageerror',lambda e:errors.append(str(e)))
       await pg.goto(B);await pg.locator('#v-welcome.active').wait_for()
+      await pg.evaluate('document.fonts.load(\'600 16px "DynaPuff"\', "ÇĞİÖŞÜçğıöşü")')
+      assert await pg.evaluate('document.fonts.check(\'600 16px "DynaPuff"\')')
       prefix=f'{width}x{height}'
       await fits(pg,prefix+'-welcome')
-      await pg.fill('#in-name','Ayşe Çağla');await pg.click('#btn-start');await pg.wait_for_timeout(2800)
+      await pg.fill('#in-name','Kaşif');await pg.click('#btn-start');await pg.wait_for_timeout(1200)
+      opening=await pg.locator('.opening .book-open').bounding_box()
+      assert opening and abs(opening['y']+opening['height']/2-height/2) < height*.15,(prefix,opening)
+      await pg.screenshot(path=str(OUT/(prefix+'-opening.png')))
+      await pg.wait_for_timeout(1600)
       await fits(pg,prefix+'-home')
+      await pg.click('.stop[data-id="fosil"]')
+      assert 'duvarların yukarısındaki' in await pg.locator('.tg-where').inner_text()
+      await fits(pg,prefix+'-fossil-location')
+      await pg.click('.stop[data-id="pirana"]')
       await pg.click('#target-learn');await fits(pg,prefix+'-learn')
       await pg.click('#learn-next');await fits(pg,prefix+'-observe')
       await pg.reload();await pg.locator('#v-learn.active').wait_for()
@@ -55,7 +68,7 @@ async def main():
       stations=await pg.evaluate('KASIF.stations.map(s=>({code:s.code,answer:s.quiz.answer}))')
       # QR bağlantıları da bilgiden başlar; kodları değiştirmeden tüm görevler tamamlanır.
       for st in stations[1:]:
-        await pg.goto(B+'#s='+st['code']);await lesson_to_quiz(pg)
+        await pg.goto(B+'#s='+st['code']);await lesson_to_quiz(pg,prefix+'-'+st['code'])
         await pg.click(f"#quiz-opts .opt:nth-child({st['answer']+1})")
         await pg.wait_for_timeout(1000)
         await pg.click('#rw-next')
@@ -94,6 +107,15 @@ async def main():
     await pg.click('#v-learn [data-listen]');await pg.click('#learn-next');await pg.wait_for_timeout(100)
     assert await pg.locator('#modal').evaluate("e=>e.classList.contains('hidden')")
     await br.close()
+  # Küçük bir görsel kontrol şeridi, test günlüğünden incelenebilir.
+  import base64, io
+  from PIL import Image
+  names=['390x844-welcome.png','390x844-opening.png','390x844-home.png','390x844-learn.png']
+  sheet=Image.new('RGB',(1000,542),'#0b3c6e')
+  for i,name in enumerate(names):
+    im=Image.open(OUT/name).convert('RGB');im.thumbnail((250,542));sheet.paste(im,(i*250,0))
+  data=io.BytesIO();sheet.save(data,format='JPEG',quality=65)
+  print('VISUAL_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
   server.shutdown()
   print('PASS: 5 ekran boyutu, 9 görev, bilgi/gözlem, QR, final, kayıt ve çevrimdışı açılış')
 
