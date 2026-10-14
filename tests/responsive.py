@@ -51,7 +51,13 @@ async def main():
         await pg.click(f'.stop[data-id="{st}"]');await pg.click('#target-learn');await check(pg,f'{w}x{h}-learn-{st}')
         await pg.click('#learn-back')
       # Aynı telefonda tarayıcı çubuğu açılıp kapandığında düzen yeniden hesaplanır.
-      await pg.set_viewport_size({'width':w,'height':max(429,h-100)})
+      if chrome:
+        await pg.evaluate('(height)=>{visualViewport.height=height;window.dispatchEvent(new Event("resize"))}',h-80)
+      else:
+        await pg.set_viewport_size({'width':w,'height':max(429,h-100)})
+      await pg.wait_for_timeout(250)
+      await check(pg,f'{w}x{h}-resized-home')
+      await pg.click('#btn-hints');await check(pg,f'{w}x{h}-resized-hint')
       await ctx.close()
     await br.close()
   server.shutdown()
