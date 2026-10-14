@@ -1,0 +1,64 @@
+"""Dar/kısa ekranlar, tarayıcı çubukları ve okunabilir içerik sınırları."""
+import asyncio, functools, http.server, pathlib, threading
+from playwright.async_api import async_playwright
+ROOT=pathlib.Path(__file__).resolve().parent.parent
+OUT=ROOT/'tests'/'out';OUT.mkdir(exist_ok=True)
+
+async def check(pg,label):
+    await pg.wait_for_timeout(100)
+    result=await pg.evaluate('''()=>{
+      const v=document.querySelector('.view.active'),vr=v.getBoundingClientRect();
+      const all=[...v.querySelectorAll('button,input,.field-label,.field>span,#hint-copy,#learn-copy,.hint-subject')];
+      const issues=[];
+      for(const e of all){const r=e.getBoundingClientRect(),s=getComputedStyle(e);if(!r.width||!r.height||s.display==='none')continue;
+        if(r.top<vr.top-2||r.bottom>vr.bottom-5||r.left<vr.left-2||r.right>vr.right+2)issues.push(e.id||e.className);
+        if(e.scrollHeight>e.clientHeight+2||e.scrollWidth>e.clientWidth+2)issues.push('clipped '+(e.id||e.className));
+      }
+      for(const id of ['hint-copy','learn-copy']){const e=v.querySelector('#'+id);if(!e)continue;const r=e.getBoundingClientRect();const card=e.closest('.paper').getBoundingClientRect();if(r.bottom>card.bottom-5)issues.push('card clipped '+id);}
+      const av=[...v.querySelectorAll('#avatars button')].map(e=>e.getBoundingClientRect());
+      if(av.some(r=>r.width<43||r.height<43))issues.push('avatar touch size');
+      const subject=v.querySelector('.hint-subject'),bubble=v.querySelector('.guide-bubble');
+      if(subject&&bubble&&subject.getBoundingClientRect().bottom>bubble.getBoundingClientRect().top+1)issues.push('hint overlap');
+      return {issues,overflow:v.scrollHeight>v.clientHeight+2};
+    }''')
+    assert not result['issues'] and not result['overflow'],(label,result)
+
+async def main():
+  server=http.server.ThreadingHTTPServer(('127.0.0.1',8766),functools.partial(http.server.SimpleHTTPRequestHandler,directory=str(ROOT)))
+  threading.Thread(target=server.serve_forever,daemon=True).start()
+  async with async_playwright() as p:
+    br=await p.chromium.launch()
+    for w,h,chrome in [(280,480,0),(320,480,0),(320,568,96),(360,640,110),(375,667,100),(390,844,120),(412,915,120),(430,932,120),(253,429,0),(844,390,0)]:
+      ctx=await br.new_context(viewport={'width':w,'height':h},is_mobile=True,has_touch=True,device_scale_factor=2)
+      if chrome:
+        await ctx.add_init_script(f"Object.defineProperty(window,'visualViewport',{{value:{{height:{h-chrome},width:{w},addEventListener(){{}}}}}})")
+      pg=await ctx.new_page();await pg.goto('http://127.0.0.1:8766/');await pg.evaluate('document.fonts.ready')
+      if w>=375:
+        await pg.add_style_tag(content=':root{--safe-t:24px;--safe-b:24px}')
+      await check(pg,f'{w}x{h}-welcome')
+      if w in [280,320,375]: await pg.screenshot(path=str(OUT/f'responsive-{w}x{h}-welcome.png'))
+      await pg.evaluate("localStorage.setItem('okyanus-kasifi-v1',JSON.stringify({v:1,id:'1234',name:'Uzun Kaşif Adı',avatar:'vatoz',badges:{},created:Date.now()}))")
+      await pg.reload();await pg.click('#btn-hints')
+      for i in range(9):
+        await check(pg,f'{w}x{h}-hint-{i}')
+        if i==0 and w in [280,320,375]:await pg.screenshot(path=str(OUT/f'responsive-{w}x{h}-hints.png'))
+        if i<8:await pg.click('#hint-next')
+      await pg.click('#hint-home')
+      for st in await pg.evaluate('KASIF.stations.map(s=>s.id)'):
+        await pg.click(f'.stop[data-id="{st}"]');await pg.click('#target-learn');await check(pg,f'{w}x{h}-learn-{st}')
+        await pg.click('#learn-back')
+      # Aynı telefonda tarayıcı çubuğu açılıp kapandığında düzen yeniden hesaplanır.
+      await pg.set_viewport_size({'width':w,'height':max(429,h-100)})
+      await ctx.close()
+    await br.close()
+  server.shutdown()
+  print('PASS: 10 mobile configurations, all 9 hints and lessons; touch sizes, clipping and overlaps')
+  from PIL import Image,ImageOps,ImageDraw
+  import io,base64
+  names=['responsive-320x480-welcome.png','responsive-320x480-hints.png','responsive-375x667-welcome.png','responsive-375x667-hints.png']
+  sheet=Image.new('RGB',(1000,600),'#fff');d=ImageDraw.Draw(sheet)
+  for i,name in enumerate(names):
+    im=Image.open(OUT/name).convert('RGB');im.thumbnail((240,560));sheet.paste(im,(i*250,28));d.text((i*250+4,4),name,fill='#000')
+  b=io.BytesIO();sheet.save(b,format='JPEG',quality=85);print('RESPONSIVE_QA_BASE64:'+base64.b64encode(b.getvalue()).decode())
+
+asyncio.run(main())

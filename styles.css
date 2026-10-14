@@ -519,3 +519,86 @@ h1,h2,h3,.btn,.pill,.me b,.tb-title,.pp-title,.hello-hi{font-family:var(--displa
 @media(max-height:680px){.welcome-brand{height:52px;margin-bottom:7px}.passport-inner>.brand-logo{height:30px}.final-cover .passport-inner>.brand-logo{height:30px}}
 @media(max-height:520px){.welcome-brand{height:42px;margin-bottom:5px}.passport-inner>.brand-logo,.final-cover .passport-inner>.brand-logo{height:25px}}
 @media(orientation:landscape) and (max-height:520px){.welcome-brand{width:230px;height:42px}}
+/* Görünür ekran yüksekliği: tarayıcı çubukları ve klavye dahil. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.view{min-width:0}.view>*{min-width:0}.topbar .tb-title{min-width:0;text-align:center}
+.passport,.final-cover,.final-cover.gold{color:#fff}
+.passport-inner{border-color:#ffffffb3;justify-content:center;gap:14px}
+.pp-emblem{color:#fff;width:65%;flex:0 1 auto;min-height:0}
+.pp-title,.final-cover.gold .pp-title,.final-cover.gold .pp-name{color:#fff}
+.pp-back{box-shadow:inset 0 0 0 10px #0b2148,inset 0 0 0 12px #ffffff70}
+.final-cover .passport-inner{justify-content:flex-start;gap:8px;padding-top:14px}
+.final-cover .pp-emblem{width:50%;max-height:85px;flex-shrink:1}
+.final-cover.gold{background:radial-gradient(120% 90% at 30% 20%,#256b9f,#123266 65%,#0b2148)}
+.welcome-brand{height:clamp(54px,12dvh,95px);width:min(220px,68vw);margin:0 auto 6px}
+#v-welcome:not(.opening){gap:0}
+#v-welcome:not(.opening) .cover-wrap{overflow:hidden;min-height:0}
+#v-welcome:not(.opening) .book-open{height:min(100%,calc(var(--app-height)*.29),240px);max-width:55vw}
+.sheet{width:100%;padding:12px 14px;margin-top:6px}
+.field>span,.field-label{margin-left:0;font-size:15px}
+.avatars{grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin:8px 0 12px}
+.avatars button{min-width:0;min-height:44px;max-width:64px;width:100%;justify-self:center}
+.avatars button.sel{transform:none;box-shadow:0 0 0 2px #f5bd3a55}
+.sheet input{min-height:46px;font-size:18px}
+.sheet .btn{min-height:48px}
+html[data-narrow=true] .avatars{grid-template-columns:repeat(3,48px);justify-content:center;gap:7px 22px}
+html[data-narrow=true] .sheet{padding:10px 12px}
+html[data-narrow=true] .sheet-lead{font-size:13px;margin-bottom:7px}
+html[data-narrow=true] #v-welcome:not(.opening) .book-open{max-height:150px}
+.learn-card{grid-template-rows:auto auto minmax(0,1fr) auto;gap:10px;padding:14px}
+.quick-tip{font-size:clamp(18px,4.8vw,21px);line-height:1.35;padding:13px 14px}
+.tip-instruction{margin-top:7px}.tip-heading{margin-bottom:8px}
+.learn-art{flex:none;min-height:0;max-height:180px}
+.hint-card{display:flex;flex-direction:column;justify-content:center;gap:12px;padding:14px}
+.hint-subject{flex-direction:row;text-align:left;gap:12px;flex-shrink:0;width:100%}
+.hint-subject h2{font-size:clamp(20px,5.5vw,25px);line-height:1.15;overflow-wrap:break-word}
+.hint-art{width:clamp(52px,13vw,85px);height:clamp(52px,13vw,85px);flex:none}
+.guide-bubble{width:100%;padding:12px;gap:7px 10px}
+.guide-bubble p{font-size:clamp(18px,4.8vw,21px);line-height:1.35;overflow-wrap:break-word}
+.guide-bubble b{overflow-wrap:anywhere}
+.hint-pager{flex-shrink:0}.hint-pager>div{min-width:0}.hint-pager b{font-size:clamp(19px,5.8vw,26px)}
+.hint-actions .btn{min-height:48px;font-size:16px;line-height:1.25}
+html[data-layout=short] .view.active,html[data-layout=tiny] .view.active{gap:7px}
+html[data-layout=short] .welcome-brand{height:62px}
+html[data-layout=short] .learn-card{padding:12px;gap:8px}
+html[data-layout=short] .hint-card{padding:12px;gap:10px}
+html[data-layout=short] .guide-avatar{width:32px;height:32px}
+html[data-layout=short] .guide-bubble{grid-template-columns:32px 1fr}
+html[data-layout=tiny] .view{padding:calc(var(--safe-t) + 6px) 10px calc(var(--safe-b) + 8px)}
+html[data-layout=tiny] .welcome-brand{height:54px}
+html[data-layout=tiny] #v-welcome:not(.opening) .cover-wrap{display:none}
+html[data-layout=tiny] .sheet{margin-top:0;padding:10px 12px}
+html[data-layout=tiny] .sheet-lead{font-size:13px;margin-bottom:6px}
+html[data-layout=tiny] .sheet .field{margin-bottom:6px}
+html[data-layout=tiny] .hint-actions{grid-template-columns:1fr 1fr;gap:8px}
+html[data-layout=tiny] .hint-actions .btn{font-family:var(--font);min-height:48px;padding:8px;font-size:15px}
+html[data-layout=tiny] .hint-pager{padding:5px 7px}
+html[data-layout=tiny] #hint-group,html[data-layout=tiny] .hint-earned{display:none}
+html[data-layout=tiny] .hint-card{padding:10px;gap:8px}
+html[data-layout=tiny] .guide-avatar,html[data-layout=tiny] #hint-greeting{display:none}
+html[data-layout=tiny] .guide-bubble{display:block;padding:10px}
+html[data-layout=tiny] .guide-content{display:contents}
+html[data-layout=tiny] .hint-art{width:48px;height:48px;border-radius:14px}
+html[data-layout=tiny] .hint-subject{gap:9px}
+html[data-layout=tiny] .learn-art{display:none}
+html[data-layout=tiny] .learn-card{grid-template-rows:auto auto 1fr auto;padding:10px;gap:7px}
+html[data-layout=tiny] #learn-region{font-size:17px;grid-template-columns:20px minmax(0,1fr) auto;padding:7px}
+html[data-layout=tiny] .learn-card h2{font-size:23px}
+.view[data-density=compact] .hint-art{width:48px;height:48px}
+.view[data-density=compact] .guide-avatar,.view[data-density=compact] #hint-greeting,.view[data-density=compact] .hint-earned{display:none}
+.view[data-density=compact] .guide-bubble{display:block}
+.view[data-density=compact] .learn-art{max-height:60px}
+.view[data-density=minimal] .hint-art,.view[data-density=minimal] .guide-avatar,.view[data-density=minimal] #hint-greeting,.view[data-density=minimal] .hint-earned,.view[data-density=minimal] #hint-name,.view[data-density=minimal] .learn-art{display:none}
+.view[data-density=minimal] .hint-card{gap:7px;padding:9px}
+.view[data-density=minimal] .guide-bubble{display:block;padding:9px}
+.view[data-density=minimal] .learn-card{grid-template-rows:auto auto 0 auto;gap:7px}
+.keyboard-open .welcome-brand,.keyboard-open #v-welcome .cover-wrap,.keyboard-open .sheet-lead{display:none}
+.keyboard-open #v-welcome .sheet{max-height:100%;overflow-y:auto}
+@media(orientation:landscape) and (max-height:520px){
+ .welcome-brand{display:none}html[data-narrow=false] .avatars{grid-template-columns:repeat(6,44px);justify-content:center}
+ .hint-card{display:grid;grid-template-columns:1fr 1.5fr;gap:12px;align-items:center}
+ .hint-subject{flex-direction:column;text-align:center}.guide-bubble{display:block}
+ .learn-card{grid-template-columns:1fr 1.5fr;grid-template-rows:auto 1fr}
+ html[data-layout=tiny] #learn-region{grid-template-columns:minmax(0,1fr) auto}
+}
+

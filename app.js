@@ -33,7 +33,7 @@ function show(id, push = true){
   if (push && current && current !== id && !["v-reward","v-quiz"].includes(current)) stack.push(current);
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === id));
   document.body.classList.toggle("scan-mode", id === "v-scan");
-  current = id; window.scrollTo(0,0);
+  current = id; window.scrollTo(0,0); scheduleFit();
   document.querySelectorAll("[data-listen]").forEach(b => b.hidden = !("speechSynthesis" in window));
   if (id === "v-home") renderHome();
   if (id === "v-scan") startCam();
@@ -356,8 +356,32 @@ document.querySelectorAll("[data-listen]").forEach(b => b.onclick = () => {
   speaking=true;b.textContent="■ Durdur";b.setAttribute("aria-pressed","true");speechSynthesis.speak(u);
 });
 // Klavye ve tarayıcı çubukları dahil görünür yüksekliği kullan.
-function fitViewport(){document.documentElement.style.setProperty("--app-height",(window.visualViewport ? visualViewport.height : innerHeight)+"px");}
-window.addEventListener("resize",fitViewport);if(window.visualViewport)visualViewport.addEventListener("resize",fitViewport);fitViewport();
+function fitContent(){
+  const v=document.querySelector('.view.active');if(!v)return;
+  v.removeAttribute('data-density');
+  const card=v.querySelector('.learn-card,.hint-card');
+  if(card){
+    const crowded=()=>card.scrollHeight>card.clientHeight+2;
+    if(crowded())v.dataset.density='compact';
+    if(crowded())v.dataset.density='minimal';
+  }
+}
+let fitFrame=0;
+function scheduleFit(){cancelAnimationFrame(fitFrame);fitFrame=requestAnimationFrame(fitContent);}
+function fitViewport(){
+  const vp=window.visualViewport,h=vp?vp.height:innerHeight,w=vp?vp.width:innerWidth;
+  const root=document.documentElement;root.style.setProperty('--app-height',h+'px');
+  root.dataset.layout=h<530?'tiny':h<690?'short':'roomy';
+  root.dataset.narrow=w<360?'true':'false';
+  root.classList.toggle('keyboard-open',h<400 && document.activeElement.matches('input'));
+  scheduleFit();
+}
+window.addEventListener('resize',fitViewport);
+if(window.visualViewport)visualViewport.addEventListener('resize',fitViewport);
+document.addEventListener('focusin',fitViewport);document.addEventListener('focusout',fitViewport);
+new MutationObserver(scheduleFit).observe(document.body,{childList:true,subtree:true,characterData:true});
+document.fonts.ready.then(scheduleFit);fitViewport();
+
 
 // ---------- Soru ----------
 function openQuiz(st){
@@ -495,7 +519,7 @@ function svgImg(svg){
 }
 let logoImagePromise=null;
 function brandImage(){
-  if(!logoImagePromise)logoImagePromise=new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(new Error("Logo yüklenemedi"));i.src="KörfezAqua Logo/Korfez_Logo_yatay_1000x232px-e1785397178582.png";});
+  if(!logoImagePromise)logoImagePromise=new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(new Error("Logo yüklenemedi"));i.src="logo2.png";});
   return logoImagePromise;
 }
 
@@ -522,7 +546,7 @@ async function drawCert(){
   x.textAlign = "left";
   x.fillStyle = "#7a4a00"; x.font = `700 24px ${F}`; x.fillText("KEŞİF PASAPORTU", 120, 110);
   const brand=await brandImage();
-  x.drawImage(brand,390,1265,300,69.6);
+  x.drawImage(brand,637,332,646,399,475,1257,130,80.3);
   x.fillStyle = "#10264d"; x.font = `700 58px ${F}`; x.fillText("Okyanus Kaşifi", 120, 186);
   x.fillStyle = "#7a4a00"; x.font = `600 34px ${F}`; x.fillText("pasaportu tamamlandı!", 120, 226);
   // kaşif kartı
@@ -555,7 +579,7 @@ async function drawCert(){
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v20`; renderInstall(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v21`; renderInstall(); }
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
   {label:"Vazgeç",cls:"btn-ghost"}]);

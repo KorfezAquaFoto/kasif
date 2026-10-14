@@ -38,8 +38,8 @@ async def main():
       await pg.evaluate('document.fonts.load(\'600 16px "DynaPuff"\', "ÇĞİÖŞÜçğıöşü")')
       assert await pg.evaluate('document.fonts.check(\'600 16px "DynaPuff"\')')
       await pg.evaluate('document.fonts.ready')
-      assert await pg.evaluate("async()=>{const i=new Image();i.src='KörfezAqua Logo/Korfez_Logo_yatay_1000x232px-e1785397178582.png';await i.decode();return i.naturalWidth}")==996
-      assert await pg.locator('#v-welcome .brand-logo').count()==2
+      assert await pg.evaluate("async()=>{const i=new Image();i.src='logo2.png';await i.decode();return i.naturalWidth}")==1920
+      assert await pg.locator('#v-welcome .brand-logo').count()==1
       assert await pg.locator('#v-welcome .field-label').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
       assert await pg.locator('#v-welcome .field>span').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
       assert await pg.locator('.welcome-brand .brand-logo').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgba(0, 0, 0, 0)'
