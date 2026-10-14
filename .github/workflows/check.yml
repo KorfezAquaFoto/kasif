@@ -1,0 +1,21 @@
+name: Kaşif ekran ve görev testleri
+on: [push, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  mobile-flow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install playwright
+      - run: python -m playwright install --with-deps chromium
+      - run: python tests/e2e.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: telefon-ekranlari
+          path: tests/out/*.png

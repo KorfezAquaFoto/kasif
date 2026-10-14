@@ -119,3 +119,126 @@ window.KASIF = {
     }
   ]
 };
+
+
+// Kısa tanışma bilgileri ve yerinde gözlem yönlendirmesi.
+const LESSONS = {
+  "pirana": {
+    "intro": [
+      "Piranalar Güney Amerika’da yaşayan balıklardır.",
+      "Keskin dişleriyle tanınırlar. Hepsi aynı büyüklükte değildir."
+    ],
+    "observe": "Tanktaki piranaları izle. Tek başlarına mı, birlikte mi yüzüyorlar?",
+    "reward": "Piranalar sürü hâlinde yüzerek kendilerini koruyabilir.",
+    "icons": [
+      "💤",
+      "🛡️",
+      "🌡️"
+    ]
+  },
+  "mersin": {
+    "intro": [
+      "Mersin balığının uzun bir gövdesi vardır.",
+      "Ağzının yakınındaki küçük bıyıklar yiyecek bulmasına yardımcı olur."
+    ],
+    "observe": "Mersin balığının vücuduna dikkatle bak. Sert plakaları fark edebiliyor musun?",
+    "reward": "Vücudundaki sert plakalar mersin balığını korur.",
+    "icons": [
+      "💨",
+      "🎨",
+      "🛡️"
+    ]
+  },
+  "kesis": {
+    "intro": [
+      "Keşiş yengeci, boş bir deniz salyangozu kabuğunu ev olarak kullanır.",
+      "Kabuğunu yanında taşıyarak dolaşır."
+    ],
+    "observe": "Sırtındaki kabuğa bak. Yengeç büyürse bu eve hâlâ sığabilir mi?",
+    "reward": "Büyüyen keşiş yengeci, sığabileceği daha büyük bir kabuk arar.",
+    "icons": [
+      "📏",
+      "🫧",
+      "🎨"
+    ]
+  },
+  "fosil": {
+    "intro": [
+      "Çok eski canlılar bazen taşların içinde iz bırakır.",
+      "Bu izleri inceleyen bilim insanları geçmişi araştırır."
+    ],
+    "observe": "Sergideki fosillere bak. Bir kabuk, canlı şekli veya iz fark edebiliyor musun?",
+    "reward": "Fosiller, çok eski zamanlarda yaşamış canlıları tanımamıza yardım eder.",
+    "icons": [
+      "☁️",
+      "🦕",
+      "🌡️"
+    ]
+  },
+  "orfoz": {
+    "intro": [
+      "Orfoz, iri gövdeli bir balıktır.",
+      "Onu fark etmek için tankın farklı köşelerine dikkatle bak."
+    ],
+    "observe": "Orfozu bulmaya çalış. Tankın hangi bölümünde duruyor? Kayalara da bak.",
+    "reward": "Orfozlar kaya oyuklarını saklanacak bir yer olarak kullanır.",
+    "icons": [
+      "🌊",
+      "🏖️",
+      "🪨"
+    ]
+  },
+  "korfez": {
+    "intro": [
+      "İzmit Körfezi, yaşadığımız şehrin denizidir.",
+      "Karagöz, mırmır ve sargos gibi balıklar bu denizde yaşar."
+    ],
+    "observe": "Körfez akvaryumundaki balıkları izle. Temiz bir deniz, onlar için neden önemli olabilir?",
+    "reward": "Temiz bir deniz dibi, Körfez balıkları için daha sağlıklı bir yaşam alanıdır.",
+    "icons": [
+      "🚢",
+      "🐟",
+      "❄️"
+    ]
+  },
+  "kabuk": {
+    "intro": [
+      "Deniz kabuklarının pek çok rengi ve şekli vardır.",
+      "Bazıları spiral kıvrımlı, bazıları iki parçalıdır."
+    ],
+    "observe": "Vitrindeki kabuklara bak. Bu kabuklardan birinde nasıl bir canlı yaşamış olabilir?",
+    "reward": "Deniz kabuğunu, içinde yaşayan yumuşak gövdeli canlı oluşturur.",
+    "icons": [
+      "🌊",
+      "🐚",
+      "🐟"
+    ]
+  },
+  "megalodon": {
+    "intro": [
+      "Megalodon, çok eskiden yaşamış dev bir köpekbalığıydı.",
+      "Bugün yaşayan bir megalodon yok. Onu fosillerinden tanıyoruz."
+    ],
+    "observe": "Sergideki dişlere bak. Kendi elinle karşılaştır: sence ne kadar büyükler?",
+    "reward": "Megalodonun büyük dişleri bir yetişkinin eli kadar olabiliyordu.",
+    "icons": [
+      "✋",
+      "🍚",
+      "🚌"
+    ]
+  },
+  "vatoz": {
+    "intro": [
+      "Vatozun vücudu geniş ve yassıdır.",
+      "Köpekbalıklarıyla akrabadır. Ama görünüşleri çok farklıdır!"
+    ],
+    "observe": "Tüneldeki vatozu izle. Vücudunun iki yanındaki geniş kısımlar nasıl hareket ediyor?",
+    "reward": "Kanat gibi görünen geniş kısımlar, vatozun göğüs yüzgeçleridir.",
+    "icons": [
+      "🪽",
+      "🐟",
+      "〰️"
+    ]
+  }
+};
+KASIF.stations.forEach(st => Object.assign(st, LESSONS[st.id]));

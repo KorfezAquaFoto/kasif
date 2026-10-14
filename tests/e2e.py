@@ -1,84 +1,89 @@
-"""Uçtan uca test (Playwright, Python).
-Kullanım:
-  1) Proje kökünde:  python3 -m http.server 8765
-  2) Başka terminalde:  pip install playwright qrcode pillow && python3 tests/e2e.py
-Ekran görüntüleri tests/out/ klasörüne yazılır.
-"""
-import os, pathlib
-OUT = pathlib.Path(__file__).parent / "out"; OUT.mkdir(exist_ok=True)
-Y4M = str(OUT / "qr.y4m")
-
-def make_fake_camera(url):
-    import qrcode
-    from PIL import Image
-    q = qrcode.make(url, box_size=8, border=4).convert("RGB")
-    bg = Image.new("RGB", (640, 480), (90, 110, 130)); bg.paste(q.resize((360, 360)), (140, 60))
-    Y, Cb, Cr = bg.convert("YCbCr").split()
-    with open(Y4M, "wb") as f:
-        f.write(b"YUV4MPEG2 W640 H480 F10:1 Ip A1:1 C420jpeg\n")
-        for _ in range(20):
-            f.write(b"FRAME\n" + Y.tobytes() + Cb.resize((320, 240)).tobytes() + Cr.resize((320, 240)).tobytes())
-
-import asyncio
+"""v14: görev akışı, QR, kayıt, çevrimdışı açılış ve ekran taşması testi."""
+import asyncio, functools, http.server, os, pathlib, threading
 from playwright.async_api import async_playwright
-B=os.environ.get("BASE","http://localhost:8765/")
-make_fake_camera(B+"#s=PRN-3T9F")
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+OUT = ROOT / 'tests' / 'out'; OUT.mkdir(exist_ok=True)
+B = os.environ.get('BASE', 'http://127.0.0.1:8765/')
+
+async def fits(pg, label):
+    await pg.wait_for_timeout(150)
+    result = await pg.evaluate('''() => {
+      const v=document.querySelector('.view.active'), r=v.getBoundingClientRect();
+      const bad=[...v.querySelectorAll('button,input,.intro-facts,.observe-text,.quiz-msg,.fact-card')].filter(e=>{
+        const b=e.getBoundingClientRect(),s=getComputedStyle(e);
+        return b.width && b.height && s.visibility!=='hidden' && (b.bottom>innerHeight+2 || b.top < -2 || b.left < -2 || b.right > innerWidth+2);
+      }).map(e=>e.id||e.className);
+      return {bad,overflow:v.scrollHeight>v.clientHeight+2,body:document.documentElement.scrollHeight>innerHeight+2};
+    }''')
+    assert not result['bad'] and not result['overflow'] and not result['body'], (label,result)
+    await pg.screenshot(path=str(OUT / (label+'.png')))
+
+async def lesson_to_quiz(pg):
+    await pg.locator('#v-learn.active').wait_for()
+    await pg.click('#learn-next')
+    assert await pg.locator('#learn-heading').inner_text() == 'Yakından bak'
+    await pg.click('#learn-next')
+    await pg.locator('#v-quiz.active').wait_for()
+
 async def main():
+  handler=functools.partial(http.server.SimpleHTTPRequestHandler,directory=str(ROOT))
+  server=http.server.ThreadingHTTPServer(('127.0.0.1',8765),handler)
+  threading.Thread(target=server.serve_forever,daemon=True).start()
   async with async_playwright() as p:
-    br=await p.chromium.launch(args=["--use-fake-ui-for-media-stream","--use-fake-device-for-media-stream","--use-file-for-fake-video-capture="+Y4M])
-    ctx=await br.new_context(viewport={"width":390,"height":844}, device_scale_factor=2, is_mobile=True, has_touch=True, permissions=["camera"])
-    pg=await ctx.new_page()
-    errs=[]; pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("console", lambda m: m.type=="error" and errs.append(m.text))
-    await pg.goto(B); await pg.wait_for_timeout(1200)
-    await pg.screenshot(path=str(OUT/"v2-01-welcome.png"))
-    print("kapak yuksekligi:", await pg.evaluate("Math.round(document.querySelector('#passport').getBoundingClientRect().height)"))
-    await pg.fill("#in-name","Ayşe Çağla"); await pg.click("#avatars button:nth-child(2)")
-    await pg.click("#btn-start"); await pg.wait_for_timeout(1300)
-    await pg.screenshot(path=str(OUT/"v6-opening.png"))
-    await pg.wait_for_timeout(1700)
-    await pg.screenshot(path=str(OUT/"v2-02-home.png"), full_page=True)
-    await pg.click("#btn-scan", force=True); await pg.wait_for_timeout(3000)
-    print("after cam:", await pg.evaluate("document.querySelector('.view.active').id"))
-    await pg.click("#quiz-opts .opt:nth-child(1)"); await pg.wait_for_timeout(400)
-    await pg.screenshot(path=str(OUT/"v2-03-quiz.png"))
-    await pg.click("#quiz-opts .opt:nth-child(2)"); await pg.wait_for_timeout(1280)
-    await pg.screenshot(path=str(OUT/"v6-press.png"))
-    await pg.wait_for_timeout(1600)
-    await pg.screenshot(path=str(OUT/"v2-04-reward.png"))
-    await pg.click("#rw-next"); await pg.wait_for_timeout(500)
-    await pg.evaluate("navigator.serviceWorker.ready"); await pg.wait_for_timeout(500)
-    await ctx.set_offline(True)
-    await pg.goto(B+"#s=MRS-4N7C"); await pg.wait_for_timeout(1200)
-    print("offline:", await pg.evaluate("document.querySelector('#quiz-q').textContent"))
-    await pg.click("#quiz-opts .opt:nth-child(3)"); await pg.wait_for_timeout(1500)
-    await pg.click("#rw-next"); await pg.wait_for_timeout(500)
-    await pg.screenshot(path=str(OUT/"v2-05-home2.png"), full_page=True)
-    await pg.click(".cell.locked >> nth=3"); await pg.wait_for_timeout(400)
-    print("hedef:", await pg.evaluate("document.querySelector('.tg-hint').textContent.slice(0,30)"))
-    await pg.screenshot(path=str(OUT/"v2-06-drawer.png"))
-    await pg.evaluate("void (navigator.mediaDevices.getUserMedia=()=>Promise.reject(new Error('denied')))")
-    for code in ["KSY-2P6L","FSL-8D3M","ORF-5G2H","KRF-7S1B","KAB-6R9T","MGL-8W4K","VTZ-9K3A"]:
-      await pg.click("#btn-scan", force=True); await pg.wait_for_timeout(300)
-      await pg.fill("#in-code", code); await pg.click("#manual-form button"); await pg.wait_for_timeout(400)
-      ans=await pg.evaluate(f"KASIF.stations.find(s=>s.code=='{code}').quiz.answer")
-      await pg.click(f"#quiz-opts .opt:nth-child({ans+1})"); await pg.wait_for_timeout(1500)
-      if code=="KRF-7S1B": await pg.screenshot(path=str(OUT/"v4-eco.png"))
-      if code!="VTZ-9K3A": await pg.click("#rw-next"); await pg.wait_for_timeout(300)
-    await pg.screenshot(path=str(OUT/"v2-07-final.png"))
-    await pg.click("#rw-next"); await pg.wait_for_timeout(700)
-    await pg.screenshot(path=str(OUT/"v8-final-press.png"))
-    await pg.wait_for_timeout(2300)
-    await pg.screenshot(path=str(OUT/"v2-08-cert.png"), full_page=True)
-    await pg.click("#v-cert [data-back]"); await pg.wait_for_timeout(400)
-    await pg.screenshot(path=str(OUT/"v2-09-done.png"), full_page=True)
-    await pg.goto(B+"#s=PRN-3T9F"); await pg.wait_for_timeout(900)
-    await pg.screenshot(path=str(OUT/"v2-10-dup.png"))
-    print("dup:", await pg.evaluate("document.querySelector('#modal-title').textContent"))
-    await pg.click("#modal-btns button"); await pg.click("#btn-help"); await pg.wait_for_timeout(400)
-    await pg.screenshot(path=str(OUT/"v10-help.png"))
-    await pg.click("#help-close"); await pg.click("#btn-menu"); await pg.wait_for_timeout(400)
-    await pg.screenshot(path=str(OUT/"v2-11-menu.png"))
-    img=await pg.evaluate("document.querySelector('#cert-img').naturalWidth")
-    print("cert width:", img, "errors:", errs)
+    br=await p.chromium.launch()
+    for width,height in [(320,568),(360,640),(390,844),(768,1024),(844,390)]:
+      ctx=await br.new_context(viewport={'width':width,'height':height},has_touch=True)
+      pg=await ctx.new_page();errors=[];pg.on('pageerror',lambda e:errors.append(str(e)))
+      await pg.goto(B);await pg.locator('#v-welcome.active').wait_for()
+      prefix=f'{width}x{height}'
+      await fits(pg,prefix+'-welcome')
+      await pg.fill('#in-name','Ayşe Çağla');await pg.click('#btn-start');await pg.wait_for_timeout(2800)
+      await fits(pg,prefix+'-home')
+      await pg.click('#target-learn');await fits(pg,prefix+'-learn')
+      await pg.click('#learn-next');await fits(pg,prefix+'-observe')
+      await pg.reload();await pg.locator('#v-learn.active').wait_for()
+      assert await pg.locator('#learn-heading').inner_text()=='Yakından bak'
+      await pg.click('#learn-next');await pg.locator('#v-scan.active').wait_for()
+      await fits(pg,prefix+'-scan')
+      await pg.fill('#in-code','PRN-3T9F');await pg.click('#manual-form button')
+      await pg.locator('#v-quiz.active').wait_for();await fits(pg,prefix+'-quiz')
+      await pg.click('#quiz-opts .opt:nth-child(1)')
+      assert 'İpucu' in await pg.locator('#quiz-msg').inner_text()
+      await fits(pg,prefix+'-hint')
+      await pg.click('#quiz-opts .opt:nth-child(2)');await pg.wait_for_timeout(1100)
+      await fits(pg,prefix+'-reward');await pg.click('#rw-next')
+      stations=await pg.evaluate('KASIF.stations.map(s=>({code:s.code,answer:s.quiz.answer}))')
+      # QR bağlantıları da bilgiden başlar; kodları değiştirmeden tüm görevler tamamlanır.
+      for st in stations[1:]:
+        await pg.goto(B+'#s='+st['code']);await lesson_to_quiz(pg)
+        await pg.click(f"#quiz-opts .opt:nth-child({st['answer']+1})")
+        await pg.wait_for_timeout(1000)
+        await pg.click('#rw-next')
+      await pg.locator('#v-cert.active').wait_for();await fits(pg,prefix+'-final')
+      await pg.click('#btn-preview');await pg.wait_for_function('document.querySelector("#cert-img").naturalWidth===1080')
+      await fits(pg,prefix+'-passport')
+      await pg.click('#v-cert [data-back]');await fits(pg,prefix+'-complete')
+      await pg.click('#btn-help');await pg.click('#help-close');await pg.click('#btn-menu');await fits(pg,prefix+'-menu')
+      # Önbellek güncellemesi sonrası çevrimdışı açılış ve damgaların korunması.
+      await pg.evaluate('navigator.serviceWorker.ready');await pg.wait_for_timeout(1000)
+      await ctx.set_offline(True);await pg.reload();await pg.locator('#v-home.active').wait_for()
+      assert '9/9' in await pg.locator('#me-count').inner_text()
+      assert not errors,errors
+      await ctx.close()
+    # Gerçek QR çözümleyici: jsQR ile giriş ve dokuz görev QR'ını çöz.
+    ctx=await br.new_context();pg=await ctx.new_page();await pg.goto(B)
+    await pg.add_script_tag(url=B+'vendor/qrcode.js')
+    codes=await pg.evaluate('KASIF.stations.map(s=>s.code)')
+    for code in codes:
+      decoded=await pg.evaluate('''async code=>{
+        const text=location.href.split('#')[0]+'#s='+code,q=qrcode(0,'M');q.addData(text);q.make();
+        const image=new Image();image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(q.createSvgTag({cellSize:8,margin:4}));await image.decode();
+        const c=document.createElement('canvas');c.width=image.width;c.height=image.height;const x=c.getContext('2d');x.fillStyle='white';x.fillRect(0,0,c.width,c.height);x.drawImage(image,0,0);
+        return jsQR(x.getImageData(0,0,c.width,c.height).data,c.width,c.height)?.data;
+      }''',code)
+      assert decoded and decoded.endswith('#s='+code),(code,decoded)
     await br.close()
+  server.shutdown()
+  print('PASS: 5 ekran boyutu, 9 görev, bilgi/gözlem, QR, final, kayıt ve çevrimdışı açılış')
+
 asyncio.run(main())

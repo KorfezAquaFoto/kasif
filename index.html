@@ -117,16 +117,25 @@
   </div>
 </section>
 
+<!-- GÖREV ÖNCESİ: TANIŞ / GÖZLEMLE -->
+<section id="v-learn" class="view">
+  <header class="topbar"><button class="icon-btn" id="learn-back" aria-label="Geri">←</button><b class="tb-title" id="learn-heading">Canlıyla tanış</b><button class="listen-btn" data-listen>♪ Dinle</button></header>
+  <div class="task-progress" aria-label="Görev aşamaları"><span class="active" id="phase-learn">1 · Tanış</span><span id="phase-observe">2 · Gözlemle</span><span>3 · Cevapla</span></div>
+  <div class="learn-card paper"><p class="eyebrow center" id="learn-region"></p><h2 class="center" id="learn-name"></h2><div class="learn-art" id="learn-art"></div><div id="learn-copy" aria-live="polite"></div><p class="learn-where" id="learn-where"></p></div>
+  <button class="btn btn-gold" id="learn-next">Haydi onu bul!</button>
+</section>
+
 <!-- SORU -->
 <section id="v-quiz" class="view">
-  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title">Kaşif sorusu</b><span class="tb-sp"></span></header>
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title">Kaşif sorusu</b><button class="listen-btn" data-listen>♪ Dinle</button></header>
+  <div class="task-progress"><span>1 · Tanış</span><span>2 · Gözlemle</span><span class="active">3 · Cevapla</span></div>
   <div class="quiz">
     <div class="quiz-art" id="quiz-art"></div>
     <div class="paper">
       <p class="eyebrow center" id="quiz-title"></p>
       <h2 class="center" id="quiz-q"></h2>
       <div class="options" id="quiz-opts"></div>
-      <p class="quiz-msg" id="quiz-msg"></p>
+      <p class="quiz-msg" id="quiz-msg" role="status"></p>
     </div>
   </div>
 </section>
@@ -134,7 +143,7 @@
 <!-- DAMGA KAZANILDI -->
 <section id="v-reward" class="view reward-view">
   <div class="reward">
-    <p class="kicker">Yeni damga!</p>
+    <div class="reward-head"><p class="kicker">Yeni damga!</p><button class="listen-btn" data-listen>♪ Dinle</button></div>
     <div class="rw-page">
       <div class="leaf-hd"><span id="rw-page-hd"></span></div>
       <div class="stamp-stage">
@@ -178,6 +187,7 @@
     </div>
     <h2 class="final-h">Artık gerçek bir Okyanus Kaşifisin!</h2>
     <p class="final-p" id="final-p"></p>
+    <button class="btn btn-gold" id="btn-preview">Dolu pasaportumu gör →</button>
     <img id="cert-img" alt="Tamamlanmış Okyanus Kaşifi pasaportu">
     <button class="btn btn-gold" id="btn-save">📥 Telefonuma kaydet</button>
     <button class="btn btn-ghost" id="btn-share">📤 Paylaş</button>
@@ -195,7 +205,7 @@
       <p>Tüm damgalar bu telefondan silinir.</p>
       <button class="btn btn-danger" id="btn-reset">Sıfırla</button>
     </div>
-    <p class="note" id="ver"></p>
+    <div class="install hidden" id="install-menu"></div><p class="note" id="ver"></p>
   </div>
 </section>
 
@@ -236,3 +246,4 @@
 <script src="app.js" defer></script>
 </body>
 </html>
+

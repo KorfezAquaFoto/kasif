@@ -316,3 +316,64 @@ body.scan-mode .ocean{filter:brightness(.4)}
 .tg-hint{margin:2px 0 0;font-size:15px;line-height:1.3;color:var(--ink)}
 .tg-where{margin:3px 0 0;font-size:14px;font-weight:800;color:var(--sea2)}
 @media (prefers-reduced-motion:reduce){.stop.on,.me-pin,.road-end .chest{animation:none}}
+
+/* v14: bütün ekranlar görünür alana yerleşir; görevler ayrı aşamalardır. */
+:root{--app-height:100dvh}
+html,body{height:100%;overflow:hidden}
+button:focus-visible{outline:3px solid #7fe3ff;outline-offset:3px}
+button{touch-action:manipulation}
+.view{height:var(--app-height);min-height:0;padding:calc(var(--safe-t) + 8px) 16px calc(var(--safe-b) + 12px);overflow:hidden}
+.view.active{display:flex;flex-direction:column;gap:10px}
+.topbar{flex-shrink:0;margin-bottom:0;gap:8px}
+.tb-title{font-size:17px}.icon-btn{color:white;font:inherit;font-size:24px;flex-shrink:0}
+.listen-btn{border:1px solid #ffffff40;background:#ffffff18;color:white;border-radius:14px;font:inherit;font-size:14px;min-height:44px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+.listen-btn[aria-pressed=true]{background:#e4f1fd;color:var(--sea)}
+.task-progress{display:flex;justify-content:center;gap:6px;flex-shrink:0}
+.task-progress span{font-size:12px;flex:1;text-align:center;border-radius:99px;padding:5px 4px;background:#ffffff16;color:#c4dbef}
+.task-progress .active{background:var(--gold);color:#4a2d00;font-weight:800}
+.learn-card{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:18px}
+.learn-card h2{font-size:30px}.learn-art{width:clamp(90px,25vh,190px);height:clamp(90px,25vh,190px);flex-shrink:1;min-height:50px}.learn-art svg{width:100%;height:100%}
+#learn-copy{width:100%}.intro-facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.intro-facts li{display:flex;align-items:center;gap:12px;background:var(--paper2);border-radius:16px;padding:12px;font-size:17px;line-height:1.35}
+.intro-facts li span{font-size:24px;flex:none}.observe-text{font-size:21px;text-align:center;line-height:1.4;margin:0}.observe-note{text-align:center;font-size:14px;color:var(--muted);margin:10px 0 0}
+.learn-where{font-size:14px;color:var(--sea2);margin:0;text-align:center}
+#learn-next{flex-shrink:0;min-height:52px}
+/* Yol, dokuz durak ve eylem düğmeleri bir ekrandadır. */
+#v-home .road{flex:1;min-height:0;height:auto;margin:46px 0 4px}
+.stop{width:min(74px,calc(var(--app-height)*.105),19vw)}
+.road-start{font-size:12px;padding:2px 9px}.road-end .chest{font-size:34px}.road-end b{font-size:12px}
+.me-pin{top:-48%;width:56%}.stop .num{width:24px;height:24px;font-size:13px}
+.target{margin:0;flex-shrink:0;padding:10px 12px;gap:8px;justify-content:space-between}
+.target::before{display:none}.tg-k{font-size:18px}.tg-k small{display:block;margin:0;font-size:12px}.tg-where{font-size:13px;line-height:1.2}
+#target-learn{min-height:48px;flex-shrink:0;font-size:16px;padding:10px 14px}
+.fab-wrap{position:static;padding:0;background:none;flex-shrink:0}.fab{padding:13px;font-size:19px;min-height:52px}
+#install,#offline-ok{display:none!important}.done-banner{margin:0;padding:10px;flex-shrink:0}.done-banner .trophy{font-size:26px}
+.me-av{width:42px;height:42px}.me b{font-size:18px;max-width:28vw}.pill{font-size:16px;padding:4px 10px}.tb-right{gap:6px}
+/* Açılış: kitap küçülür, isim ve seçimler okunur kalır. */
+#v-welcome{justify-content:center;gap:0}.cover-wrap{flex:1;min-height:0;padding:4px 0;align-items:center}.book-open{height:min(34dvh,270px);width:auto;max-width:60vw;aspect-ratio:.7}
+.sheet{flex-shrink:0;margin-top:8px;padding:14px 16px;border-radius:22px}.sheet-lead{font-size:15px;margin-bottom:9px}.field{margin-bottom:8px}.avatars{margin-bottom:12px;gap:6px}
+.pp-brand{font-size:11px}.pp-title{font-size:17px}.pp-title span{font-size:12px}.passport-inner{padding:10px 6px}.ready-msg{font-size:18px}
+/* QR ve elle kod alanı, klavye açıkken de görünür kalır. */
+.cam{flex:1;min-height:60px;aspect-ratio:auto}.manual{margin-top:0;flex-shrink:0;font-size:14px}.manual input{min-width:0}.row{align-items:center}.cam-msg{font-size:14px}
+/* Soru ve kısa yanlış cevap ipucu. */
+.quiz{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding:0}
+.quiz-art{height:min(20dvh,130px);width:min(20dvh,130px);min-height:45px;flex-shrink:1;margin:0 auto -20px}
+.quiz .paper{padding:28px 16px 14px}.quiz h2{font-size:23px;margin:6px 0 14px}.options{gap:9px}.opt{padding:10px 12px;min-height:54px;font-size:17px;line-height:1.25}.opt .l{background:#e3f0fb;color:var(--navy);width:34px;height:34px;font-size:21px}.quiz-msg{font-size:15px;margin:10px 0 0;min-height:20px}
+/* Damga ve öğrenilen tek cümle. */
+.reward-view.active{height:var(--app-height);overflow:hidden;padding:calc(var(--safe-t) + 10px) 16px calc(var(--safe-b) + 12px)}
+.reward{height:100%;width:100%;min-height:0;padding:0;display:flex;flex-direction:column;justify-content:center;gap:9px}
+.reward-head{display:flex;justify-content:space-between;align-items:center}.kicker{margin:0}.rw-page{width:100%;height:min(32dvh,240px);min-height:110px;margin:0;flex-shrink:1;padding:10px}
+.stamp-stage{height:min(23dvh,170px);width:min(23dvh,170px);margin:8px auto 0}.rw-tool{top:20px}.rw-name{font-size:12px;margin:0}.reward h2{font-size:27px;margin:0}.fact-card{padding:12px 14px}.fact-card p{font-size:17px;margin:4px 0 0}.rw-count{margin:0;font-size:16px}.reward .btn{margin-top:0;flex-shrink:0}
+/* Final iki aşamalıdır: altın kapak, sonra pasaport resmi. */
+.final{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:12px}.final-stage{height:min(45dvh,330px);margin:0;flex-shrink:1;min-height:230px}.final-h{font-size:25px}.final-p{font-size:16px}.final img{display:none;min-height:0;width:100%;object-fit:contain;border-radius:16px;margin:0;box-shadow:none;background:transparent}
+#v-cert:not(.preview-passport) #btn-save,#v-cert:not(.preview-passport) #btn-share,#v-cert:not(.preview-passport) #save-hint{display:none!important}
+.preview-passport .final-stage,.preview-passport .final-h,.preview-passport .final-p,.preview-passport #btn-preview{display:none}
+.preview-passport .final img{display:block;flex:1;min-height:0;max-height:calc(var(--app-height) - 245px)}
+.final .btn{min-height:48px;padding:11px;flex-shrink:0}.final .note{font-size:13px;margin:0}.btn:disabled{opacity:.6;cursor:wait}
+.drawer,.modal{max-height:var(--app-height)}.drawer-box{max-height:calc(var(--app-height) - 50px);padding:16px 18px calc(var(--safe-b) + 16px)}.drawer-art{width:100px;height:100px;margin:-45px auto 4px}.drawer-box p{font-size:16px;margin:8px 0 12px}.drawer-box h3{font-size:23px}
+.menu{min-height:0}.menu .install{margin:0;font-size:14px}
+@media(max-height:680px){.view.active{gap:7px}.view{padding-left:12px;padding-right:12px}.learn-card{gap:8px;padding:12px}.learn-card h2{font-size:26px}.learn-art{width:130px;height:130px}.intro-facts{gap:7px}.intro-facts li{padding:9px;font-size:16px}.observe-text{font-size:19px}.quiz-art{height:90px;width:90px}.quiz h2{font-size:21px;margin-bottom:10px}.quiz .paper{padding:24px 12px 12px}.opt{font-size:16px;min-height:49px;padding:8px 10px}.quiz-msg{font-size:14px}.btn{font-size:17px;padding:12px}.fact-card p{font-size:16px}.reward h2{font-size:24px}.rw-page{height:185px}.stamp-stage{height:135px;width:135px}.sheet{padding:10px 14px}.sheet-lead{font-size:14px}.book-open{height:28dvh}.field span,.field-label{font-size:13px;margin-bottom:3px}.avatars{margin-bottom:9px}input{padding:9px 12px;font-size:17px}.final-stage{min-height:200px;height:240px}.final-cover{width:150px;height:210px;margin-left:-75px}.final-seal{top:125px;width:105px;margin-left:-52px}.final-tool{top:70px}.final-cover .pp-title{font-size:15px}.final-cover .pp-title span{font-size:11px}.final-h{font-size:22px}.final-p{font-size:15px}}
+@media(max-height:520px){.cover-wrap{display:none}.sheet{margin:0}.learn-art,.quiz-art{display:none}.learn-card{gap:7px}.intro-facts li{font-size:15px;padding:8px}.task-progress span{font-size:11px}.rw-page{height:110px}.stamp-stage{width:78px;height:78px;margin:0 auto}.leaf-hd{font-size:11px}.reward{gap:5px}.reward h2{font-size:21px}.fact-card{padding:8px 12px}.fact-card p{font-size:14px}.fact-card b{font-size:12px}.rw-name{display:none}.rw-count{font-size:14px}.road{margin-top:35px!important}.target{padding:7px 9px}.tg-where{font-size:12px}.tg-k{font-size:16px}.topbar{min-height:44px}.drawer-art{display:none}.drawer-box p{font-size:14px}.drawer-box h3{font-size:20px}.final-stage{height:170px;min-height:170px}.final-cover{width:115px;height:160px;margin-left:-57px}.final-cover .pp-brand{font-size:9px}.final-cover .pp-title{font-size:12px}.final-cover .pp-title span{font-size:9px}.final-seal{top:100px;width:80px;margin-left:-40px}.final-h{font-size:19px}.final-p{font-size:14px}.final{gap:8px}#help .howto{font-size:15px}}
+@media(orientation:landscape) and (max-height:520px){.view{max-width:620px}.learn-card{padding:8px}.intro-facts{grid-template-columns:1fr 1fr}.learn-where{font-size:12px}.learn-card h2{font-size:22px}.quiz h2{font-size:19px}.options{grid-template-columns:repeat(3,1fr)}.opt{font-size:14px;gap:6px;padding:8px}.quiz .paper{padding:12px}.quiz-msg{margin-top:8px}.reward .rw-page{height:92px;max-width:200px}.reward .fact-card{padding:6px 12px}.reward-head{display:none}.final-stage{display:none}.sheet{max-width:430px;margin:auto}.drawer-box{max-width:620px}.stop{width:min(48px,10vw)}.me-pin{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.big-stamp,.final-seal{opacity:1}.opening .idpage{opacity:1}}
+

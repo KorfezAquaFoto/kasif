@@ -26,11 +26,13 @@ const av = key => artSVG(AVATARS.includes(key) ? key : AVATARS[0]);
 // ---------- Görünümler ----------
 let current = null, stack = [];
 function show(id, push = true){
+  stopSpeech();
   if (current === "v-scan" && id !== "v-scan") stopCam();
   if (push && current && current !== id && !["v-reward","v-quiz"].includes(current)) stack.push(current);
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === id));
   document.body.classList.toggle("scan-mode", id === "v-scan");
   current = id; window.scrollTo(0,0);
+  document.querySelectorAll("[data-listen]").forEach(b => b.hidden = !("speechSynthesis" in window));
   if (id === "v-home") renderHome();
   if (id === "v-scan") startCam();
   if (id === "v-menu") renderMenu();
@@ -97,7 +99,7 @@ function helloHTML(){
 // Çocuğun ilk gördüğü yer oyunun kendisi: Başla'dan Hazine'ye zikzak bir yol, üstünde 9 durak.
 // Kaşif dostu aranan durağın üstünde durur; ipucu alttaki konuşma balonunda.
 const ROAD = [[18,79],[50,79],[82,79],[82,51],[50,51],[18,51],[18,23],[50,23],[82,23]];   // % konumlar, 3 sıra zikzak
-let target = null;   // aranan görev; boş bir durağa dokununca değişir
+let target = S && S.target || null;   // aranan görev; boş bir durağa dokununca değişir
 function renderHome(){
   $("#me-av").innerHTML = av(S.avatar); $("#me-name").textContent = S.name;
   const n = count(), t = ST.length;
@@ -112,8 +114,10 @@ function renderHome(){
 function renderTarget(){
   const st = ST.find(s => s.id === target), box = $("#target");
   box.classList.toggle("hidden", !st); if (!st) return;
-  box.innerHTML = `<span class="tg-av">${av(S.avatar)}</span><div class="tg-txt"><p class="tg-k">🔍 Beni bul! <small>${ST.indexOf(st) + 1}. durak</small></p>
-    <p class="tg-hint">${esc(st.hint)}</p>${st.where ? `<p class="tg-where">📍 ${esc(st.where)}</p>` : ""}</div>`;
+  box.innerHTML = `<div class="tg-txt"><p class="tg-k">${esc(st.name)} <small>${ST.indexOf(st) + 1}. durak</small></p><p class="tg-where">📍 ${esc(st.where || REG[st.region].label)}</p></div><button class="btn btn-ghost sm" id="target-learn">${S.flow && S.flow.id === st.id ? "Devam et →" : "Tanış →"}</button>`;
+  $("#target-learn").onclick = () => {
+    if (S.flow && S.flow.id === st.id) resumeTask(); else openLesson(st, false);
+  };
 }
 function renderRoad(){
   const done = count() === ST.length;
@@ -130,7 +134,7 @@ $("#road-nodes").addEventListener("click", e => {
   const b = e.target.closest(".stop"); if (!b) return;
   const st = ST.find(s => s.id === b.dataset.id);
   if (S.badges[st.id]) return openDrawer(st, true);
-  target = st.id; renderTarget(); renderRoad();
+  target = st.id; S.target = target; save(); renderTarget(); renderRoad();
 });
 $("#road-end").onclick = () => count() === ST.length ? openCert()
   : modal("🎁", "Hazine burada!", `${ST.length} damganın hepsini topla, hazineyi aç!`, [{ label: "Tamam" }]);
@@ -157,7 +161,7 @@ let deferredInstall = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredInstall = e; if (current === "v-home") renderInstall(); });
 function isStandalone(){ return matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; }
 function renderInstall(){
-  const box = $("#install");
+  const box = $("#install-menu");
   if (isStandalone()) { box.classList.add("hidden"); return; }
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
   if (ios) {
@@ -247,11 +251,73 @@ function handleCode(code){
   const st = ST.find(s => s.code === code);
   if (!st) return modal("🤔","Kod bulunamadı","Bu kodu tanıyamadık. Harfleri kontrol edip tekrar dene.",[{label:"Tekrar dene",onClick:retry},{label:"Damga sayfama dön",cls:"btn-ghost",onClick:goHome}]);
   if (S.badges[st.id]) return modal(st.art,"Bu damga zaten sende!",`“${st.title}” görevini daha önce tamamladın. Diğer canlıları bul!`,[{label:"Damga sayfam",onClick:goHome}]);
-  if (st.quiz) openQuiz(st); else award(st);
+  if (st.quiz) {
+    if (S.flow && S.flow.id === st.id && S.flow.step === "observe") { S.flow.verified = true; save(); openQuiz(st); }
+    else openLesson(st, true);
+  } else award(st);
 }
+
+// ---------- Tanış → Gözlemle → Cevapla ----------
+let lesson = null;
+function openLesson(st, verified){
+  lesson = st; target = st.id; S.target = target;
+  S.flow = {id:st.id, step:"learn", verified:!!verified}; save();
+  stack = ["v-home"]; show("v-learn", false); renderLesson();
+}
+function resumeTask(){
+  const f = S && S.flow, st = f && ST.find(s => s.id === f.id);
+  if (!st || S.badges[st.id]) { if(S){S.flow=null;save();} return goHome(); }
+  if (f.step === "quiz" && f.verified) return openQuiz(st);
+  lesson = st; stack = ["v-home"]; show("v-learn", false); renderLesson();
+}
+function renderLesson(){
+  stopSpeech();
+  const observing = S.flow.step === "observe", st = lesson;
+  $("#learn-heading").textContent = observing ? "Yakından bak" : "Canlıyla tanış";
+  $("#learn-region").textContent = REG[st.region].label + " · " + (ST.indexOf(st)+1) + " / " + ST.length;
+  $("#learn-name").textContent = st.name;
+  $("#learn-art").innerHTML = artSVG(st.art);
+  $("#phase-learn").classList.toggle("active", !observing);
+  $("#phase-observe").classList.toggle("active", observing);
+  $("#learn-copy").innerHTML = observing ? `<p class="observe-text">${esc(st.observe)}</p><p class="observe-note">Acele etme. Hazır olduğunda devam et.</p>` : `<ul class="intro-facts">${st.intro.map((t,i)=>`<li><span aria-hidden="true">${i ? "✦" : "🌊"}</span>${esc(t)}</li>`).join("")}</ul>`;
+  $("#learn-where").textContent = "📍 " + st.where;
+  $("#learn-next").textContent = !observing ? "Haydi yakından bakalım →" : S.flow.verified ? "Hazırım, soruyu aç →" : "Buldum, QR’ını tara →";
+}
+$("#learn-next").onclick = () => {
+  if (S.flow.step === "learn") {S.flow.step="observe";save();renderLesson();}
+  else if (S.flow.verified) openQuiz(lesson);
+  else {stack=["v-home","v-learn"];show("v-scan", false);}
+};
+$("#learn-back").onclick = () => {
+  if (S.flow.step === "observe") {S.flow.step="learn";save();renderLesson();}
+  else show("v-home", false);
+};
+// Ses kullanıcı istediğinde başlar; ekran değişince durur.
+let speaking = false;
+function stopSpeech(){
+  if ("speechSynthesis" in window) speechSynthesis.cancel(); speaking=false;
+  document.querySelectorAll("[data-listen]").forEach(b => {b.textContent="♪ Dinle";b.setAttribute("aria-pressed","false");});
+}
+function spokenText(){
+  if(current === "v-learn") return lesson.name + ". " + (S.flow.step === "observe" ? lesson.observe : lesson.intro.join(" "));
+  if(current === "v-quiz") return $("#quiz-q").textContent + ". " + [...$("#quiz-opts").children].map((b,i)=>(i+1)+". "+b.lastChild.textContent).join(". ") + ". " + $("#quiz-msg").textContent;
+  return $("#rw-title").textContent + ". " + $("#rw-fact").textContent;
+}
+document.querySelectorAll("[data-listen]").forEach(b => b.onclick = () => {
+  if(speaking) return stopSpeech();
+  if (!("speechSynthesis" in window)) return;
+  const u = new SpeechSynthesisUtterance(spokenText()); u.lang="tr-TR";u.rate=.9;
+  const voice=speechSynthesis.getVoices().find(v=>v.lang.startsWith("tr"));if(voice)u.voice=voice;
+  u.onend=stopSpeech;u.onerror=()=>{stopSpeech();modal("♪","Ses açılamadı","Bu cihazda Türkçe ses kullanılamıyor. Bilgileri ekrandan okuyabilirsin.");};
+  speaking=true;b.textContent="■ Durdur";b.setAttribute("aria-pressed","true");speechSynthesis.speak(u);
+});
+// Klavye ve tarayıcı çubukları dahil görünür yüksekliği kullan.
+function fitViewport(){document.documentElement.style.setProperty("--app-height",(window.visualViewport ? visualViewport.height : innerHeight)+"px");}
+window.addEventListener("resize",fitViewport);if(window.visualViewport)visualViewport.addEventListener("resize",fitViewport);fitViewport();
 
 // ---------- Soru ----------
 function openQuiz(st){
+  S.flow={id:st.id,step:"quiz",verified:true};save();
   $("#quiz-art").innerHTML = artSVG(st.art);
   $("#quiz-title").textContent = `${st.name} · ${st.title}`;
   $("#quiz-q").textContent = st.quiz.q;
@@ -259,14 +325,14 @@ function openQuiz(st){
   const box = $("#quiz-opts"); box.innerHTML = "";
   st.quiz.options.forEach((o, i) => {
     const el = document.createElement("button"); el.className = "opt";
-    el.innerHTML = `<span class="l">${"ABCD"[i]}</span><span></span>`; el.lastChild.textContent = o;
+    el.innerHTML = `<span class="l">${st.icons ? st.icons[i] : "ABCD"[i]}</span><span></span>`; el.lastChild.textContent = o;
     el.onclick = () => {
       if (i === st.quiz.answer) {
         el.classList.add("right"); box.querySelectorAll(".opt").forEach(x => x.disabled = true);
         msg.textContent = "Doğru! Damgan geliyor…"; msg.style.color = "var(--ok)";
         setTimeout(() => award(st), 800);
       } else {
-        el.classList.add("wrong"); el.disabled = true;
+        el.classList.add("wrong");
         // Kaybetmek yok: yanlış cevapta yön gösteren ipucu, istediği kadar deneyebilir
         msg.textContent = "Neredeyse! 💡 İpucu: " + (st.quiz.clue || "Tabelaya bir daha bak."); msg.style.color = "var(--sea2)";
         if (navigator.vibrate) navigator.vibrate([40,40,40]);
@@ -279,7 +345,7 @@ function openQuiz(st){
 
 // ---------- Damga ----------
 function award(st){
-  S.badges[st.id] = Date.now(); save();
+  S.badges[st.id] = Date.now(); S.flow=null; save();
   S.last = st.id;   // haritada yeni yanan bölge parlasın
   // Damga aleti pasaport sayfasına iner, damga basılır
   const stage = $("#rw-stamp"), ring = $("#ink-ring"), tool = $("#rw-tool");
@@ -291,7 +357,7 @@ function award(st){
   $("#rw-title").textContent = st.title;
   $("#rw-fact-title").textContent = st.factTitle || "Biliyor muydun?";
   $(".fact-card").classList.toggle("eco", !!st.factTitle);
-  $("#rw-fact").textContent = st.fact;
+  $("#rw-fact").textContent = st.reward || st.fact;
   const n = count(), t = ST.length;
   $("#rw-count").textContent = `⭐ ${n} / ${t} damga`;
   $("#rw-next").textContent = n === t ? "Final damgamı bas ⭐" : "Pasaportuma dön";
@@ -301,6 +367,7 @@ function award(st){
   setTimeout(() => { if (navigator.vibrate) navigator.vibrate(80); confetti(n === t ? 260 : 120); }, 560);
 }
 function confetti(N, sel = "#confetti", view = "v-reward"){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const c = $(sel), x = c.getContext("2d"), dpr = devicePixelRatio || 1;
   c.width = innerWidth * dpr; c.height = innerHeight * dpr; x.setTransform(dpr,0,0,dpr,0,0);
   const cols = ["#f5bd3a","#7fe3ff","#ff7b54","#7be08f","#ffffff","#c08cff"];
@@ -324,6 +391,8 @@ let certBlob = null;
 function openCert(){
   if (count() < ST.length) return show("v-home", false);
   stack = ["v-home"]; show("v-cert", false);
+  $("#v-cert").classList.remove("preview-passport");
+  certBlob=null; $("#btn-save").disabled=true; $("#btn-share").disabled=true;
   document.querySelectorAll("#v-cert [data-aq]").forEach(el => el.textContent = D.aquarium);
   $("#final-name").textContent = S.name;
   $("#final-p").textContent = `${S.name}, ${D.aquarium}'daki ${ST.length} bölgenin hepsini keşfettin. Pasaportun artık altın!`;
@@ -335,10 +404,12 @@ function openCert(){
   setupSave();
   drawCert().then(blob => {
     certBlob = blob;
+    $("#btn-save").disabled=false; $("#btn-share").disabled=false;
     // data: adresi, resme basılı tutunca iPhone'da "Fotoğraflara Ekle", Android'de "Resmi indir" çıkmasını garantiler
     const fr = new FileReader(); fr.onload = () => { $("#cert-img").src = fr.result; }; fr.readAsDataURL(blob);
-  });
+  }).catch(()=>modal("🤔","Resim hazırlanamadı","Pasaportunu yeniden açıp tekrar dene."));
 }
+$("#btn-preview").onclick=()=>$("#v-cert").classList.add("preview-passport");
 
 // ---------- Kaydetme: telefona göre en kolay yol ----------
 // iPhone: paylaşma menüsündeki "Resmi Kaydet" doğrudan Fotoğraflar'a koyar (indirme Dosyalar'a gider).
@@ -351,13 +422,13 @@ function setupSave(){
   $("#btn-save").textContent = IOS ? "📲 Fotoğraflarıma kaydet" : "📥 Telefonuma kaydet";
   $("#btn-share").classList.toggle("hidden", !navigator.share);
   $("#save-hint").innerHTML = IOS ? "Açılan menüde <b>“Resmi Kaydet”</b>e dokun. Ya da resme basılı tut → <b>“Fotoğraflara Ekle”</b>."
-    : ANDROID ? "Resim Galeri'ne kaydedilir. Ya da resme basılı tut → <b>“Resmi indir”</b>."
+    : ANDROID ? "Resim İndirilenler’e kaydedilir. Galeri’de de görünebilir. Ya da resme basılı tut → <b>“Resmi indir”</b>."
     : "Resim bilgisayarına indirilir.";
 }
 function download(){
   const a = document.createElement("a"); a.href = URL.createObjectURL(certBlob); a.download = `okyanus-kasifi-${S.id}.png`;
   document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => modal("🎉", "Kaydedildi!", ANDROID ? "Pasaportun Galeri'nde, İndirilenler klasöründe." : "Pasaportun İndirilenler klasöründe.", [{label:"Tamam"}]), 600);
+  setTimeout(() => { URL.revokeObjectURL(a.href); modal("📥", "İndirme başlatıldı", "Pasaportunu İndirilenler klasöründe bulabilirsin. Telefona göre Galeri’de de görünebilir.", [{label:"Tamam"}]); }, 600);
 }
 async function shareFile(){
   try { await navigator.share({ files:[certFile()], title:"Okyanus Kaşifi Pasaportum", text:`${D.aquarium}'da Okyanus Kaşifi oldum!` }); return true; }
@@ -433,7 +504,7 @@ async function drawCert(){
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season}`; }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v14`; renderInstall(); }
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
   {label:"Vazgeç",cls:"btn-ghost"}]);
@@ -451,17 +522,19 @@ window.addEventListener("hashchange", readHash);
 renderWelcome();
 show(S ? "v-home" : "v-welcome", false);
 readHash();
-if (pending && !S) setTimeout(() => modal("🐠","Bir canlı buldun!","Önce kaşif adını yaz, damgan hemen pasaportuna basılacak.",[{label:"Tamam"}]), 300);
+if (S && S.flow && !location.hash && current === "v-home") resumeTask();
+if (pending && !S) setTimeout(() => modal("🐠","Bir canlı buldun!","Önce kaşif adını yaz. Sonra canlıyı tanıyıp görevini çözebilirsin.",[{label:"Tamam"}]), 300);
 
 // Service worker: çevrimdışı çalışma
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   // Yeni sürüm yüklenince sayfayı bir kez yenile
   const hadCtrl = !!navigator.serviceWorker.controller; let reloaded = false;
   navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (hadCtrl && !reloaded && current !== "v-scan" && current !== "v-quiz" && current !== "v-reward") { reloaded = true; location.reload(); }
+    if (hadCtrl && !reloaded && current !== "v-scan" && current !== "v-quiz" && current !== "v-reward" && current !== "v-learn" && current !== "v-cert") { reloaded = true; location.reload(); }
   });
   navigator.serviceWorker.register("sw.js").then(() => navigator.serviceWorker.ready).then(() => {
     $("#offline-ok").classList.remove("hidden");
   }).catch(()=>{});
 }
 })();
+
