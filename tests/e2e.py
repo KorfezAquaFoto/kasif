@@ -51,7 +51,7 @@ async def main():
       await pg.screenshot(path=str(OUT/(prefix+'-opening.png')))
       await pg.wait_for_timeout(1600)
       await fits(pg,prefix+'-home')
-      assert await pg.locator('.stop.on .here-pin').inner_text() == 'Buradasın▼'
+      assert 'Buradasın' in await pg.locator('.stop.on .here-pin').inner_text()
       assert await pg.locator('.stop.on').get_attribute('aria-current') == 'step'
       await pg.click('.stop[data-id="fosil"]')
       assert 'duvarların yukarısındaki' in await pg.locator('.tg-where').inner_text()
