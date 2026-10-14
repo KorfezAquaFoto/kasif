@@ -1,7 +1,9 @@
 (() => {
 "use strict";
 const D = window.KASIF;
-const ST = D.stations;
+const route = D.regionOrder || Object.keys(D.regions);
+const rank = s => route.includes(s.region) ? route.indexOf(s.region) : route.length;
+const ST = [...D.stations].sort((a,b) => rank(a)-rank(b));
 const KEY = "okyanus-kasifi-v1";
 const AVATARS = ["vatoz","kesis","orfoz","pirana","mersin","karagoz"];
 const REG = D.regions;
@@ -36,6 +38,7 @@ function show(id, push = true){
   if (id === "v-home") renderHome();
   if (id === "v-scan") startCam();
   if (id === "v-menu") renderMenu();
+  if (id === "v-hints") renderHints();
 }
 function back(){ show(stack.pop() || (S ? "v-home" : "v-welcome"), false); }
 document.querySelectorAll("[data-back]").forEach(b => b.onclick = back);
@@ -178,6 +181,36 @@ function renderInstall(){
 }
 function requestPersist(){ try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){} }
 
+// ---------- Bölüm ve kıta ipuçları ----------
+let hintIndex = 0;
+function hintStation(){return ST[hintIndex];}
+function openHints(){
+  hintIndex = Math.max(0, ST.findIndex(s => s.id === target)); 
+  stack=["v-home"];show("v-hints",false);
+}
+function renderHints(){
+  const st=hintStation(), reg=REG[st.region], group=D.groups.find(g=>g.kind===reg.kind);
+  $("#hint-group").textContent=group ? group.label : "Keşif bölümü";
+  $("#hint-region").textContent=reg.label;
+  $("#hint-page").textContent=`Bölüm ${hintIndex+1} / ${ST.length}`;
+  $("#hint-art").innerHTML=artSVG(st.art);$("#hint-name").textContent=st.name;
+  $("#hint-title").textContent=st.title;
+  $("#hint-earned").textContent=S.badges[st.id] ? "✓ Bu damga sende!" : "Bu bölümdeki keşfin";
+  $("#hint-guide").innerHTML=av(S.avatar);
+  $("#hint-greeting").textContent=`${S.name}, keşfe hazır mısın?`;
+  $("#hint-copy").textContent=st.tip;
+  $("#hint-prev").disabled=hintIndex===0;$("#hint-next").disabled=hintIndex===ST.length-1;
+  $("#hint-go").textContent=S.badges[st.id] ? "Öğrendiklerime bak →" : "Buldum, QR’ını tara →";
+}
+$("#btn-hints").onclick=openHints;
+$("#hint-prev").onclick=()=>{if(hintIndex>0){hintIndex--;stopSpeech();renderHints();}};
+$("#hint-next").onclick=()=>{if(hintIndex<ST.length-1){hintIndex++;stopSpeech();renderHints();}};
+$("#hint-go").onclick=()=>{
+  const st=hintStation();target=st.id;S.target=target;save();
+  if(S.badges[st.id]){show("v-home",false);openDrawer(st,true);}
+  else{lesson=st;S.flow={id:st.id,step:"find",verified:false};save();stack=["v-home","v-hints"];show("v-scan",false);}
+};
+
 // ---------- Kamera / QR okuma ----------
 let stream = null, raf = 0, detector = null, busy = false;
 const canvas = document.createElement("canvas");
@@ -255,7 +288,7 @@ function handleCode(code){
   if (!st) return modal("🤔","Kod bulunamadı","Bu kodu tanıyamadık. Harfleri kontrol edip tekrar dene.",[{label:"Tekrar dene",onClick:retry},{label:"Damga sayfama dön",cls:"btn-ghost",onClick:goHome}]);
   if (S.badges[st.id]) return modal(st.art,"Bu damga zaten sende!",`“${st.title}” görevini daha önce tamamladın. Diğer canlıları bul!`,[{label:"Damga sayfam",onClick:goHome}]);
   if (st.quiz) {
-    if (S.flow && S.flow.id === st.id && S.flow.step === "observe") { S.flow.verified = true; save(); openQuiz(st); }
+    if (S.flow && S.flow.id === st.id && S.flow.step === "find") { S.flow.verified = true; save(); openQuiz(st); }
     else openLesson(st, true);
   } else award(st);
 }
@@ -264,7 +297,7 @@ function handleCode(code){
 let lesson = null;
 function openLesson(st, verified){
   lesson = st; target = st.id; S.target = target;
-  S.flow = {id:st.id, step:"learn", verified:!!verified}; save();
+  S.flow = {id:st.id, step:"find", verified:!!verified}; save();
   stack = ["v-home"]; show("v-learn", false); renderLesson();
 }
 function resumeTask(){
@@ -274,28 +307,21 @@ function resumeTask(){
   lesson = st; stack = ["v-home"]; show("v-learn", false); renderLesson();
 }
 function renderLesson(){
-  stopSpeech();
-  const observing = S.flow.step === "observe", st = lesson;
-  $("#learn-heading").textContent = observing ? "Yakından bak" : "Canlıyla tanış";
-  $("#learn-region").textContent = REG[st.region].label + " · " + (ST.indexOf(st)+1) + " / " + ST.length;
-  $("#learn-name").textContent = st.name;
-  $("#learn-art").innerHTML = artSVG(st.art);
-  $("#phase-learn").classList.toggle("active", !observing);
-  $("#phase-observe").classList.toggle("active", observing);
-  $("#learn-copy").innerHTML = observing ? `<p class="observe-text">${esc(st.observe)}</p><p class="observe-note">Acele etme. Hazır olduğunda devam et.</p>` : `<ul class="intro-facts">${st.intro.map((t,i)=>`<li><span aria-hidden="true">${i ? "✦" : "🌊"}</span>${esc(t)}</li>`).join("")}</ul>`;
-  $("#learn-where").classList.add("location-cue");
-  $("#learn-where").innerHTML = locationCue(st);
-  $("#learn-next").textContent = !observing ? "Haydi yakından bakalım →" : S.flow.verified ? "Hazırım, soruyu aç →" : "Buldum, QR’ını tara →";
+  stopSpeech();const st=lesson;
+  // Eski iki aşamalı kayıtları tek hazırlık ekranına taşı.
+  S.flow.step="find";save();
+  $("#learn-heading").textContent="Tanış ve bul";
+  $("#learn-region").textContent=REG[st.region].label+" · "+(ST.indexOf(st)+1)+" / "+ST.length;
+  $("#learn-name").textContent=st.name;
+  $("#learn-art").innerHTML=artSVG(st.art);
+  $("#learn-copy").innerHTML=`<p class="quick-tip">${esc(st.tip)}</p>`;
+  $("#learn-next").textContent=S.flow.verified ? "Haydi soruyu çöz →" : "Buldum, QR’ını tara →";
 }
-$("#learn-next").onclick = () => {
-  if (S.flow.step === "learn") {S.flow.step="observe";save();renderLesson();}
-  else if (S.flow.verified) openQuiz(lesson);
-  else {stack=["v-home","v-learn"];show("v-scan", false);}
+$("#learn-next").onclick=()=>{
+  if(S.flow.verified)openQuiz(lesson);
+  else{stack=["v-home","v-learn"];show("v-scan",false);}
 };
-$("#learn-back").onclick = () => {
-  if (S.flow.step === "observe") {S.flow.step="learn";save();renderLesson();}
-  else show("v-home", false);
-};
+$("#learn-back").onclick=()=>show("v-home",false);
 // Ses kullanıcı istediğinde başlar; ekran değişince durur.
 let speaking = false, speechGeneration = 0;
 function stopSpeech(){
@@ -304,7 +330,8 @@ function stopSpeech(){
   document.querySelectorAll("[data-listen]").forEach(b => {b.textContent="♪ Dinle";b.setAttribute("aria-pressed","false");});
 }
 function spokenText(){
-  if(current === "v-learn") return lesson.name + ". " + (S.flow.step === "observe" ? lesson.observe : lesson.intro.join(" "));
+  if(current === "v-hints") return REG[hintStation().region].label+". "+hintStation().title+". "+$("#hint-greeting").textContent+" "+$("#hint-copy").textContent;
+  if(current === "v-learn") return lesson.name + ". " + lesson.tip;
   if(current === "v-quiz") return $("#quiz-q").textContent + ". " + [...$("#quiz-opts").children].map((b,i)=>(i+1)+". "+b.lastChild.textContent).join(". ") + ". " + $("#quiz-msg").textContent;
   return $("#rw-title").textContent + ". " + $("#rw-fact").textContent;
 }
@@ -511,7 +538,7 @@ async function drawCert(){
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v16`; renderInstall(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v17`; renderInstall(); }
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
   {label:"Vazgeç",cls:"btn-ghost"}]);

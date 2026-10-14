@@ -9,7 +9,7 @@ async def fits(pg, label, shot=True):
     await pg.wait_for_timeout(150)
     result = await pg.evaluate('''() => {
       const v=document.querySelector('.view.active'), r=v.getBoundingClientRect();
-      const bad=[...v.querySelectorAll('button,input,.intro-facts,.observe-text,.quiz-msg,.fact-card')].filter(e=>{
+      const bad=[...v.querySelectorAll('button,input,.quick-tip,#hint-copy,.quiz-msg,.fact-card')].filter(e=>{
         const b=e.getBoundingClientRect(),s=getComputedStyle(e);
         return b.width && b.height && s.visibility!=='hidden' && (b.bottom>innerHeight+2 || b.top < -2 || b.left < -2 || b.right > innerWidth+2);
       }).map(e=>e.id||e.className);
@@ -21,9 +21,6 @@ async def fits(pg, label, shot=True):
 async def lesson_to_quiz(pg, label='task'):
     await pg.locator('#v-learn.active').wait_for()
     await fits(pg,label+'-learn',False)
-    await pg.click('#learn-next')
-    assert await pg.locator('#learn-heading').inner_text() == 'Yakından bak'
-    await fits(pg,label+'-observe',False)
     await pg.click('#learn-next')
     await pg.locator('#v-quiz.active').wait_for()
     await fits(pg,label+'-quiz',False)
@@ -58,11 +55,23 @@ async def main():
       await fits(pg,prefix+'-fossil-location')
       await pg.click('.stop[data-id="pirana"]')
       await pg.click('#target-learn');await fits(pg,prefix+'-learn')
-      await pg.click('#learn-next');await fits(pg,prefix+'-observe')
       await pg.reload();await pg.locator('#v-learn.active').wait_for()
-      assert await pg.locator('#learn-heading').inner_text()=='Yakından bak'
+      assert await pg.locator('#learn-heading').inner_text()=='Tanış ve bul'
+      assert await pg.locator('.quick-tip').count()==1
       await pg.click('#learn-next');await pg.locator('#v-scan.active').wait_for()
       await fits(pg,prefix+'-scan')
+      await pg.click('#v-scan [data-back]');await pg.click('#learn-back')
+      await pg.click('#btn-hints');await pg.locator('#v-hints.active').wait_for()
+      await fits(pg,prefix+'-hints')
+      stations=await pg.evaluate('KASIF.stations.map(s=>({region:s.region,tip:s.tip}))')
+      for i,st in enumerate(stations):
+        assert await pg.locator('#hint-region').inner_text()==await pg.evaluate('KASIF.regions['+repr(st['region'])+'].label')
+        assert await pg.locator('#hint-copy').inner_text()==st['tip']
+        assert len(st['tip'].split())<=30
+        await fits(pg,prefix+'-hint-region-'+str(i),False)
+        if i<8: await pg.click('#hint-next')
+      assert await pg.locator('#hint-next').is_disabled()
+      await pg.click('#v-hints [data-back]');await pg.click('#btn-hints');await pg.click('#hint-go')
       await pg.fill('#in-code','PRN-3T9F');await pg.click('#manual-form button')
       await pg.locator('#v-quiz.active').wait_for();await fits(pg,prefix+'-quiz')
       await pg.click('#quiz-opts .opt:nth-child(1)')
@@ -123,7 +132,7 @@ async def main():
   # Küçük bir görsel kontrol şeridi, test günlüğünden incelenebilir.
   import base64, io
   from PIL import Image
-  names=['390x844-welcome.png','390x844-opening.png','390x844-home.png','390x844-learn.png']
+  names=['390x844-home.png','390x844-hints.png','390x844-learn.png','390x844-reward.png']
   sheet=Image.new('RGB',(1000,542),'#0b3c6e')
   for i,name in enumerate(names):
     im=Image.open(OUT/name).convert('RGB');im.thumbnail((250,542));sheet.paste(im,(i*250,0))

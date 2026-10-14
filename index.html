@@ -97,7 +97,19 @@
 
   <div class="fab-wrap"><button class="btn btn-gold fab" id="btn-scan">
     <svg viewBox="0 0 24 24"><path d="M3 7h4l2-3h6l2 3h4v13H3Z M16 13a4 4 0 1 1-8 0a4 4 0 0 1 8 0"/></svg>
-    QR Tara</button></div>
+    QR Tara</button><button class="btn btn-ghost fab-hints" id="btn-hints"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M8 14a7 7 0 1 1 8 0q-1 1-1 3H9q0-2-1-3Z"/></svg>İpuçları</button></div>
+</section>
+
+<!-- KITA VE BÖLÜME GÖRE İPUÇLARI -->
+<section id="v-hints" class="view">
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Pasaportuma dön">←</button><b class="tb-title">İpuçları</b><button class="listen-btn" data-listen>♪ Dinle</button></header>
+  <div class="hint-pager"><button class="icon-btn" id="hint-prev" aria-label="Önceki bölüm">←</button><div><span id="hint-group"></span><b id="hint-region"></b><small id="hint-page"></small></div><button class="icon-btn" id="hint-next" aria-label="Sonraki bölüm">→</button></div>
+  <div class="paper hint-card"><div class="hint-subject"><div class="hint-art" id="hint-art"></div><div><p class="eyebrow" id="hint-name"></p><h2 id="hint-title"></h2><p class="hint-earned" id="hint-earned"></p></div></div>
+
+    <div class="guide-bubble"><span class="guide-avatar" id="hint-guide" aria-hidden="true"></span><div class="guide-content"><b id="hint-greeting"></b><p id="hint-copy" aria-live="polite"></p></div></div>
+
+  </div>
+  <button class="btn btn-gold" id="hint-go">Bu göreve git →</button>
 </section>
 
 <!-- TARAYICI -->
@@ -120,15 +132,15 @@
 <!-- GÖREV ÖNCESİ: TANIŞ / GÖZLEMLE -->
 <section id="v-learn" class="view">
   <header class="topbar"><button class="icon-btn" id="learn-back" aria-label="Geri">←</button><b class="tb-title" id="learn-heading">Canlıyla tanış</b><button class="listen-btn" data-listen>♪ Dinle</button></header>
-  <div class="task-progress" aria-label="Görev aşamaları"><span class="active" id="phase-learn">1 · Tanış</span><span id="phase-observe">2 · Gözlemle</span><span>3 · Cevapla</span></div>
-  <div class="learn-card paper"><p class="eyebrow center" id="learn-region"></p><h2 class="center" id="learn-name"></h2><div class="learn-art" id="learn-art"></div><div id="learn-copy" aria-live="polite"></div><p class="learn-where" id="learn-where"></p></div>
+  <div class="task-progress" aria-label="Görev aşamaları"><span class="active">1 · Tanış ve bul</span><span>2 · Cevapla</span></div>
+  <div class="learn-card paper"><p class="eyebrow center" id="learn-region"></p><h2 class="center" id="learn-name"></h2><div class="learn-art" id="learn-art"></div><div id="learn-copy" aria-live="polite"></div></div>
   <button class="btn btn-gold" id="learn-next">Haydi onu bul!</button>
 </section>
 
 <!-- SORU -->
 <section id="v-quiz" class="view">
   <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title">Kaşif sorusu</b><button class="listen-btn" data-listen>♪ Dinle</button></header>
-  <div class="task-progress"><span>1 · Tanış</span><span>2 · Gözlemle</span><span class="active">3 · Cevapla</span></div>
+  <div class="task-progress"><span>1 · Tanış ve bul</span><span class="active">2 · Cevapla</span></div>
   <div class="quiz">
     <div class="quiz-art" id="quiz-art"></div>
     <div class="paper">

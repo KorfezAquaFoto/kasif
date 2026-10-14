@@ -242,3 +242,21 @@ const LESSONS = {
   }
 };
 KASIF.stations.forEach(st => Object.assign(st, LESSONS[st.id]));
+
+// Fiziksel gezi sırası netleşince yalnızca bu listeyi değiştirin.
+// Kıtalar, Körfez ve özel bölümler ayrı kimliklerini korur; görevler kilitlenmez.
+KASIF.regionOrder = ["guney-amerika", "asya", "avustralya", "afrika", "avrupa", "izmit", "kabuk", "megalodon", "tunel"];
+
+// Tek kısa ipucu: bilgi ve yerinde gözlem aynı metinde.
+const QUICK_TIPS = {
+  "pirana": "Piranalar Güney Amerika’da yaşar. Bu bölümdeki pirana tankına bak: tek tek mi, birlikte mi yüzüyorlar?",
+  "mersin": "Mersin balığının vücudunda sert plakalar vardır. Asya bölümündeki tankta bu plakaları dikkatle incele!",
+  "kesis": "Keşiş yengeci boş bir kabuğu ev olarak kullanır. Avustralya bölümünde kabuğunu taşıyan bu küçük kaşifi ara!",
+  "fosil": "Fosiller, çok eski canlıların izleridir. Afrika bölümünde başını kaldır; duvarların yukarısındaki şekilleri incele!",
+  "orfoz": "Orfoz, iri gövdeli bir balıktır. Avrupa bölümündeki tankı incele; kayaların çevresinde onu bulabilir misin?",
+  "korfez": "Karagöz, mırmır ve sargos bizim Körfez’imizde yaşar. Körfez akvaryumundaki balıkları izle: temiz bir deniz onlar için neden önemli?",
+  "kabuk": "Deniz kabuklarının pek çok şekli vardır. Vitrindeki kıvrımlı ve iki parçalı kabukları incele; içlerinde kim yaşamış olabilir?",
+  "megalodon": "Megalodon, çok eskiden yaşamış dev bir köpekbalığıydı. Sergideki dişlerini kendi elinle karşılaştır; ne kadar büyükler?",
+  "vatoz": "Vatoz, geniş ve yassı gövdeli bir balıktır. Büyük tünelde yukarıya bak; kanat gibi görünen kısımlarının hareketini izle!"
+};
+KASIF.stations.forEach(st => st.tip = QUICK_TIPS[st.id]);
