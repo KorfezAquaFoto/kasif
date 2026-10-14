@@ -142,6 +142,40 @@ const ART = {
   }
 };
 
+// v16: net dış hatlar, canlıya özgü şekiller ve küçük boyutta okunur renkler.
+const eye=(x,y,r=5)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#fff9e7"/><circle cx="${x+1}" cy="${y}" r="${r*.55}" fill="#15384a"/><circle cx="${x+2}" cy="${y-1.5}" r="${r*.2}" fill="white"/>`;
+function palette(a,b){const id=uid('paint');return {id,defs:`<defs><linearGradient id="${id}" x1="0" y1="0" x2=".3" y2="1"><stop stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs>`};}
+function fish(kind){
+ const pr=kind==='pirana',kg=kind==='karagoz',p=palette(pr?'#bcd6df':kg?'#e1f3f4':'#dda965',pr?'#6694a6':kg?'#89bec7':'#9a623b');
+ const shape=pr?'M23 50C23 24 62 18 81 35C97 49 85 75 62 79C39 82 23 69 23 50Z':'M22 52C26 29 58 24 79 37Q94 44 92 56C88 75 53 81 30 66Z';
+ const clip=uid('body');let pattern='';
+ if(pr)pattern='<path d="M18 57Q56 61 95 51V88H18Z" fill="#ef7661"/><g fill="#527f8d"><circle cx="42" cy="39" r="2"/><circle cx="52" cy="34" r="2"/><circle cx="56" cy="45" r="2"/><circle cx="35" cy="48" r="1.6"/></g>';
+ else if(kg)pattern='<path d="M34 23L30 77M66 22L70 81" stroke="#315d6c" stroke-width="8"/><path d="M24 52Q56 44 93 52" stroke="#fff8e6" stroke-width="2" opacity=".8"/>';
+ else pattern=[[36,45],[50,38],[58,58],[40,62],[67,46]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="4" ry="3" fill="#f2d3a0"/>`).join('');
+ return `${p.defs}<defs><clipPath id="${clip}"><path d="${shape}"/></clipPath></defs><g stroke="#284957" stroke-width="2" stroke-linejoin="round"><path d="M26 49L7 33Q11 51 7 68L27 57Z" fill="${pr?'#629cb2':kg?'#80c9ce':'#b68143'}"/><path d="M37 31L43 18L48 27L55 17L62 28L68 23L74 36" fill="${pr?'#6facc1':kg?'#9bdde0':'#b98246'}"/><path d="${shape}" fill="url(#${p.id})"/></g><g clip-path="url(#${clip})">${pattern}<path d="M28 40Q43 26 60 29" stroke="#fff" stroke-width="3" opacity=".5" fill="none" stroke-linecap="round"/></g><path d="M51 56Q44 62 47 71Q58 66 61 58" fill="${kg?'#efc660':pr?'#df6b54':'#ab713d'}" stroke="#315566" stroke-width="1.5"/><path d="M67 47Q61 55 67 64" stroke="#487889" stroke-width="1.6" fill="none"/>${eye(77,43,5.5)}<path d="M78 61Q85 63 89 57" stroke="#284957" stroke-width="2" fill="none" stroke-linecap="round"/>${pr?'<path d="M80 60L82 64L84 60L86 63L88 58" stroke="#fff9e7" stroke-width="2" fill="none"/>':''}`;
+}
+ART.pirana=()=>fish('pirana');ART.orfoz=()=>fish('orfoz');ART.karagoz=()=>fish('karagoz');
+ART.mersin=()=>{
+ const p=palette('#a4c9cf','#467b91');const plates=Array.from({length:6},(_,i)=>`<path d="M${28+i*7} 43l3-3l3 3l-3 4Z" fill="#f0e6bf" stroke="#395c70" stroke-width="1"/>`).join('');
+ return `${p.defs}<path d="M26 52L7 24L11 48L5 67Z" fill="#568b9c" stroke="#294e62" stroke-width="2"/><path d="M50 42L60 30L64 44M49 59L43 73L62 60" fill="#6096a6" stroke="#294e62" stroke-width="2"/><path d="M20 51Q35 35 72 41Q86 43 97 47L77 58Q38 69 20 51Z" fill="url(#${p.id})" stroke="#294e62" stroke-width="2"/><path d="M26 55Q50 63 77 55" stroke="#d4e8df" stroke-width="4" fill="none"/>${plates}<path d="M78 54l-2 9M82 53l-1 9M86 51l1 8" stroke="#385e73" stroke-width="2" stroke-linecap="round"/>${eye(76,47,4)}<path d="M84 55h4" stroke="#284957" stroke-width="2"/>`;
+};
+ART.vatoz=()=>{
+ const p=palette('#75bdcd','#347788');return `${p.defs}<path d="M50 66Q51 87 66 95" stroke="#275569" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M50 20C38 22 34 38 8 50Q5 56 16 59L39 67Q50 77 61 67L84 59Q96 56 92 50C67 38 62 22 50 20Z" fill="url(#${p.id})" stroke="#275569" stroke-width="2.4" stroke-linejoin="round"/><path d="M15 51Q28 51 39 44M85 51Q72 51 61 44" stroke="#a4d7db" stroke-width="2" fill="none"/><path d="M42 28Q50 23 58 28" stroke="#d5eeeb" stroke-width="3" fill="none" opacity=".7"/>${eye(42,38,4.5)}${eye(58,38,4.5)}<g fill="#bde2dd"><circle cx="27" cy="53" r="2.2"/><circle cx="34" cy="48" r="1.7"/><circle cx="73" cy="53" r="2.2"/><circle cx="66" cy="48" r="1.7"/><circle cx="45" cy="56" r="1.7"/><circle cx="55" cy="56" r="1.7"/></g>`;
+};
+ART.kesis=()=>{
+ const p=palette('#ffdea0','#dea56c');return `${p.defs}<g fill="none" stroke="#a65027" stroke-width="3.5" stroke-linecap="round"><path d="M48 65L40 81L33 84M58 65L57 84M67 65L76 80L83 83"/></g><path d="M16 65C3 39 25 12 48 16C75 19 80 45 62 67Z" fill="url(#${p.id})" stroke="#94613c" stroke-width="2.5"/><path d="M49 56C24 55 23 30 41 27C61 23 68 45 52 48C41 52 35 40 44 36Q51 34 52 40" fill="none" stroke="#b77545" stroke-width="4" stroke-linecap="round"/><path d="M22 39Q18 51 27 60" fill="none" stroke="#ffebc0" stroke-width="3"/><ellipse cx="67" cy="62" rx="17" ry="13" fill="#f28c4a" stroke="#a65027" stroke-width="2"/><path d="M62 53L63 38M75 54L79 39" stroke="#b65328" stroke-width="3.5" stroke-linecap="round"/>${eye(63,36,5)}${eye(79,37,5)}<path d="M61 65Q68 70 73 65" fill="none" stroke="#803c26" stroke-width="2" stroke-linecap="round"/><path d="M78 65Q89 52 96 61L90 68L97 72Q87 83 77 72Z" fill="#ed7841" stroke="#a65027" stroke-width="2" stroke-linejoin="round"/>`;
+};
+ART.fosil=()=>{
+ const p=palette('#eee1bb','#cab58e');return `${p.defs}<path d="M15 23L38 12L73 17L88 32L85 69L72 87L34 89L12 72L9 45Z" fill="url(#${p.id})" stroke="#8b7654" stroke-width="2.5" stroke-linejoin="round"/><path d="M19 31L27 35L24 43M77 70L67 75L70 82" stroke="#aa936b" stroke-width="2" fill="none"/><path d="M65 71C91 55 74 25 50 28C23 31 20 65 42 75C62 84 79 66 72 48C65 31 40 35 38 51C35 65 53 72 61 61C68 51 54 43 48 51Q45 58 52 60" fill="none" stroke="#8b6945" stroke-width="4" stroke-linecap="round"/><g stroke="#aa8756" stroke-width="2"><path d="M49 28l1 9M34 35l6 7M27 50l9 1M30 64l9-5M43 75l3-9M58 77l-2-9M71 66l-7-4M74 51l-7 2M66 39l-4 6"/></g>`;
+};
+ART.kabuk=()=>{
+ const p=palette('#ffd0b5','#e69b83');return `${p.defs}<path d="M52 71L45 83L19 83L13 72C3 56 9 38 24 31C42 24 63 37 62 53Q61 64 52 71Z" fill="url(#${p.id})" stroke="#a96757" stroke-width="2"/><path d="M15 48Q34 39 48 50Q61 64 44 73Q28 81 22 64Q17 50 31 48Q44 45 46 57Q48 69 35 67Q27 65 31 58Q36 54 39 59" stroke="#c47166" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M29 30L27 16L43 29" fill="#ffdfc4" stroke="#a96757" stroke-width="2"/><path d="M69 82L59 61Q53 44 68 43Q75 39 80 45Q93 43 94 54L87 80Z" fill="#efc27a" stroke="#aa7e42" stroke-width="2" stroke-linejoin="round"/><g stroke="#c89853" stroke-width="2" fill="none"><path d="M73 77L65 49M77 77L77 47M81 77L89 51"/></g><path d="M68 78H85" stroke="#a97b3d" stroke-width="3" stroke-linecap="round"/>`;
+};
+ART.megalodon=()=>{
+ let teeth='';for(let i=0;i<7;i++){let a=Math.PI*(.13+.74*i/6),x=50-Math.cos(a)*29,y=49-Math.sin(a)*25;teeth+=`<path d="M${x-4} ${y}L${x+4} ${y}L${50-Math.cos(a)*19} ${49-Math.sin(a)*12}Z" fill="#fff7de" stroke="#b88c62" stroke-width=".8"/>`;y=49+Math.sin(a)*25;teeth+=`<path d="M${x-4} ${y}L${x+4} ${y}L${50-Math.cos(a)*19} ${49+Math.sin(a)*12}Z" fill="#fff7de" stroke="#b88c62" stroke-width=".8"/>`;}
+ return `<ellipse cx="50" cy="50" rx="40" ry="34" fill="#d2b08a" stroke="#8c694c" stroke-width="2.5"/><ellipse cx="50" cy="49" rx="34" ry="28" fill="#c3836e"/><ellipse cx="50" cy="49" rx="24" ry="18" fill="#473642"/>${teeth}<path d="M24 29Q37 17 51 19" stroke="#f7dfbd" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+};
+
 // Vize damgası: bölgenin türüne göre yuvarlak (kıta), köşeli (körfez) ya da sekizgen (özel bölge).
 // opts.date verilirse damgada tarih yazar.
 const TXT = `font-family='"Baloo 2",ui-rounded,system-ui,sans-serif' font-weight="800" text-anchor="middle"`;
@@ -203,3 +237,4 @@ function artSVG(key, cls = ""){
 }
 window.ART = ART; window.stampSVG = stampSVG; window.finalSealSVG = finalSealSVG; window.artSVG = artSVG;
 })();
+

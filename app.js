@@ -109,10 +109,15 @@ function renderHome(){
   S.last = null;
   renderInstall();
 }
+// Konum simgeleri: metne eşlik eder, tek başlarına anlam taşımak zorunda değildir.
+function locationCue(st){
+  const paths = st.id === "fosil" ? '<path d="M12 21V4M5 11l7-7 7 7"/>' : st.id === "orfoz" ? '<path d="M3 19l4-10 7-5 6 7 1 8Z M7 9l6 5 7-3 M13 14l-2 5"/>' : st.id === "vatoz" ? '<path d="M3 21V11a9 9 0 0 1 18 0v10M7 21V11a5 5 0 0 1 10 0v10 M3 21h18"/>' : st.id === "kabuk" ? '<path d="M12 21L3 9Q2 2 8 4Q12 0 16 4Q22 2 21 9ZM12 21V5M12 21L7 7M12 21l5-14"/>' : '<path d="M2 12Q12 0 22 12Q12 24 2 12Z"/><circle cx="12" cy="12" r="3"/>';
+  return `<span class="cue-icon" aria-hidden="true"><svg viewBox="0 0 24 24">${paths}</svg></span><span>${esc(st.where || REG[st.region].label)}</span>`;
+}
 function renderTarget(){
   const st = ST.find(s => s.id === target), box = $("#target");
   box.classList.toggle("hidden", !st); if (!st) return;
-  box.innerHTML = `<div class="target-heading"><span class="target-art" aria-hidden="true">${artSVG(st.art)}</span><div class="tg-txt"><p class="target-kicker">SIRADAKİ KEŞFİN · ${ST.indexOf(st) + 1} / ${ST.length}</p><h2 class="tg-k">${esc(st.name)}</h2></div></div><p class="tg-where">${esc(st.where || REG[st.region].label)}</p><button class="btn btn-gold" id="target-learn">${S.flow && S.flow.id === st.id ? "Kaldığın yerden devam et →" : "Tanış ve keşfet →"}</button>`;
+  box.innerHTML = `<div class="target-heading"><span class="target-art" aria-hidden="true">${artSVG(st.art)}<span class="target-step">${ST.indexOf(st)+1}</span></span><div class="tg-txt"><p class="target-kicker">SIRADAKİ KEŞFİN</p><h2 class="tg-k">${esc(st.name)}</h2></div></div><p class="tg-where location-cue">${locationCue(st)}</p><button class="btn btn-gold" id="target-learn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5Q7 2 2 4v15q5-2 10 1q5-3 10-1V4q-5-2-10 1Z M12 5v15"/></svg>${S.flow && S.flow.id === st.id ? "Kaldığın yerden devam et →" : "Tanış ve keşfet →"}</button>`;
   $("#target-learn").onclick = () => {
     if (S.flow && S.flow.id === st.id) resumeTask(); else openLesson(st, false);
   };
@@ -121,9 +126,9 @@ function renderRoad(){
   const done = count() === ST.length;
   $("#road-nodes").innerHTML = ST.map((st, i) => {
     const [x, y] = ROAD[i] || [50, 50], has = !!S.badges[st.id], on = st.id === target;
-    return `<button type="button" class="stop ${has ? "got" : "locked"}${on ? " on" : ""}" data-id="${st.id}" style="left:${x}%;top:${y}%;--rot:${ROT[i % ROT.length]}deg" aria-label="${esc(has ? st.name : (i + 1) + ". durak")}">
+    return `<button type="button" class="stop ${has ? "got" : "locked"}${on ? " on" : ""}" data-id="${st.id}" style="left:${x}%;top:${y}%;--rot:${ROT[i % ROT.length]}deg" aria-label="${esc((i+1)+". durak: "+st.name+(has?", tamamlandı":on?", buradasın":""))}" aria-current="${on ? "step" : "false"}">
       ${has ? stampSVG(st, { date: S.badges[st.id] }) : `<span class="sil">${artSVG(st.art)}</span>`}<span class="num">${i + 1}</span>
-      ${on ? `<span class="me-pin">${av(S.avatar)}</span>` : ""}</button>`;
+      ${has ? `<span class="stop-done" aria-hidden="true">✓</span>` : ""}${on ? `<span class="here-pin">Buradasın<span aria-hidden="true">▼</span></span>` : ""}</button>`;
   }).join("");
   $("#road-end").classList.toggle("done", done);
   $("#road-end").querySelector(".chest").innerHTML = done ? finalSealSVG() : "🎁";
@@ -278,7 +283,8 @@ function renderLesson(){
   $("#phase-learn").classList.toggle("active", !observing);
   $("#phase-observe").classList.toggle("active", observing);
   $("#learn-copy").innerHTML = observing ? `<p class="observe-text">${esc(st.observe)}</p><p class="observe-note">Acele etme. Hazır olduğunda devam et.</p>` : `<ul class="intro-facts">${st.intro.map((t,i)=>`<li><span aria-hidden="true">${i ? "✦" : "🌊"}</span>${esc(t)}</li>`).join("")}</ul>`;
-  $("#learn-where").textContent = st.where;
+  $("#learn-where").classList.add("location-cue");
+  $("#learn-where").innerHTML = locationCue(st);
   $("#learn-next").textContent = !observing ? "Haydi yakından bakalım →" : S.flow.verified ? "Hazırım, soruyu aç →" : "Buldum, QR’ını tara →";
 }
 $("#learn-next").onclick = () => {
@@ -505,7 +511,7 @@ async function drawCert(){
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v15`; renderInstall(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v16`; renderInstall(); }
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
   {label:"Vazgeç",cls:"btn-ghost"}]);

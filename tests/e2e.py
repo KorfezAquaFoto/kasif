@@ -40,6 +40,7 @@ async def main():
       await pg.goto(B);await pg.locator('#v-welcome.active').wait_for()
       await pg.evaluate('document.fonts.load(\'600 16px "DynaPuff"\', "ÇĞİÖŞÜçğıöşü")')
       assert await pg.evaluate('document.fonts.check(\'600 16px "DynaPuff"\')')
+      await pg.evaluate('document.fonts.ready')
       prefix=f'{width}x{height}'
       await fits(pg,prefix+'-welcome')
       await pg.fill('#in-name','Kaşif');await pg.click('#btn-start');await pg.wait_for_timeout(1200)
@@ -50,6 +51,8 @@ async def main():
       await pg.screenshot(path=str(OUT/(prefix+'-opening.png')))
       await pg.wait_for_timeout(1600)
       await fits(pg,prefix+'-home')
+      assert await pg.locator('.stop.on .here-pin').inner_text() == 'Buradasın▼'
+      assert await pg.locator('.stop.on').get_attribute('aria-current') == 'step'
       await pg.click('.stop[data-id="fosil"]')
       assert 'duvarların yukarısındaki' in await pg.locator('.tg-where').inner_text()
       await fits(pg,prefix+'-fossil-location')
@@ -67,6 +70,7 @@ async def main():
       await fits(pg,prefix+'-hint')
       await pg.click('#quiz-opts .opt:nth-child(2)');await pg.wait_for_timeout(1100)
       await fits(pg,prefix+'-reward');await pg.click('#rw-next')
+      assert await pg.locator('.stop.got .stop-done').count() == 1
       stations=await pg.evaluate('KASIF.stations.map(s=>({code:s.code,answer:s.quiz.answer}))')
       # QR bağlantıları da bilgiden başlar; kodları değiştirmeden tüm görevler tamamlanır.
       for st in stations[1:]:
@@ -108,6 +112,13 @@ async def main():
     }''')
     await pg.click('#v-learn [data-listen]');await pg.click('#learn-next');await pg.wait_for_timeout(100)
     assert await pg.locator('#modal').evaluate("e=>e.classList.contains('hidden')")
+    await pg.set_viewport_size({'width':600,'height':600})
+    assert await pg.evaluate('''() => Object.keys(ART).every(k=>!new DOMParser().parseFromString(artSVG(k),'image/svg+xml').querySelector('parsererror'))''')
+    await pg.evaluate('''() => {
+      const g=document.createElement('div');g.style.cssText='position:fixed;inset:0;z-index:100;background:#fff8ec;display:grid;grid-template-columns:repeat(3,1fr);padding:10px;gap:6px;color:#15384a';
+      g.innerHTML=KASIF.stations.map(s=>'<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:18px"><div style="width:155px;height:155px">'+artSVG(s.art)+'</div>'+s.name+'</div>').join('');document.body.append(g);
+    }''')
+    await pg.screenshot(path=str(OUT/'art-gallery.png'))
     await br.close()
   # Küçük bir görsel kontrol şeridi, test günlüğünden incelenebilir.
   import base64, io
@@ -118,6 +129,8 @@ async def main():
     im=Image.open(OUT/name).convert('RGB');im.thumbnail((250,542));sheet.paste(im,(i*250,0))
   data=io.BytesIO();sheet.save(data,format='JPEG',quality=65)
   print('VISUAL_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
+  im=Image.open(OUT/'art-gallery.png').convert('RGB');im.thumbnail((600,600));data=io.BytesIO();im.save(data,format='JPEG',quality=75)
+  print('ART_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
   server.shutdown()
   print('PASS: 5 ekran boyutu, 9 görev, bilgi/gözlem, QR, final, kayıt ve çevrimdışı açılış')
 
