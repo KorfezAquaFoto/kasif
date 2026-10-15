@@ -162,3 +162,13 @@ Kaynak: https://www.floridamuseum.ufl.edu/discover-fish/skates-rays/biology/
 - “Bazı piranalar” ve “çoğu vatoz” ifadeleri tür farklarını gözetir.
 - Kamera görüntü işleme alanının boyutlandırılmasına müdahale edilmedi.
 - Bilgi yazıları kısa tutuldu; sayfaya yeni bilgi ekranı eklenmedi.
+
+## Doğrulama
+
+- Üç test grubu başarılı: mobile-layout, browser-platforms, mobile-flow.
+- 10 telefon düzeni; Chromium ve WebKit; klavye, büyük yazı, kayıt ve kamera kontrolleri geçti.
+- 5 ekran boyutunda dokuz görev tamamlandı. Yeni damga yazılarının gerçekten ekrana geldiği, başlıkların ortalı ve açıklamaların sola yaslı olduğu doğrulandı.
+- Mersin balığı ve fosillerin yeni bilgi kartlarının ekran görüntüleri alındı.
+- QR kodları, sorular, yanıtlar, görev öncesi ipuçları ve konum metinleri v24 ile aynı.
+- Test kaydı: https://github.com/KorfezAquaFoto/kasif/actions/runs/38689785426
+- Kontroller otomatik tarayıcı testleridir; fiziksel telefon ve basılı QR ile yerinde deneme yapılmadı.
