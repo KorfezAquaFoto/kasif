@@ -43,7 +43,24 @@ async def certificate_cases(pg,engine):
    const time=Date.parse('2026-10-15T10:00:00Z');
    localStorage.setItem('okyanus-kasifi-v1',JSON.stringify({v:1,id:'2026',name,avatar,badges:Object.fromEntries(KASIF.stations.map(s=>[s.id,time])),created:time}));
   }""",{'name':name,'avatar':avatar})
-  await pg.reload();await pg.click('#btn-cert');await pg.click('#btn-preview')
+  if index==6:await pg.set_viewport_size({'width':280,'height':480})
+  if index==7:await pg.emulate_media(reduced_motion='reduce')
+  await pg.reload();await pg.click('#btn-cert')
+  if index==0:
+   await pg.wait_for_timeout(80);await pg.screenshot(path=str(OUT/f'final-closed-{engine}.png'))
+   await pg.wait_for_timeout(500);await pg.screenshot(path=str(OUT/f'final-opening-{engine}.png'))
+   await pg.wait_for_timeout(850);await pg.screenshot(path=str(OUT/f'final-press-{engine}.png'))
+  await pg.wait_for_timeout(700 if index==0 else 2100)
+  final=await pg.evaluate("""()=>{
+   const book=document.querySelector('.final-book').getBoundingClientRect(),page=document.querySelector('.final-right-page').getBoundingClientRect(),seal=document.querySelector('#final-seal').getBoundingClientRect(),friend=document.querySelector('#final-friend').getBoundingClientRect(),name=document.querySelector('#final-name'),nr=name.getBoundingClientRect();
+   return {inside:seal.left>=page.left&&seal.right<=page.right&&seal.top>=page.top&&seal.bottom<=page.bottom,centered:Math.abs((book.left+book.right)/2-innerWidth/2)<2,ink:+getComputedStyle(document.querySelector('#final-seal')).opacity,friend:friend.width>20&&friend.height>20,nameFits:name.scrollWidth<=name.clientWidth+1&&nr.bottom<=book.bottom&&nr.top>=book.top,visible:book.top>=0&&book.bottom<=visualViewport.height};
+  }""")
+  assert all(final.values()),(engine,name,final)
+  await bounds(pg,f'{engine}-final-book-{index}')
+  if index in [0,6,7]:await pg.screenshot(path=str(OUT/f'final-open-{engine}-{index}.png'))
+  await pg.click('#btn-preview')
+  if index==6:await pg.set_viewport_size({'width':390,'height':844})
+  if index==7:await pg.emulate_media(reduced_motion='no-preference')
   await pg.wait_for_function('document.querySelector("#cert-img").naturalWidth===1080')
   result=await pg.evaluate("""name=>{
    const texts=__certTexts,hero=texts.find(t=>t.value===name&&t.top<400),circle=__certArcs.find(t=>t.r===80);

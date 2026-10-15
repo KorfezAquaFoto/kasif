@@ -140,7 +140,7 @@ async def main():
           await pg.wait_for_timeout(500)
           await pg.screenshot(path=str(OUT/(prefix+'-'+st['id']+'-new-fact.png')))
         await pg.click('#rw-next')
-      await pg.locator('#v-cert.active').wait_for();await fits(pg,prefix+'-final')
+      await pg.locator('#v-cert.active').wait_for();await pg.wait_for_timeout(2100);await fits(pg,prefix+'-final')
       await pg.click('#btn-preview');await pg.wait_for_function('document.querySelector("#cert-img").naturalWidth===1080')
       await fits(pg,prefix+'-passport')
       await pg.click('#v-cert [data-back]');await fits(pg,prefix+'-complete')

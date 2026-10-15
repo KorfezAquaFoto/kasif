@@ -179,7 +179,19 @@
 <section id="v-cert" class="view">
   <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title">Pasaportun tamamlandı!</b><span class="tb-sp"></span></header>
   <div class="final">
-    <div class="final-stage">
+    <div class="final-stage" role="img" aria-label="Pasaportun açılıyor ve final damgan sağ sayfaya basılıyor.">
+      <div class="final-book">
+      <div class="final-pages">
+        <div class="final-left-page">
+          <span class="final-page-label">Kaşif pasaportum</span>
+          <div id="final-friend" class="final-friend"></div>
+          <p class="pp-name" id="final-name"></p>
+        </div>
+        <div class="final-right-page">
+          <span class="final-page-label">Final damgam</span>
+          <span class="final-page-count" id="final-page-count"></span>
+        </div>
+      </div>
       <div class="final-cover" id="final-cover">
         <div class="passport-inner"><svg class="pp-emblem" viewBox="0 0 120 120" aria-hidden="true">
   <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="2.5"/>
@@ -188,7 +200,6 @@
 </svg>
           
           <p class="pp-title">OKYANUS KAŞİFİ<br><span>PASAPORTU</span></p>
-          <p class="pp-name" id="final-name"></p>
         </div>
       </div>
       <div class="final-seal" id="final-seal"></div>
@@ -198,6 +209,7 @@
         <rect x="14" y="76" width="92" height="24" rx="7" fill="#6b4523"/>
         <rect x="18" y="98" width="84" height="12" rx="4" fill="#f5bd3a"/>
       </svg>
+      </div>
     </div>
     <h2 class="final-h">Tebrikler, Okyanus Kaşifi!</h2>
     <p class="final-p" id="final-p"></p>

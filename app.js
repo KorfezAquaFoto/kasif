@@ -486,7 +486,7 @@ function confetti(N, sel = "#confetti", view = "v-reward"){
 // ---------- Final: pasaport tamamlandı ----------
 // Damga aleti büyük altın "Okyanus Kaşifi" damgasını kapağa basar, kapak altına döner.
 // Paylaşılan resim sertifika değil, çocuğun dolu pasaportu.
-let certBlob = null;
+let certBlob = null, certAnimationRun = 0;
 function openCert(){
   if (count() < ST.length) return show("v-home", false);
   stack = ["v-home"]; show("v-cert", false);
@@ -495,10 +495,20 @@ function openCert(){
   document.querySelectorAll("#v-cert [data-aq]").forEach(el => el.textContent = D.aquarium);
   $("#final-name").textContent = S.name;
   $("#final-p").textContent = `${S.name}, ${D.aquarium} içindeki ${ST.length} görevi tamamladın. Pasaportun tamamlandı!`;
-  const cover = $("#final-cover"), seal = $("#final-seal"), tool = $("#final-tool");
-  seal.innerHTML = finalSealSVG(); cover.classList.remove("gold");
-  [seal, tool].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
-  setTimeout(() => { cover.classList.add("gold"); if (navigator.vibrate) navigator.vibrate([60,40,120]); confetti(280, "#confetti2", "v-cert"); }, 560);
+  const stage = $("#v-cert .final-stage"), run = ++certAnimationRun;
+  $("#final-seal").innerHTML = finalSealSVG();
+  $("#final-friend").innerHTML = artSVG(S.avatar);
+  $("#final-page-count").textContent = count() + " / " + ST.length + " keşif";
+  stage.classList.remove("final-opening");
+  void stage.offsetWidth;
+  stage.classList.add("final-opening");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  setTimeout(() => {
+    if (run !== certAnimationRun || current !== "v-cert" || $("#v-cert").classList.contains("preview-passport")) return;
+    if (!reduced && navigator.vibrate) navigator.vibrate([50,35,80]);
+    playStampSound();
+    confetti(70, "#confetti2", "v-cert");
+  }, reduced ? 0 : 1400);
   $("#cert-img").removeAttribute("src");
   setupSave();
   drawCert().then(blob => {
@@ -716,7 +726,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v34`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v35`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
