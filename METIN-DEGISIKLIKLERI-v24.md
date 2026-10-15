@@ -739,6 +739,11 @@ Sonra: Vatoz bir kuş değil, bir balık. Balıkların yüzmek için neleri vard
 
 ## Bilgi kaynakları ve sınırlar
 
+- Keşiş yengeci: boş salyangoz kabuğu, yumuşak karın ve büyüdükçe kabuk değiştirme: https://www.montereybayaquarium.org/animals-the-ocean/animals-a-to-z/hermit-crab
+- Orfozun kaya oyuklarıyla ilişkisi: https://www.aquariumbcn.com/en/especies/bony-fish/dusky-grouper/
+- Kabuk oluşturma ve yumuşakçaların manto dokusu: https://www.montereybayaquarium.org/animals-the-ocean/animals-a-to-z/cephalopods
+- Vatozların göğüs yüzgeçleri: https://www.montereybayaquarium.org/animals-the-ocean/ecosystems/sandy-seafloor
+- Vatozlar ve köpekbalıklarının kıkırdak iskeleti: https://www.fisheries.noaa.gov/species/smalltooth-sawfish/science
 - Pirana sürülerinin korunma işlevi (kırmızı karınlı pirana araştırması): https://pmc.ncbi.nlm.nih.gov/articles/PMC1626212/
 - Mersin balığı plakaları, eğitim kaynağı: https://www.fisheries.noaa.gov/new-england-mid-atlantic/endangered-species-conservation/scutes-student-resources
 - Fosil tanımı: https://www.nhm.ac.uk/discover/what-is-a-fossil.html/

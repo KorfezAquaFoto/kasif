@@ -98,8 +98,13 @@ async def main():
       # QR bağlantıları da bilgiden başlar; kodları değiştirmeden tüm görevler tamamlanır.
       for st in stations[1:]:
         await pg.goto(B+'#s='+st['code']);await lesson_to_quiz(pg,prefix+'-'+st['code'])
+        wrong=(st['answer']+1)%3
+        await pg.click(f"#quiz-opts .opt:nth-child({wrong+1})")
+        assert 'İpucu' in await pg.locator('#quiz-msg').inner_text()
+        await fits(pg,prefix+'-'+st['code']+'-wrong-answer',False)
         await pg.click(f"#quiz-opts .opt:nth-child({st['answer']+1})")
         await pg.wait_for_timeout(1000)
+        await fits(pg,prefix+'-'+st['code']+'-reward',False)
         await pg.click('#rw-next')
       await pg.locator('#v-cert.active').wait_for();await fits(pg,prefix+'-final')
       await pg.click('#btn-preview');await pg.wait_for_function('document.querySelector("#cert-img").naturalWidth===1080')
@@ -156,6 +161,11 @@ async def main():
   print('ART_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
   im=Image.open(OUT/'390x844-reward.png').convert('RGB');im.thumbnail((390,844));data=io.BytesIO();im.save(data,format='JPEG',quality=80)
   print('STAMP_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
+  sheet=Image.new('RGB',(1170,844),'#0b3c6e')
+  for i,name in enumerate(['390x844-learn.png','390x844-hint.png','390x844-reward.png']):
+    im=Image.open(OUT/name).convert('RGB');im.thumbnail((390,844));sheet.paste(im,(i*390,0))
+  data=io.BytesIO();sheet.save(data,format='JPEG',quality=80)
+  print('CONTENT_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
   server.shutdown()
   print('PASS: 5 ekran boyutu, 9 görev, bilgi/gözlem, QR, final, kayıt ve çevrimdışı açılış')
 
