@@ -19,7 +19,7 @@ async def bounds(pg,label):
  assert not result,(label,result)
 
 async def certificate_cases(pg,engine):
- await pg.add_init_script("""()=>{
+ await pg.add_init_script("""(()=>{
   window.__certTexts=[];window.__certArcs=[];
   const proto=CanvasRenderingContext2D.prototype,fill=proto.fillText,arc=proto.arc;
   proto.fillText=function(value,x,y,...rest){
@@ -33,7 +33,7 @@ async def certificate_cases(pg,engine):
    if(this.canvas.width===1080&&this.canvas.height===1350)window.__certArcs.push({x,y,r});
    return arc.call(this,x,y,r,...rest);
   };
- }""")
+ })()""")
  cases=[('Deniz',a) for a in ['kesis','vatoz','orfoz','pirana','mersin','karagoz']]
  cases += [('WWWWWWWWWWWWWWWW','mersin'),('Çağrı İpek','vatoz')]
  for index,(name,avatar) in enumerate(cases):
