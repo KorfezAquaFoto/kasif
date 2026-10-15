@@ -25,7 +25,9 @@ async def certificate_cases(pg,engine):
   proto.fillText=function(value,x,y,...rest){
    if(this.canvas.width===1080&&this.canvas.height===1350){
     const m=this.measureText(value);
-    window.__certTexts.push({value:String(value),left:x-m.actualBoundingBoxLeft,right:x+m.actualBoundingBoxRight,top:y-m.actualBoundingBoxAscent,bottom:y+m.actualBoundingBoxDescent});
+    const matrix=this.getTransform();
+    const points=[[x-m.actualBoundingBoxLeft,y-m.actualBoundingBoxAscent],[x+m.actualBoundingBoxRight,y-m.actualBoundingBoxAscent],[x-m.actualBoundingBoxLeft,y+m.actualBoundingBoxDescent],[x+m.actualBoundingBoxRight,y+m.actualBoundingBoxDescent]].map(([a,b])=>new DOMPoint(a,b).matrixTransform(matrix));
+    window.__certTexts.push({value:String(value),left:Math.min(...points.map(p=>p.x)),right:Math.max(...points.map(p=>p.x)),top:Math.min(...points.map(p=>p.y)),bottom:Math.max(...points.map(p=>p.y))});
    }
    return fill.call(this,value,x,y,...rest);
   };
@@ -46,6 +48,8 @@ async def certificate_cases(pg,engine):
   result=await pg.evaluate("""name=>{
    const texts=__certTexts,hero=texts.find(t=>t.value===name&&t.top<400),circle=__certArcs.find(t=>t.r===80);
    const problems=[];
+   const letters=texts.filter(t=>t.value.trim().length===1&&t.top<200);
+   if(letters.length<10||((letters[0].top+letters[0].bottom+letters[letters.length-1].top+letters[letters.length-1].bottom)/4-(letters[Math.floor(letters.length/2)].top+letters[Math.floor(letters.length/2)].bottom)/2)<10)problems.push('curved certificate heading');
    if(!hero||!circle||Math.abs((hero.top+hero.bottom)/2-circle.y)>1)problems.push('avatar/name vertical alignment');
    if(hero&&circle&&(hero.left<circle.x+circle.r+20||hero.right>1010))problems.push('name overlaps or clips');
    if(texts.some(t=>t.left<65||t.right>1015||t.top<60||t.bottom>1245))problems.push('certificate text outside page');

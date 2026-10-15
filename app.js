@@ -625,11 +625,31 @@ async function drawCert(){
       x.beginPath();x.arc(a,b,r,0,Math.PI*2);x.stroke();
     });
   x.restore();
-  text("OKYANUS KAŞİFİ",540,119,76,900);
-  text("SERTİFİKASI",540,180,47,680);
+  // Örnekteki başlık: ortası yükselen yay, hafif dönen iri harfler.
+  const heading="OKYANUS KAŞİFİ",radius=2200;
+  let headingSize=96;
+  x.font="700 "+headingSize+"px "+F;
+  let widths=Array.from(heading,ch=>x.measureText(ch).width);
+  while(widths.reduce((a,b)=>a+b,0)>800){headingSize--;x.font="700 "+headingSize+"px "+F;widths=Array.from(heading,ch=>x.measureText(ch).width);}
+  let advance=-widths.reduce((a,b)=>a+b,0)/2;
+  Array.from(heading).forEach((ch,i)=>{
+    const angle=(advance+widths[i]/2)/radius;
+    x.save();x.translate(540+Math.sin(angle)*radius,155+(1-Math.cos(angle))*radius);
+    x.rotate(angle);x.font="700 "+headingSize+"px "+F;x.textAlign="center";x.textBaseline="alphabetic";x.fillStyle=navy;
+    x.fillText(ch,0,0);x.restore();advance+=widths[i];
+  });
+  // Başlığın iki yanındaki altın vurgular.
+  [128,952].forEach((cx,index)=>{
+    const flip=index?-1:1;
+    [[-7,-8,-.5,17,6],[-9,13,.15,14,5],[8,26,1,12,5]].forEach(([dx,dy,angle,rx,ry])=>{
+      x.save();x.translate(cx+dx*flip,157+dy);x.rotate(angle*flip);
+      x.beginPath();x.ellipse(0,0,rx,ry,0,0,Math.PI*2);x.fillStyle=gold;x.fill();x.restore();
+    });
+  });
+  text("SERTİFİKASI",540,190,44,680);
   x.strokeStyle="#b78624";x.lineWidth=2.5;
-  x.beginPath();x.moveTo(356,215);x.lineTo(505,215);x.moveTo(575,215);x.lineTo(724,215);x.stroke();
-  star(540,215,18,gold);
+  x.beginPath();x.moveTo(356,224);x.lineTo(505,224);x.moveTo(575,224);x.lineTo(724,224);x.stroke();
+  star(540,224,18,gold);
   // İsim ve kaşif dostu tek bir grup: görsel mürekkep merkezleri aynı yatay çizgide.
   const name=String(S.name||"Kaşif"),r=80,gap=34,cy=315;
   let fs=104;x.font="700 "+fs+"px "+F;
