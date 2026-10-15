@@ -641,7 +641,7 @@ async function drawCert(){
   // Başlığın iki yanındaki altın vurgular.
   [128,952].forEach((cx,index)=>{
     const flip=index?-1:1;
-    [[-7,-8,-.5,17,6],[-9,13,.15,14,5],[8,26,1,12,5]].forEach(([dx,dy,angle,rx,ry])=>{
+    [[-9,-18,-.5,15,4.5],[-12,7,.05,14,4.5],[-4,31,.65,12,4.5]].forEach(([dx,dy,angle,rx,ry])=>{
       x.save();x.translate(cx+dx*flip,157+dy);x.rotate(angle*flip);
       x.beginPath();x.ellipse(0,0,rx,ry,0,0,Math.PI*2);x.fillStyle=gold;x.fill();x.restore();
     });
@@ -651,11 +651,11 @@ async function drawCert(){
   x.beginPath();x.moveTo(356,224);x.lineTo(505,224);x.moveTo(575,224);x.lineTo(724,224);x.stroke();
   star(540,224,18,gold);
   // İsim ve kaşif dostu tek bir grup: görsel mürekkep merkezleri aynı yatay çizgide.
-  const name=String(S.name||"Kaşif"),r=80,gap=34,cy=315;
+  const name=String(S.name||"Kaşif"),r=80,gap=34,sealGap=32,sealWidth=100,cy=315;
   let fs=104;x.font="700 "+fs+"px "+F;
-  while(x.measureText(name).width>600&&fs>24){fs--;x.font="700 "+fs+"px "+F;}
-  const metrics=x.measureText(name),groupWidth=r*2+gap+metrics.width,left=(W-groupWidth)/2;
-  const avatarX=left+r,nameX=left+r*2+gap;
+  while(x.measureText(name).width>500&&fs>24){fs--;x.font="700 "+fs+"px "+F;}
+  const metrics=x.measureText(name),groupWidth=r*2+gap+metrics.width+sealGap+sealWidth,left=(W-groupWidth)/2;
+  const avatarX=left+r,nameX=left+r*2+gap,sealX=nameX+metrics.width+sealGap+sealWidth/2,sealY=cy;
   x.beginPath();x.arc(avatarX,cy,r,0,Math.PI*2);
   x.fillStyle="#e4f2f8";x.fill();x.lineWidth=8;x.strokeStyle=gold;x.stroke();
   const avatarImage=await svgImg(artSVG(S.avatar));
@@ -673,11 +673,10 @@ async function drawCert(){
   // Tamamlanma tarihi bir kez: son keşfin tarihi.
   const finishedAt=Math.max(...ST.map(st=>Number(S.badges[st.id])||0))||Date.now();
   const date=new Date(finishedAt).toLocaleDateString("tr-TR",{day:"numeric",month:"long",year:"numeric"});
-  text(date,500,1210,28,300);
+  text(date,W/2,1210,28,300);
   x.strokeStyle="#c6952c";x.lineWidth=2;
-  x.beginPath();x.moveTo(203,1210);x.lineTo(325,1210);x.moveTo(817,1210);x.lineTo(926,1210);x.stroke();
+  x.beginPath();x.moveTo(205,1210);x.lineTo(365,1210);x.moveTo(715,1210);x.lineTo(875,1210);x.stroke();
   // Küçük başarı mührü: bütün tamamlanma bilgisi burada.
-  const sealX=748,sealY=1205;
   x.fillStyle="#137594";
   [[-26,-7], [26,7]].forEach(([dx,dir])=>{
     x.beginPath();x.moveTo(sealX+dx,sealY+25);x.lineTo(sealX+dx+dir,sealY+58);
@@ -717,7 +716,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v33`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v34`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},

@@ -54,7 +54,11 @@ async def certificate_cases(pg,engine):
    if(hero&&circle&&(hero.left<circle.x+circle.r+20||hero.right>1010))problems.push('name overlaps or clips');
    if(texts.some(t=>t.left<65||t.right>1015||t.top<60||t.bottom>1245))problems.push('certificate text outside page');
    if(texts.some(t=>/tamamlayarak|oldun|hepsini keşfetti/.test(t.value)))problems.push('removed sentence returned');
-   if(texts.filter(t=>t.value==='15 Ekim 2026').length!==1)problems.push('single completion date');
+   const dates=texts.filter(t=>t.value==='15 Ekim 2026'),seal=__certArcs.find(t=>t.r===36);
+   if(dates.length!==1)problems.push('single completion date');
+   if(dates.length&&Math.abs((dates[0].left+dates[0].right)/2-540)>2)problems.push('completion date not centered');
+   if(!seal||!hero||hero.right+24>seal.x-45||Math.abs(seal.y-circle.y)>1)problems.push('name/seal clearance');
+   if(!texts.some(t=>t.value==='9 / 9'&&t.top<400))problems.push('discovery seal beside name');
    for(const st of KASIF.stations){
     if(!texts.some(t=>t.value===st.name&&t.top>500))problems.push('missing creature caption '+st.id);
     const svg=stampSVG(st,{certificate:true});
