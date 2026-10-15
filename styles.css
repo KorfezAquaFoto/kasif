@@ -603,3 +603,12 @@ html[data-layout=tiny][data-narrow=true] .reward .stamp-stage{width:72px;height:
  html[data-layout=tiny] .hint-subject{gap:4px}
  html[data-layout=tiny] .hint-subject h2{font-size:20px;line-height:1.1}
 }
+
+/* Kart esnediğinde damga da kullanılabilir iç yüksekliğe sığar. */
+.reward .rw-page{container-type:size;--stamp-limit:195px;--stamp-heading:26px}
+html[data-layout=short] .reward .rw-page{--stamp-limit:145px}
+html[data-layout=tiny] .reward .rw-page{--stamp-limit:84px;--stamp-heading:12px}
+html[data-layout=tiny][data-narrow=true] .reward .rw-page{--stamp-limit:72px}
+@supports(width:1cqh){
+ .reward .rw-page .stamp-stage{width:min(var(--stamp-limit),calc(100cqh - var(--stamp-heading)));height:min(var(--stamp-limit),calc(100cqh - var(--stamp-heading)))}
+}
