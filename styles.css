@@ -499,7 +499,7 @@ html[data-narrow=true] #v-welcome:not(.opening) .book-open{max-height:150px}
 .region-name{min-width:0}.region-counter{font-family:var(--font);font-size:16px;font-weight:800;white-space:nowrap;border-radius:10px;background:#d5f1ed;color:#104a5c;padding:5px 7px;line-height:1.2}
 .learn-art{width:min(200px,50vw);height:100%;max-height:180px;min-height:0;min-width:0}.learn-art svg{display:block;width:100%;height:100%;filter:drop-shadow(0 7px 0 #abcbd63d)}
 #learn-copy{width:100%;align-self:end}
-.quick-tip{background:#fffefa;border:2px solid #e7c97a;border-radius:22px;padding:13px 14px;text-align:center;box-shadow:0 5px 0 #d7c39a65;font-size:clamp(18px,4.8vw,21px);line-height:1.35;color:#193b54;font-weight:600;margin:0}
+.quick-tip{background:#fffefa;border:2px solid #e7c97a;border-radius:22px;padding:13px 14px;text-align:left;box-shadow:0 5px 0 #d7c39a65;font-size:clamp(18px,4.8vw,21px);line-height:1.35;color:#193b54;font-weight:600;margin:0}
 .tip-heading{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;font-family:var(--display-font);font-size:15px;color:#735215;line-height:1.2}
 .tip-heading>span{display:grid;place-items:center;width:29px;height:29px;flex:none;border-radius:9px;background:#ffedb5}.tip-heading svg{width:22px;height:22px;fill:none;stroke:#8b631a;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .quick-tip p{margin:0}.tip-fact{display:block;color:#126884;font-weight:800}.tip-instruction{display:block;margin-top:7px;color:#1b344b;font-weight:600}
@@ -512,7 +512,7 @@ html[data-narrow=true] #v-welcome:not(.opening) .book-open{max-height:150px}
 .hint-earned{font-size:14px;color:#237846;margin:6px 0 0;line-height:1.2}
 .guide-bubble{display:grid;grid-template-columns:52px 1fr;width:100%;padding:12px;gap:7px 10px;border-radius:20px;background:#e2eff7;border:2px solid #c9e1ef;align-items:center}
 .guide-content{display:contents}.guide-avatar{width:52px;height:52px;grid-column:1;grid-row:1;border:2px solid #e2bc55;border-radius:50%;background:#fff8ec;padding:4px}.guide-avatar svg{width:100%;height:100%}
-.guide-bubble b{grid-column:2;grid-row:1;font-size:15px;line-height:1.3;color:#0f5a96;overflow-wrap:anywhere}.guide-bubble p{text-align:center;grid-column:1/-1;grid-row:2;margin:0;font-size:clamp(18px,4.8vw,21px);line-height:1.35;overflow-wrap:break-word;color:#1b3c52;font-weight:600}
+.guide-bubble b{grid-column:2;grid-row:1;font-size:15px;line-height:1.3;color:#0f5a96;overflow-wrap:anywhere}.guide-bubble p{text-align:left;grid-column:1/-1;grid-row:2;margin:0;font-size:clamp(18px,4.8vw,21px);line-height:1.35;overflow-wrap:break-word;color:#1b3c52;font-weight:600}
 .hint-actions{display:grid;gap:9px;flex-shrink:0}.hint-actions .btn{min-height:48px;padding:11px 10px;font-size:16px;line-height:1.25}.hint-actions #hint-home{font-family:var(--font)}
 html[data-layout=roomy] .hint-subject{flex-direction:column;text-align:center;gap:10px}html[data-layout=roomy] .hint-art{width:min(20dvh,140px);height:min(20dvh,140px);border-radius:28px}
 /* Gerçek görünür alanın kısa ve çok kısa varyantları. */
@@ -581,3 +581,6 @@ html[data-layout=tiny] #rw-next{grid-column:1;grid-row:5;font-size:15px;line-hei
 html[data-layout=tiny][data-narrow=true] .rw-page{height:88px;min-height:88px}html[data-layout=tiny][data-narrow=true] .stamp-stage{width:68px;height:68px}
 html[data-layout=tiny][data-narrow=true] #rw-title{font-size:18px}
 html[data-layout=tiny] .reward-view.active .rw-page::after{font-size:18px;top:6px;right:8px}
+
+/* v29: damga ve bilgi kartının dış kenarları her ekranda eşleşir. */
+.reward .rw-page,.reward .fact-card{width:100%;max-width:none;margin-left:0;margin-right:0;border-radius:24px}

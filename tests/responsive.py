@@ -19,6 +19,8 @@ async def check(pg,label):
       if(av.some(r=>r.width<43||r.height<43))issues.push('avatar touch size');
       const subject=v.querySelector('.hint-subject'),bubble=v.querySelector('.guide-bubble');
       if(subject&&bubble){const a=subject.getBoundingClientRect(),b=bubble.getBoundingClientRect();if(a.left<b.right-1&&a.right>b.left+1&&a.top<b.bottom-1&&a.bottom>b.top+1)issues.push('hint overlap');}
+      const stamp=v.querySelector('.rw-page'),fact=v.querySelector('.fact-card');
+      if(stamp&&fact){const a=stamp.getBoundingClientRect(),b=fact.getBoundingClientRect();if(Math.abs(a.left-b.left)>1||Math.abs(a.width-b.width)>1)issues.push('reward card alignment');}
       return {issues,overflow:v.scrollHeight>v.clientHeight+2};
     }''')
     if result['issues'] or result['overflow']:

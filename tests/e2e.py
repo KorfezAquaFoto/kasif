@@ -45,6 +45,10 @@ async def main():
       assert await pg.locator('#v-welcome .field-label').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
       assert await pg.locator('#v-welcome .field>span').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
       assert await pg.locator('.welcome-brand .brand-logo').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgba(0, 0, 0, 0)'
+      # Her iki kapakta gerçek amblem kutusu daire merkezindedir; dalga kaldırıldı.
+      assert await pg.locator('.pp-emblem > path').count()==0
+      for emblem in await pg.locator('.pp-emblem > svg').all():
+        assert await emblem.evaluate("(e)=>Math.abs(+e.getAttribute('x')+(+e.getAttribute('width'))/2-60)<.01 && Math.abs(+e.getAttribute('y')+(+e.getAttribute('height'))/2-60)<.01")
       prefix=f'{width}x{height}'
       await fits(pg,prefix+'-welcome')
       await pg.locator('#avatars button').nth(1).click()
@@ -72,12 +76,13 @@ async def main():
       assert await pg.locator('.region-counter').inner_text()=='1 / 9'
       assert await pg.locator('.tip-fact').count()==1
       assert await pg.locator('.tip-heading').evaluate('(e)=>getComputedStyle(e).justifyContent')=='center'
-      assert await pg.locator('.quick-tip').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
+      assert await pg.locator('.quick-tip').evaluate('(e)=>getComputedStyle(e).textAlign')=='left'
       await pg.click('#learn-next');await pg.locator('#v-scan.active').wait_for()
       await fits(pg,prefix+'-scan')
       await pg.click('#v-scan [data-back]');await pg.click('#learn-back')
       await pg.click('#btn-hints');await pg.locator('#v-hints.active').wait_for()
       await fits(pg,prefix+'-hints')
+      assert await pg.locator('#hint-copy').evaluate('(e)=>getComputedStyle(e).textAlign')=='left'
       stations=await pg.evaluate('KASIF.stations.map(s=>({region:s.region,tip:s.tip}))')
       for i,st in enumerate(stations):
         assert await pg.locator('#hint-region').inner_text()==await pg.evaluate('KASIF.regions['+repr(st['region'])+'].label')
@@ -104,6 +109,9 @@ async def main():
       assert await pg.locator('#rw-fact-title').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
       assert await pg.locator('.fact-card').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
       assert await pg.locator('.leaf-hd').evaluate('(e)=>getComputedStyle(e).color')=='rgb(11, 79, 112)'
+      page_box=await pg.locator('.rw-page').bounding_box()
+      fact_box=await pg.locator('.fact-card').bounding_box()
+      assert abs(page_box['x']-fact_box['x'])<1 and abs(page_box['width']-fact_box['width'])<1,(prefix,page_box,fact_box)
       for selector in ['.rw-page','.stamp-stage']:
         bounds=await pg.locator(selector).bounding_box()
         assert abs(bounds['x']+bounds['width']/2-width/2)<2,(prefix,selector,bounds)
