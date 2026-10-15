@@ -545,3 +545,39 @@ html[data-layout=tiny] .quick-tip{padding:10px 12px;font-size:18px}html[data-lay
 .view.text-overflow .learn-card{flex-direction:column}.view[data-density=minimal] .tip-heading{display:none}
 .view[data-density=minimal] .learn-card h2{display:none}
 html[data-layout=tiny][data-narrow=true] #v-learn .task-progress{display:none}
+
+/* v28: küçük ekranlarda metni koruyan, kısa ve sakin görsel geri bildirimler. */
+html[data-layout=roomy] .learn-art{width:min(290px,72vw);max-height:260px}
+html[data-layout=short] .learn-art{width:min(245px,64vw);max-height:210px}
+.avatars button{position:relative}.avatar-check{position:absolute;right:0;top:0;display:grid;place-items:center;width:15px;height:15px;border:1.5px solid #fff;border-radius:50%;background:#167849;color:#fff;font:800 11px/1 var(--font);pointer-events:none}
+.avatars .just-picked>svg{animation:friend-pick .42s ease-out both}
+.copy-icon{display:inline-block;width:17px;height:17px;margin-right:5px;vertical-align:-3px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.quick-tip .tip-fact .copy-icon{display:none}.tip-instruction .copy-icon{color:#8b631a}
+html[data-layout=tiny] .copy-icon,.view[data-density=compact] .copy-icon,.view[data-density=minimal] .copy-icon{display:none}
+.view.active .learn-art[data-creature=pirana]>svg,.view.active .learn-art[data-creature=mersin]>svg,.view.active .learn-art[data-creature=orfoz]>svg,.view.active .learn-art[data-creature=korfez]>svg{animation:gentle-swim 3.2s ease-in-out 2}
+.view.active .learn-art[data-creature=kesis]>svg{animation:gentle-peek 3.2s ease-in-out 2}
+.view.active .learn-art[data-creature=vatoz]>svg{animation:gentle-glide 3.6s ease-in-out 2}
+.page-hidden .learn-art>svg{animation-play-state:paused!important}
+.opt.right .l{background:#167849;color:#fff;border-radius:50%;font-weight:800}.opt.right{border-color:#167849}
+#rw-title{font-size:clamp(20px,6vw,25px);line-height:1.15;text-wrap:balance}
+.rw-page{position:relative}.reward-view.active .rw-page::after{content:'✦';position:absolute;top:12px;right:15px;color:#e3a31b;font-size:28px;pointer-events:none;animation:discovery-sparkle 1.1s .55s both}
+.sound-setting{min-height:44px;font-family:var(--font);font-size:17px;padding:9px 12px}
+@keyframes friend-pick{0%,100%{transform:translateY(0)}45%{transform:translateY(-4px)}75%{transform:translateY(1px)}}
+@keyframes gentle-swim{0%,100%{transform:translateX(0) rotate(0)}50%{transform:translateX(3px) rotate(-1deg)}}
+@keyframes gentle-peek{0%,100%{transform:rotate(0)}50%{transform:rotate(2deg)}}
+@keyframes gentle-glide{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(1.5deg)}}
+@keyframes discovery-sparkle{0%,100%{opacity:0;transform:scale(.5)}40%{opacity:1;transform:scale(1.1)}}
+@media(prefers-reduced-motion:reduce){.learn-art>svg,.avatars .just-picked>svg{animation:none!important;transform:none!important}.reward-view.active .rw-page::after{animation:none;opacity:0}}
+/* Kısa görünür alanda Dinle ve Devam aynı sırayı paylaşır. */
+html[data-layout=tiny] .reward{display:grid;grid-template-columns:minmax(0,1fr) 52px;gap:5px;min-height:0}
+html[data-layout=tiny] .reward-head{display:contents}html[data-layout=tiny] .reward-head .kicker,html[data-layout=tiny] .rw-name{display:none}
+html[data-layout=tiny] .reward-head .listen-btn{grid-column:2;grid-row:5;min-width:44px;min-height:44px;padding:7px;font-size:13px}
+html[data-layout=tiny] .rw-page{grid-column:1/-1;grid-row:1;height:100px;min-height:100px;padding:4px 8px}
+html[data-layout=tiny] .leaf-hd{font-size:10px;line-height:12px}html[data-layout=tiny] .stamp-stage{width:80px;height:80px;margin:0 auto}
+html[data-layout=tiny] #rw-title{grid-column:1/-1;grid-row:2;font-size:20px;line-height:1.15}
+html[data-layout=tiny] .fact-card{grid-column:1/-1;grid-row:3;padding:6px 10px}html[data-layout=tiny] .fact-card b{font-size:11px;line-height:1.2}html[data-layout=tiny] .fact-card p{font-size:14px;line-height:1.3;margin-top:4px}
+html[data-layout=tiny] .rw-count{grid-column:1/-1;grid-row:4;font-size:13px;line-height:16px}
+html[data-layout=tiny] #rw-next{grid-column:1;grid-row:5;font-size:15px;line-height:1.2;min-height:44px;padding:9px 8px;margin:0}
+html[data-layout=tiny][data-narrow=true] .rw-page{height:88px;min-height:88px}html[data-layout=tiny][data-narrow=true] .stamp-stage{width:68px;height:68px}
+html[data-layout=tiny][data-narrow=true] #rw-title{font-size:18px}
+html[data-layout=tiny] .reward-view.active .rw-page::after{font-size:18px;top:6px;right:8px}

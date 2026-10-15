@@ -47,6 +47,9 @@ async def main():
       assert await pg.locator('.welcome-brand .brand-logo').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgba(0, 0, 0, 0)'
       prefix=f'{width}x{height}'
       await fits(pg,prefix+'-welcome')
+      await pg.locator('#avatars button').nth(1).click()
+      assert await pg.locator('#avatars button').nth(1).get_attribute('aria-pressed')=='true'
+      assert await pg.locator('#avatars .avatar-check').count()==1
       await pg.fill('#in-name','Kaşif');await pg.click('#btn-start');await pg.wait_for_timeout(1200)
       opening=await pg.locator('.opening .book-open').bounding_box()
       assert opening and abs(opening['y']+opening['height']/2-height/2) < height*.15,(prefix,opening)
@@ -89,9 +92,13 @@ async def main():
       await pg.click('#quiz-opts .opt:nth-child(1)')
       assert 'İpucu' in await pg.locator('#quiz-msg').inner_text()
       await fits(pg,prefix+'-hint')
-      await pg.click('#quiz-opts .opt:nth-child(2)');await pg.wait_for_timeout(1100)
+      await pg.click('#quiz-opts .opt:nth-child(2)')
+      assert await pg.locator('#quiz-opts .right .l').inner_text()=='✓'
+      if width==390:await pg.screenshot(path=str(OUT/(prefix+'-correct-answer.png')))
+      await pg.wait_for_timeout(1100)
       await pg.wait_for_timeout(1300)
       await fits(pg,prefix+'-reward')
+      assert 'keşfedildi!' in await pg.locator('#rw-title').inner_text()
       assert await pg.locator('#rw-fact').inner_text()==await pg.evaluate('KASIF.stations[0].reward')
       assert await pg.locator('#rw-fact-title').text_content()=='Biliyor muydun?'
       assert await pg.locator('#rw-fact-title').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
@@ -123,6 +130,9 @@ async def main():
       await fits(pg,prefix+'-passport')
       await pg.click('#v-cert [data-back]');await fits(pg,prefix+'-complete')
       await pg.click('#btn-help');await pg.click('#help-close');await pg.click('#btn-menu');await fits(pg,prefix+'-menu')
+      assert await pg.locator('#sound-toggle').get_attribute('aria-checked')=='false'
+      await pg.click('#sound-toggle');assert await pg.evaluate("JSON.parse(localStorage.getItem('okyanus-kasifi-v1')).sound===true")
+      await pg.click('#sound-toggle');assert await pg.locator('#sound-toggle').get_attribute('aria-checked')=='false'
       # Önbellek güncellemesi sonrası çevrimdışı açılış ve damgaların korunması.
       await pg.evaluate('navigator.serviceWorker.ready');await pg.wait_for_timeout(1000)
       await ctx.set_offline(True);await pg.reload();await pg.locator('#v-home.active').wait_for()
@@ -202,6 +212,11 @@ async def main():
     im=Image.open(OUT/name).convert('RGB');im.thumbnail((390,844));sheet.paste(im,(i*390,0))
   data=io.BytesIO();sheet.save(data,format='JPEG',quality=80)
   print('NEW_FACTS_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
+  sheet=Image.new('RGB',(1170,844),'#0b3c6e')
+  for i,name in enumerate(['390x844-learn.png','390x844-correct-answer.png','390x844-reward.png']):
+    im=Image.open(OUT/name).convert('RGB');im.thumbnail((390,844));sheet.paste(im,(i*390,0))
+  data=io.BytesIO();sheet.save(data,format='JPEG',quality=80)
+  print('CHILD_FRIENDLY_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
   server.shutdown()
   print('PASS: 5 ekran boyutu, 9 görev, bilgi/gözlem, QR, final, kayıt ve çevrimdışı açılış')
 

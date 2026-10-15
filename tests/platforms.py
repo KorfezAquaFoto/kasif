@@ -44,6 +44,12 @@ async def main():
     for i in range(9):
      await bounds(pg,f'{engine.name}-{w}-hint-{i}')
      if i<8:await pg.click('#hint-next')
+    # Azaltılmış hareket tercihinde canlı hareketi durmalı.
+    await pg.emulate_media(reduced_motion='reduce')
+    await pg.click('#hint-home');await pg.click('#target-learn')
+    assert await pg.locator('#learn-art>svg').evaluate('(e)=>getComputedStyle(e).animationName')=='none'
+    await bounds(pg,f'{engine.name}-{w}-reduced-motion')
+    await pg.click('#learn-back');await pg.click('#btn-hints');await pg.emulate_media(reduced_motion='no-preference')
     # Kullanıcı yazıyı büyüttüğünde metnin tamamı erişilebilir kalır.
     await pg.add_style_tag(content='.guide-bubble p,.quick-tip{font-size:24px!important}')
     await pg.click('#hint-home');await pg.click('#btn-hints')

@@ -19,7 +19,8 @@ function octagon(r){ return Array.from({length:8}, (_, i) => { const a = Math.PI
 function stampSVG(st, opts = {}){
   const id = uid("st"), K = window.KASIF, reg = (K && K.regions && K.regions[st.region]) || { label: st.name, kind: "kita" };
   const label = reg.label.toLocaleUpperCase("tr-TR"), bottom = opts.date ? fmtDate(opts.date) : "KÖRFEZ AQUA";
-  const art = (cx, cy, k) => `<g class="art" transform="translate(${cx} ${cy}) scale(${k}) translate(-50 -50)">${ART[st.art || st.id]()}</g>`;
+  const clarity={pirana:1.12,mersin:1.24,kesis:1.12,fosil:1.12,orfoz:1.12,karagoz:1.12,kabuk:1.08,megalodon:1.13,vatoz:1.12};
+  const art = (cx, cy, k) => `<g class="art" transform="translate(${cx} ${cy}) scale(${k*(clarity[st.art || st.id]||1)}) translate(-50 -50)">${ART[st.art || st.id]()}</g>`;
   const grad = `<defs><radialGradient id="${id}" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="${st.light}"/><stop offset="1" stop-color="${st.color}"/></radialGradient></defs>`;
   const white = `${TXT} fill="#fff" stroke="rgba(0,0,0,.28)" stroke-width="1.4" paint-order="stroke" letter-spacing=".6"`;
   let body;
