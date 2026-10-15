@@ -9,3 +9,14 @@
 - Dokuz çizim, metinler, sorular ve QR kodları korunur. Çevrimdışı önbellek v32.
 
 Doğrulama: 16 ekran/tarayıcı alanında soru ve yanlış yanıt ipucu kontrolü eklendi. Beş tam görev akışında dokuz soru kontrol edilir. Chromium ve WebKit'te büyük ekran görsel boyutu ve soru sınırları ayrıca doğrulanır.
+
+## Sonuçlar
+
+- Üç test grubu başarılı: mobile-layout, mobile-flow, browser-platforms.
+- 16 ekran/tarayıcı alanında soru ve yanlış yanıt ipucu taşmadan görüntülendi. 253 px genişlikteki ekran için alt boşluk ve başlık ölçüleri ayrıca ayarlandı.
+- Beş ekran boyutunda dokuz görevin tam akışı geçti. Pirana, fosil ve megalodon soru görüntüleri kaydedildi.
+- Chromium ve WebKit'te üçer telefon boyutunda soru, yanlış yanıt ipucu ve büyük görsel boyutu kontrolleri başarılı.
+- QR, kayıt ve çevrimdışı açılış kontrolleri geçti.
+- Test kaydı: https://github.com/KorfezAquaFoto/kasif/actions/runs/38709441851
+- Ekran görüntüleri: tests/out/v32-quiz-art.jpg ve tests/out/v32-quiz-mobile.jpg.
+- Testler otomatik ekran/tarayıcı simülasyonudur; fiziksel telefon testi yapılmadı.
