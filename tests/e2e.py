@@ -67,7 +67,7 @@ async def main():
       assert await pg.locator('.region-counter').inner_text()=='1 / 9'
       assert await pg.locator('.tip-fact').count()==1
       assert await pg.locator('.tip-heading').evaluate('(e)=>getComputedStyle(e).justifyContent')=='center'
-      assert await pg.locator('.quick-tip').evaluate('(e)=>getComputedStyle(e).textAlign')=='left'
+      assert await pg.locator('.quick-tip').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
       await pg.click('#learn-next');await pg.locator('#v-scan.active').wait_for()
       await fits(pg,prefix+'-scan')
       await pg.click('#v-scan [data-back]');await pg.click('#learn-back')
