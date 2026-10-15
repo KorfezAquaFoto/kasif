@@ -646,7 +646,7 @@ async function drawCert(){
       x.beginPath();x.ellipse(0,0,rx,ry,0,0,Math.PI*2);x.fillStyle=gold;x.fill();x.restore();
     });
   });
-  text("SERTİFİKASI",540,190,44,680);
+  text("SERTİFİKASI",540,180,44,680);
   x.strokeStyle="#b78624";x.lineWidth=2.5;
   x.beginPath();x.moveTo(356,224);x.lineTo(505,224);x.moveTo(575,224);x.lineTo(724,224);x.stroke();
   star(540,224,18,gold);
