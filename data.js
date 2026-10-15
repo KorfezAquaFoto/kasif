@@ -83,8 +83,8 @@ window.KASIF = {
         "answer": 1,
         "clue": "Bir tehlike olduğunda tek başına olmak mı, bir grupla birlikte olmak mı daha güvenli olabilir?"
       },
-      "fact": "Piranalar da başka hayvanlara yem olabilir. Sürü hâlinde yüzmek, bir pirananın yakalanma riskini azaltabilir.",
-      "reward": "Birlikte yüzmek, piranaların tehlikelerden korunmasına yardımcı olur.",
+      "fact": "Bazı piranalar doğada balıkların yanı sıra meyve ve başka bitkisel besinlerle de beslenir. Keskin dişlere sahip olmaları, yalnızca et yedikleri anlamına gelmez.",
+      "reward": "Bazı piranalar doğada meyve de yer. Menülerinde yalnızca başka hayvanlar yoktur!",
       "icons": [
         "💤",
         "🛡️",
@@ -113,8 +113,8 @@ window.KASIF = {
         "answer": 2,
         "clue": "Bu sert plakaları bir zırh gibi düşün. Zırh ne işe yarar?"
       },
-      "fact": "Mersin balığının sırtı ve yanları boyunca sert plakalar sıralanır. Bu plakalar, vücudunun korunmasına yardımcı olur.",
-      "reward": "Zırh gibi sert plakalar, mersin balığının korunmasına yardımcı olur.",
+      "fact": "Mersin balığının ağzıyla burnunun ucu arasında dört küçük bıyık bulunur. Bunlar dipteki yiyecekleri bulmasına yardımcı olan algılayıcılardır. Yiyeceğini ağzıyla emerek alabilir.",
+      "reward": "Mersin balığının ağzının yakınında dört küçük bıyık bulunur. Bu bıyıklar, dipteki yiyecekleri bulmasına yardım eder!",
       "icons": [
         "💨",
         "🎨",
@@ -143,8 +143,8 @@ window.KASIF = {
         "answer": 0,
         "clue": "Ayakkabıların sana küçük gelince ne yaparsın?"
       },
-      "fact": "Keşiş yengeci kabuğunu kendi yapmaz. Yumuşak karnını korumak için boş bir deniz salyangozu kabuğunu kullanır. Büyüdükçe daha büyük bir kabuk arar.",
-      "reward": "Keşiş yengeci büyüyünce eski kabuğuna sığamaz ve daha büyük bir kabuk arar.",
+      "fact": "Keşiş yengecinin bütün bacaklarını dışarıdan göremezsin. Arka bacakları kabuğun içinde kalır ve kabuğu sıkıca tutmasına yardım eder.",
+      "reward": "Keşiş yengeci, kabuğunu düşürmemek için arka bacaklarıyla içeriden sıkıca tutar!",
       "icons": [
         "📏",
         "🫧",
@@ -173,8 +173,8 @@ window.KASIF = {
         "answer": 1,
         "clue": "Fosiller eski canlılardan kalan izler ve kalıntılardır. Bize geçmişi mi, geleceği mi anlatır?"
       },
-      "fact": "Fosiller, çok eski canlıların korunmuş kalıntıları ve izleridir. Bir diş, kabuk veya ayak izi fosil olabilir. Bilim insanları fosilleri inceleyerek geçmişi araştırır.",
-      "reward": "Fosiller, çok eski zamanlarda yaşamış canlıları tanımamıza yardım eder.",
+      "fact": "Fosil olmak için geride bir kemik kalması gerekmez. Korunmuş ayak izleri de fosil olabilir. Bu izler, eski canlıların adımlarını ve hareketlerini araştırmamıza yardımcı olur.",
+      "reward": "Ayak izleri de fosilleşebilir! Bilim insanları bu izlerden, eski canlıların nasıl yürüdüğünü araştırır.",
       "icons": [
         "☁️",
         "🦕",
@@ -203,8 +203,8 @@ window.KASIF = {
         "answer": 2,
         "clue": "Görevin adı “Kaya Bekçisi”. Kayaların arasında saklanabileceği bir yer var mı?"
       },
-      "fact": "Orfozlar kayalık alanlarda yaşar ve kaya oyuklarını saklanmak için kullanabilir. Tankta onu hemen göremezsen kayaların çevresini dikkatle incele.",
-      "reward": "Kaya oyukları, orfozun saklanabileceği yerlerdir.",
+      "fact": "Orfozun gözleri başının ön tarafına yakındır. Bu yerleşim, kaya oyuğunda saklanırken dışarıyı görmesine yardımcı olur.",
+      "reward": "Orfozun öne yakın gözleri, kaya oyuğundayken dışarıyı görmesine yardımcı olur.",
       "icons": [
         "🌊",
         "🏖️",
@@ -234,8 +234,8 @@ window.KASIF = {
         "clue": "Balıkların evi denizdir. Temiz bir ev, içinde yaşayanlar için neden iyidir?"
       },
       "factTitle": "Temiz Körfez",
-      "fact": "İzmit Körfezi pek çok deniz canlısının yaşam alanıdır. Çöpleri denize atmamak ve kıyıları temiz tutmak, onların evini korumaya yardımcı olur.",
-      "reward": "Temiz bir deniz, balıklar için daha sağlıklı bir yaşam alanıdır.",
+      "fact": "Balıklar da bizim gibi oksijene ihtiyaç duyar. Suyu ağızlarından alıp solungaçlarının üzerinden geçirirler. Solungaçlar, suda çözünmüş oksijeni almalarını sağlar.",
+      "reward": "Balıklar da oksijene ihtiyaç duyar. Solungaçları, suda çözünmüş oksijeni almalarını sağlar.",
       "icons": [
         "🚢",
         "🐟",
@@ -264,8 +264,8 @@ window.KASIF = {
         "answer": 1,
         "clue": "Keşiş yengeci boş bir kabuk bulur. Salyangoz ve midye ise kabuklarını kendileriyle birlikte büyütür."
       },
-      "fact": "Deniz salyangozları ve midyeler kendi kabuklarını oluşturur. Canlı büyüdükçe kabuğuna yeni malzeme ekler. Keşiş yengeci ise başka bir canlının boş kabuğunu kullanır.",
-      "reward": "Salyangoz kendi kabuğunu oluşturur. Keşiş yengeci ise boş kalmış bir kabuğu kullanır!",
+      "fact": "Midyenin kabuğu birbirine bağlı iki parçadan oluşur. Canlı, bu parçaları açıp kapatabilir. Kabuğunu kapatmak, yumuşak gövdesini korumasına yardımcı olur.",
+      "reward": "Midyenin iki parçalı kabuğu küçük bir kapı gibi açılıp kapanabilir!",
       "icons": [
         "🌊",
         "🐚",
@@ -294,8 +294,8 @@ window.KASIF = {
         "answer": 0,
         "clue": "Sergideki büyük dişleri düşün. Bir parmak ucuna mı, bir yetişkinin eline mi daha yakın büyüklükteler?"
       },
-      "fact": "Megalodonun büyük dişleri yaklaşık 18 santimetreye ulaşabiliyordu. Bugün yaşayan bir megalodon yok; onu fosillerinden tanıyoruz.",
-      "reward": "Megalodonun büyük dişleri, yaklaşık bir yetişkinin eli kadar olabiliyordu.",
+      "fact": "Megalodonun iskeleti kemikten değil, kıkırdaktandı. Kıkırdak öldükten sonra kolayca parçalanabildiği için çok azı korunur. Megalodonu çoğunlukla daha dayanıklı olan fosil dişlerinden tanıyoruz.",
+      "reward": "Megalodonun iskeleti kemikten değil, kıkırdaktandı. Bu yüzden onu çoğunlukla daha dayanıklı olan fosil dişlerinden tanıyoruz!",
       "icons": [
         "✋",
         "☝️",
@@ -324,8 +324,8 @@ window.KASIF = {
         "answer": 1,
         "clue": "Vatoz bir kuş değil, bir balık. Balıkların yüzmek için neleri vardır?"
       },
-      "fact": "Vatozun kanat gibi görünen geniş kısımları göğüs yüzgeçleridir. Vatozlar köpekbalıklarıyla akrabadır; iskeletleri kemik yerine esnek kıkırdaktan oluşur.",
-      "reward": "Kanat gibi görünen bu geniş kısımlara göğüs yüzgeçleri denir.",
+      "fact": "Çoğu vatozun gözleri üst tarafta, ağzı ise gövdesinin altındadır. Bu yerleşim, dipteki yiyecekleri almasına yardımcı olur. Tünelde üzerinden geçen bir vatozun alt tarafını inceleyebilirsin.",
+      "reward": "Çoğu vatozun ağzı gövdesinin altındadır. Tünelde üzerinden geçerse alt tarafını dikkatle incele!",
       "icons": [
         "🪽",
         "🐟",

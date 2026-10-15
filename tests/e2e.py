@@ -66,6 +66,8 @@ async def main():
       assert 'GÜNEY AMERİKA' in await pg.locator('#learn-region').inner_text()
       assert await pg.locator('.region-counter').inner_text()=='1 / 9'
       assert await pg.locator('.tip-fact').count()==1
+      assert await pg.locator('.tip-heading').evaluate('(e)=>getComputedStyle(e).justifyContent')=='center'
+      assert await pg.locator('.quick-tip').evaluate('(e)=>getComputedStyle(e).textAlign')=='left'
       await pg.click('#learn-next');await pg.locator('#v-scan.active').wait_for()
       await fits(pg,prefix+'-scan')
       await pg.click('#v-scan [data-back]');await pg.click('#learn-back')
@@ -88,13 +90,17 @@ async def main():
       await pg.click('#quiz-opts .opt:nth-child(2)');await pg.wait_for_timeout(1100)
       await pg.wait_for_timeout(1300)
       await fits(pg,prefix+'-reward')
+      assert await pg.locator('#rw-fact').inner_text()==await pg.evaluate('KASIF.stations[0].reward')
+      assert await pg.locator('#rw-fact-title').inner_text()=='Biliyor muydun?'
+      assert await pg.locator('#rw-fact-title').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
+      assert await pg.locator('.fact-card').evaluate('(e)=>getComputedStyle(e).textAlign')=='left'
       assert await pg.locator('.leaf-hd').evaluate('(e)=>getComputedStyle(e).color')=='rgb(11, 79, 112)'
       for selector in ['.rw-page','.stamp-stage']:
         bounds=await pg.locator(selector).bounding_box()
         assert abs(bounds['x']+bounds['width']/2-width/2)<2,(prefix,selector,bounds)
       await pg.click('#rw-next')
       assert await pg.locator('.stop.got .stop-done').count() == 1
-      stations=await pg.evaluate('KASIF.stations.map(s=>({code:s.code,answer:s.quiz.answer}))')
+      stations=await pg.evaluate('KASIF.stations.map(s=>({id:s.id,code:s.code,answer:s.quiz.answer,reward:s.reward}))')
       # QR bağlantıları da bilgiden başlar; kodları değiştirmeden tüm görevler tamamlanır.
       for st in stations[1:]:
         await pg.goto(B+'#s='+st['code']);await lesson_to_quiz(pg,prefix+'-'+st['code'])
@@ -105,6 +111,10 @@ async def main():
         await pg.click(f"#quiz-opts .opt:nth-child({st['answer']+1})")
         await pg.wait_for_timeout(1000)
         await fits(pg,prefix+'-'+st['code']+'-reward',False)
+        assert await pg.locator('#rw-fact').inner_text()==st['reward']
+        if width==390 and st['id'] in ['mersin','fosil']:
+          await pg.wait_for_timeout(500)
+          await pg.screenshot(path=str(OUT/(prefix+'-'+st['id']+'-new-fact.png')))
         await pg.click('#rw-next')
       await pg.locator('#v-cert.active').wait_for();await fits(pg,prefix+'-final')
       await pg.click('#btn-preview');await pg.wait_for_function('document.querySelector("#cert-img").naturalWidth===1080')
@@ -166,6 +176,11 @@ async def main():
     im=Image.open(OUT/name).convert('RGB');im.thumbnail((390,844));sheet.paste(im,(i*390,0))
   data=io.BytesIO();sheet.save(data,format='JPEG',quality=80)
   print('CONTENT_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
+  sheet=Image.new('RGB',(1170,844),'#0b3c6e')
+  for i,name in enumerate(['390x844-learn.png','390x844-mersin-new-fact.png','390x844-fosil-new-fact.png']):
+    im=Image.open(OUT/name).convert('RGB');im.thumbnail((390,844));sheet.paste(im,(i*390,0))
+  data=io.BytesIO();sheet.save(data,format='JPEG',quality=80)
+  print('NEW_FACTS_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
   server.shutdown()
   print('PASS: 5 ekran boyutu, 9 görev, bilgi/gözlem, QR, final, kayıt ve çevrimdışı açılış')
 

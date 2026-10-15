@@ -449,7 +449,7 @@ function award(st){
   [stage, ring, tool].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
   $("#rw-name").textContent = REG[st.region].label + " · " + st.name;
   $("#rw-title").textContent = st.title;
-  $("#rw-fact-title").textContent = st.factTitle || "Keşfettiğin bilgi";
+  $("#rw-fact-title").textContent = st.factTitle || "Biliyor muydun?";
   $(".fact-card").classList.toggle("eco", !!st.factTitle);
   $("#rw-fact").textContent = st.reward || st.fact;
   const n = count(), t = ST.length;
@@ -605,7 +605,7 @@ async function drawCert(){
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v24`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v25`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall(); }
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
