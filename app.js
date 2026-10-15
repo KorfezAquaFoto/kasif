@@ -499,10 +499,16 @@ function openCert(){
   $("#final-seal").innerHTML = finalSealSVG();
   $("#final-friend").innerHTML = artSVG(S.avatar);
   $("#final-page-count").textContent = count() + " / " + ST.length + " keşif";
-  stage.classList.remove("final-opening");
+  stage.classList.remove("final-opening", "final-opened", "final-stamped");
   void stage.offsetWidth;
   stage.classList.add("final-opening");
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const stillHere = () => run === certAnimationRun && current === "v-cert" && !$("#v-cert").classList.contains("preview-passport");
+  if (reduced) stage.classList.add("final-opened", "final-stamped");
+  else {
+    setTimeout(() => { if(stillHere()) stage.classList.add("final-opened"); }, 900);
+    setTimeout(() => { if(stillHere()) stage.classList.add("final-stamped"); }, 2000);
+  }
   setTimeout(() => {
     if (run !== certAnimationRun || current !== "v-cert" || $("#v-cert").classList.contains("preview-passport")) return;
     if (!reduced && navigator.vibrate) navigator.vibrate([50,35,80]);
@@ -726,7 +732,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v35`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v36`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},

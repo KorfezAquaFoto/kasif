@@ -45,17 +45,26 @@ async def certificate_cases(pg,engine):
   }""",{'name':name,'avatar':avatar})
   if index==6:await pg.set_viewport_size({'width':280,'height':480})
   if index==7:await pg.emulate_media(reduced_motion='reduce')
-  await pg.reload();await pg.click('#btn-cert')
+  await pg.reload()
+  paused=await pg.add_style_tag(content='.final-stage *{animation-play-state:paused!important}') if index==5 else None
+  await pg.click('#btn-cert')
   if index==0:
-   await pg.wait_for_timeout(80);await pg.screenshot(path=str(OUT/f'final-closed-{engine}.png'))
-   await pg.wait_for_timeout(500);await pg.screenshot(path=str(OUT/f'final-opening-{engine}.png'))
-   await pg.wait_for_timeout(850);await pg.screenshot(path=str(OUT/f'final-press-{engine}.png'))
-  await pg.wait_for_timeout(700 if index==0 else 2100)
+   # Ara kareler: tek final fotoğrafı geçişteki taşmayı ve kapağı yakalayamaz.
+   for phase,delay in [('closed',60),('turning',200),('opening',250),('pages',400),('press',500),('settled',850)]:
+    await pg.wait_for_timeout(delay)
+    await pg.screenshot(path=str(OUT/f'final-{phase}-{engine}.png'))
+    state=await pg.evaluate("""()=>{
+     const b=document.querySelector('.final-book').getBoundingClientRect(),v=document.querySelector('#v-cert').getBoundingClientRect();
+     return {center:Math.abs((b.left+b.right)/2-innerWidth/2)<2,inside:b.left>=v.left&&b.right<=v.right,unclipped:getComputedStyle(document.querySelector('.final-pages')).clipPath==='none'};
+    }""")
+    assert all(state.values()),(engine,phase,state)
+  else:await pg.wait_for_timeout(2200)
   final=await pg.evaluate("""()=>{
    const book=document.querySelector('.final-book').getBoundingClientRect(),page=document.querySelector('.final-right-page').getBoundingClientRect(),seal=document.querySelector('#final-seal').getBoundingClientRect(),friend=document.querySelector('#final-friend').getBoundingClientRect(),name=document.querySelector('#final-name'),nr=name.getBoundingClientRect();
    return {coverHidden:getComputedStyle(document.querySelector('#final-cover')).visibility==='hidden'||getComputedStyle(document.querySelector('#final-cover')).display==='none',inside:seal.left>=page.left&&seal.right<=page.right&&seal.top>=page.top&&seal.bottom<=page.bottom,centered:Math.abs((book.left+book.right)/2-innerWidth/2)<2,ink:+getComputedStyle(document.querySelector('#final-seal')).opacity,friend:friend.width>20&&friend.height>20,nameFits:name.scrollWidth<=name.clientWidth+1&&nr.bottom<=book.bottom&&nr.top>=book.top,visible:book.top>=0&&book.bottom<=visualViewport.height};
   }""")
   assert all(final.values()),(engine,name,final)
+  if paused:await paused.evaluate('(e)=>e.remove()')
   await bounds(pg,f'{engine}-final-book-{index}')
   if index in [0,6,7]:await pg.screenshot(path=str(OUT/f'final-open-{engine}-{index}.png'))
   await pg.click('#btn-preview')
