@@ -112,6 +112,7 @@ async def main():
       page_box=await pg.locator('.rw-page').bounding_box()
       fact_box=await pg.locator('.fact-card').bounding_box()
       assert abs(page_box['x']-fact_box['x'])<1 and abs(page_box['width']-fact_box['width'])<1,(prefix,page_box,fact_box)
+      assert await pg.locator('.big-stamp').evaluate("(e)=>{const m=new DOMMatrix(getComputedStyle(e).transform);return Math.abs(m.b)<.001&&Math.abs(m.c)<.001}")
       for selector in ['.rw-page','.stamp-stage']:
         bounds=await pg.locator(selector).bounding_box()
         assert abs(bounds['x']+bounds['width']/2-width/2)<2,(prefix,selector,bounds)
@@ -191,6 +192,8 @@ async def main():
       g.innerHTML=KASIF.stations.map(s=>'<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:18px"><div style="width:155px;height:155px">'+artSVG(s.art)+'</div>'+s.name+'</div>').join('');document.body.append(g);
     }''')
     await pg.screenshot(path=str(OUT/'art-gallery.png'))
+    await pg.evaluate("""()=>{document.body.lastElementChild.innerHTML=KASIF.stations.map(s=>'<div style="display:grid;justify-items:center;align-content:center;gap:3px;font-size:16px"><div style="width:168px;height:168px">'+stampSVG(s,{date:Date.now()})+'</div>'+s.name+'</div>').join('')}""")
+    await pg.screenshot(path=str(OUT/'stamp-gallery.png'))
     await pg.goto(B+'qr-kodlari.html')
     assert await pg.locator('.poster').count()==10
     assert await pg.locator('.poster .em image').count()==10
@@ -225,6 +228,8 @@ async def main():
     im=Image.open(OUT/name).convert('RGB');im.thumbnail((390,844));sheet.paste(im,(i*390,0))
   data=io.BytesIO();sheet.save(data,format='JPEG',quality=80)
   print('CHILD_FRIENDLY_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
+  im=Image.open(OUT/'stamp-gallery.png').convert('RGB');data=io.BytesIO();im.save(data,format='JPEG',quality=85)
+  print('STAMP_GALLERY_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
   server.shutdown()
   print('PASS: 5 ekran boyutu, 9 görev, bilgi/gözlem, QR, final, kayıt ve çevrimdışı açılış')
 

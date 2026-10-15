@@ -21,6 +21,11 @@ async def check(pg,label):
       if(subject&&bubble){const a=subject.getBoundingClientRect(),b=bubble.getBoundingClientRect();if(a.left<b.right-1&&a.right>b.left+1&&a.top<b.bottom-1&&a.bottom>b.top+1)issues.push('hint overlap');}
       const stamp=v.querySelector('.rw-page'),fact=v.querySelector('.fact-card');
       if(stamp&&fact){const a=stamp.getBoundingClientRect(),b=fact.getBoundingClientRect();if(Math.abs(a.left-b.left)>1||Math.abs(a.width-b.width)>1)issues.push('reward card alignment');}
+      if(subject&&innerHeight>innerWidth&&getComputedStyle(subject).display!=='none'){
+        const art=subject.querySelector('.hint-art').getBoundingClientRect(),title=subject.querySelector('h2').getBoundingClientRect(),card=subject.getBoundingClientRect();
+        if(Math.abs(art.left+art.width/2-card.left-card.width/2)>1||Math.abs(title.left+title.width/2-card.left-card.width/2)>1||art.bottom>title.top+1)issues.push('hint identity alignment');
+      }
+      if(stamp){const a=stamp.getBoundingClientRect(),b=v.querySelector('.big-stamp').getBoundingClientRect();if(b.left<a.left-1||b.right>a.right+1||b.top<a.top-1||b.bottom>a.bottom+1)issues.push('stamp outside card');}
       return {issues,overflow:v.scrollHeight>v.clientHeight+2};
     }''')
     if result['issues'] or result['overflow']:
@@ -47,6 +52,7 @@ async def main():
       for i in range(9):
         await check(pg,f'{w}x{h}-hint-{i}')
         if i==0 and w in [280,320,375]:await pg.screenshot(path=str(OUT/f'responsive-{w}x{h}-hints.png'))
+        if i==3 and w in [320,375,390]:await pg.screenshot(path=str(OUT/f'responsive-{w}x{h}-fossil.png'))
         if i<8:await pg.click('#hint-next')
       await pg.click('#hint-home')
       for st in await pg.evaluate('KASIF.stations.map(s=>s.id)'):
@@ -77,4 +83,12 @@ async def main():
     im=Image.open(OUT/name).convert('RGB');im.thumbnail((240,560));sheet.paste(im,(i*250,28));d.text((i*250+4,4),name,fill='#000')
   b=io.BytesIO();sheet.save(b,format='JPEG',quality=85);print('RESPONSIVE_QA_BASE64:'+base64.b64encode(b.getvalue()).decode())
 
+  names=['responsive-320x480-fossil.png','responsive-375x667-fossil.png','responsive-390x844-fossil.png']
+  sheet=Image.new('RGB',(900,650),'#0b3c6e')
+  for i,name in enumerate(names):
+    im=Image.open(OUT/name).convert('RGB');im.thumbnail((300,650));sheet.paste(im,(i*300,0))
+  data=io.BytesIO();sheet.save(data,format='JPEG',quality=85)
+  print('CENTERED_HINTS_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
+
 asyncio.run(main())
+

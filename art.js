@@ -46,8 +46,8 @@ function stampSVG(st, opts = {}){
     <circle cx="60" cy="60" r="40" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.4" stroke-dasharray="3 4"/>
     <path id="${id}t" d="M16.5 60 A43.5 43.5 0 0 1 103.5 60" fill="none"/>
     <path id="${id}b" d="M10.5 60 A49.5 49.5 0 0 0 109.5 60" fill="none"/>
-    <text font-size="9" ${white}><textPath href="#${id}t" startOffset="50%">${label}</textPath></text>
-    <text font-size="8" ${white}><textPath href="#${id}b" startOffset="50%">${bottom}</textPath></text>
+    <text font-size="9" ${white}><textPath href="#${id}t" startOffset="50%" text-anchor="middle">${label}</textPath></text>
+    <text font-size="8" ${white}><textPath href="#${id}b" startOffset="50%" text-anchor="middle">${bottom}</textPath></text>
     <text x="13.5" y="63" font-size="8" ${TXT} fill="#fff">★</text><text x="106.5" y="63" font-size="8" ${TXT} fill="#fff">★</text>
     ${art(60, 61, .6)}`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="stamp-svg" aria-hidden="true">${grad}${body}</svg>`;
@@ -64,8 +64,8 @@ function finalSealSVG(){
     ${scal}<circle cx="100" cy="100" r="86" fill="url(#${id})"/>
     <circle cx="100" cy="100" r="74" fill="none" stroke="#fff6d6" stroke-width="2.5" stroke-dasharray="4 4"/>
     <circle cx="100" cy="98" r="40" fill="#10264d"/><polygon points="${star}" fill="#f5bd3a"/>
-    <text font-family='"Baloo 2",ui-rounded,system-ui,sans-serif' font-weight="800" font-size="21" fill="#5a3600" text-anchor="middle" letter-spacing="2"><textPath href="#${id}t" startOffset="50%">OKYANUS</textPath></text>
-    <text font-family='"Baloo 2",ui-rounded,system-ui,sans-serif' font-weight="800" font-size="21" fill="#5a3600" text-anchor="middle" letter-spacing="2"><textPath href="#${id}b" startOffset="50%">KAŞİFİ</textPath></text>
+    <text font-family='"Baloo 2",ui-rounded,system-ui,sans-serif' font-weight="800" font-size="21" fill="#5a3600" text-anchor="middle" letter-spacing="2"><textPath href="#${id}t" startOffset="50%" text-anchor="middle">OKYANUS</textPath></text>
+    <text font-family='"Baloo 2",ui-rounded,system-ui,sans-serif' font-weight="800" font-size="21" fill="#5a3600" text-anchor="middle" letter-spacing="2"><textPath href="#${id}b" startOffset="50%" text-anchor="middle">KAŞİFİ</textPath></text>
   </svg>`;
 }
 function artSVG(key, cls = ""){
