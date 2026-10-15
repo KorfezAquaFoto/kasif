@@ -53,7 +53,7 @@ async def certificate_cases(pg,engine):
   await pg.wait_for_timeout(700 if index==0 else 2100)
   final=await pg.evaluate("""()=>{
    const book=document.querySelector('.final-book').getBoundingClientRect(),page=document.querySelector('.final-right-page').getBoundingClientRect(),seal=document.querySelector('#final-seal').getBoundingClientRect(),friend=document.querySelector('#final-friend').getBoundingClientRect(),name=document.querySelector('#final-name'),nr=name.getBoundingClientRect();
-   return {inside:seal.left>=page.left&&seal.right<=page.right&&seal.top>=page.top&&seal.bottom<=page.bottom,centered:Math.abs((book.left+book.right)/2-innerWidth/2)<2,ink:+getComputedStyle(document.querySelector('#final-seal')).opacity,friend:friend.width>20&&friend.height>20,nameFits:name.scrollWidth<=name.clientWidth+1&&nr.bottom<=book.bottom&&nr.top>=book.top,visible:book.top>=0&&book.bottom<=visualViewport.height};
+   return {coverHidden:getComputedStyle(document.querySelector('#final-cover')).visibility==='hidden'||getComputedStyle(document.querySelector('#final-cover')).display==='none',inside:seal.left>=page.left&&seal.right<=page.right&&seal.top>=page.top&&seal.bottom<=page.bottom,centered:Math.abs((book.left+book.right)/2-innerWidth/2)<2,ink:+getComputedStyle(document.querySelector('#final-seal')).opacity,friend:friend.width>20&&friend.height>20,nameFits:name.scrollWidth<=name.clientWidth+1&&nr.bottom<=book.bottom&&nr.top>=book.top,visible:book.top>=0&&book.bottom<=visualViewport.height};
   }""")
   assert all(final.values()),(engine,name,final)
   await bounds(pg,f'{engine}-final-book-{index}')
