@@ -539,7 +539,18 @@ $("#btn-share").onclick = async () => {
   if (navigator.share) { try { await navigator.share({ title:"Okyanus Kaşifi", text:`${D.aquarium}'da Okyanus Kaşifi oldum!`, url: location.origin + location.pathname }); return; } catch(e){ if (e && e.name === "AbortError") return; } }
   download();
 };
-function svgImg(svg){
+let artworkDataPromise=null;
+function artworkDataURL(){
+ if(!artworkDataPromise)artworkDataPromise=fetch(window.KASIF_ART_PACK.src).then(r=>{
+  if(!r.ok)throw new Error('Çizimler yüklenemedi');return r.blob();
+ }).then(blob=>new Promise((resolve,reject)=>{
+  const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(reader.error);reader.readAsDataURL(blob);
+ })).catch(e=>{artworkDataPromise=null;throw e;});
+ return artworkDataPromise;
+}
+async function svgImg(svg){
+ const src=window.KASIF_ART_PACK?.src;
+ if(src&&svg.includes(src))svg=svg.split(src).join(await artworkDataURL());
   return new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null);
     i.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); });
 }
@@ -605,7 +616,7 @@ async function drawCert(){
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v26`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v27`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall(); }
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},

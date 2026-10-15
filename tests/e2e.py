@@ -38,6 +38,8 @@ async def main():
       await pg.evaluate('document.fonts.load(\'600 16px "DynaPuff"\', "ÇĞİÖŞÜçğıöşü")')
       assert await pg.evaluate('document.fonts.check(\'600 16px "DynaPuff"\')')
       await pg.evaluate('document.fonts.ready')
+      assert await pg.evaluate('Object.keys(KASIF_ART_PACK.sprites).length')==9
+      assert await pg.evaluate("async()=>{const i=new Image();i.src=KASIF_ART_PACK.src;await i.decode();return i.naturalWidth}")==1254
       assert await pg.evaluate("async()=>{const i=new Image();i.src='logo2.png';await i.decode();return i.naturalWidth}")==1920
       assert await pg.locator('#v-welcome .brand-logo').count()==1
       assert await pg.locator('#v-welcome .field-label').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
@@ -139,6 +141,20 @@ async def main():
         return jsQR(x.getImageData(0,0,c.width,c.height).data,c.width,c.height)?.data;
       }''',code)
       assert decoded and decoded.endswith('#s='+code),(code,decoded)
+    # Harici atlasın kaydedilen SVG/PNG içinde de gerçekten çizildiğini doğrula.
+    await pg.evaluate('''async()=>{
+      const src=KASIF_ART_PACK.src,blob=await(await fetch(src)).blob();
+      const data=await new Promise(resolve=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.readAsDataURL(blob)});
+      for(const key of Object.keys(ART)){
+        const svg=artSVG(key).split(src).join(data),image=new Image();
+        image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);await image.decode();
+        const c=document.createElement('canvas');c.width=c.height=200;const x=c.getContext('2d');x.drawImage(image,0,0,200,200);
+        const pixels=x.getImageData(0,0,200,200).data;let solid=0;
+        for(let i=3;i<pixels.length;i+=4)if(pixels[i]>128)solid++;
+        if(solid<2500)throw new Error('Çizim dışa aktarımda boş: '+key+' '+solid);
+        if(key==='megalodon'&&x.getImageData(100,100,1,1).data[3]>10)throw new Error('Çenenin iç boşluğu şeffaf değil');
+      }
+    }''')
     # Ses iptal edilince yanlışlıkla hata penceresi açılmamalı.
     await pg.fill('#in-name','Kaşif');await pg.click('#btn-start');await pg.wait_for_timeout(2800)
     await pg.click('#target-learn')

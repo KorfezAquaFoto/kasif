@@ -26,6 +26,15 @@ async def main():
    for w,h in [(320,568),(375,667),(390,844)]:
     ctx=await br.new_context(viewport={'width':w,'height':h},is_mobile=True,has_touch=True)
     pg=await ctx.new_page();await pg.goto(B);await pg.evaluate('document.fonts.ready');await bounds(pg,f'{engine.name}-{w}-welcome')
+    if w==320:
+     await pg.evaluate('''async()=>{
+      const src=KASIF_ART_PACK.src,blob=await(await fetch(src)).blob();
+      const data=await new Promise(resolve=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.readAsDataURL(blob)});
+      const image=new Image();image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(artSVG('mersin').split(src).join(data));await image.decode();
+      const c=document.createElement('canvas');c.width=c.height=200;const x=c.getContext('2d');x.drawImage(image,0,0,200,200);
+      const pixels=x.getImageData(0,0,200,200).data;let solid=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i]>128)solid++;
+      if(solid<2500)throw new Error('Yeni çizim tarayıcıda boş');
+     }''')
     await pg.focus('#in-name');await pg.set_viewport_size({'width':w,'height':300});await pg.fill('#in-name','Kaşif')
     r=await pg.locator('#in-name').bounding_box();assert r['y']>=0 and r['y']+r['height']<=302,(engine.name,'keyboard',r)
     await pg.press('#in-name','Enter');assert await pg.evaluate('document.activeElement.id')!='in-name'
