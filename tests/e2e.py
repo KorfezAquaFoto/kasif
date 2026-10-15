@@ -94,6 +94,10 @@ async def main():
       await pg.click('#hint-home');await pg.locator('#v-home.active').wait_for();await pg.click('#btn-hints');await pg.click('#hint-go')
       await pg.fill('#in-code','PRN-3T9F');await pg.click('#manual-form button')
       await pg.locator('#v-quiz.active').wait_for();await fits(pg,prefix+'-quiz')
+      if width==390:
+        art_box=await pg.locator('#quiz-art').bounding_box()
+        assert art_box['width']>=240 and art_box['height']>=180,('quiz art too small',art_box)
+        await pg.screenshot(path=str(OUT/'quiz-large-pirana.png'))
       await pg.click('#quiz-opts .opt:nth-child(1)')
       assert 'İpucu' in await pg.locator('#quiz-msg').inner_text()
       await fits(pg,prefix+'-hint')
@@ -123,6 +127,8 @@ async def main():
       for st in stations[1:]:
         await pg.goto(B+'#s='+st['code']);await lesson_to_quiz(pg,prefix+'-'+st['code'])
         wrong=(st['answer']+1)%3
+        if width==390 and st['id'] in ['fosil','mersin','megalodon']:
+          await pg.screenshot(path=str(OUT/('quiz-large-'+st['id']+'.png')))
         await pg.click(f"#quiz-opts .opt:nth-child({wrong+1})")
         assert 'İpucu' in await pg.locator('#quiz-msg').inner_text()
         await fits(pg,prefix+'-'+st['code']+'-wrong-answer',False)
@@ -230,6 +236,11 @@ async def main():
   print('CHILD_FRIENDLY_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
   im=Image.open(OUT/'stamp-gallery.png').convert('RGB');data=io.BytesIO();im.save(data,format='JPEG',quality=85)
   print('STAMP_GALLERY_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
+  sheet=Image.new('RGB',(1170,844),'#0b3c6e')
+  for i,name in enumerate(['quiz-large-pirana.png','quiz-large-fosil.png','quiz-large-megalodon.png']):
+    im=Image.open(OUT/name).convert('RGB');sheet.paste(im,(i*390,0))
+  data=io.BytesIO();sheet.save(data,format='JPEG',quality=85)
+  print('QUIZ_ART_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
   server.shutdown()
   print('PASS: 5 ekran boyutu, 9 görev, bilgi/gözlem, QR, final, kayıt ve çevrimdışı açılış')
 

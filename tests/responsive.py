@@ -8,7 +8,7 @@ async def check(pg,label):
     await pg.wait_for_timeout(100)
     result=await pg.evaluate('''()=>{
       const v=document.querySelector('.view.active'),vr=v.getBoundingClientRect();
-      const all=[...v.querySelectorAll('button,input,.field-label,.field>span,#hint-copy,#learn-copy,.hint-subject,.fact-card,#rw-title')];
+      const all=[...v.querySelectorAll('button,input,.field-label,.field>span,#hint-copy,#learn-copy,.hint-subject,.fact-card,#rw-title,#quiz-q,#quiz-msg,#quiz-art')];
       const issues=[];
       for(const e of all){const r=e.getBoundingClientRect(),s=getComputedStyle(e);if(!r.width||!r.height||s.display==='none')continue;
         if(r.top<vr.top-2||r.bottom>vr.bottom-5||r.left<vr.left-2||r.right>vr.right+2)issues.push(e.id||e.className);
@@ -85,6 +85,10 @@ async def main():
         await pg.click('#learn-back')
       st=await pg.evaluate("KASIF.stations.find(s=>s.id==='korfez')")
       await pg.goto('http://127.0.0.1:8766/#s='+st['code']);await pg.click('#learn-next')
+      await check(pg,f'{w}x{h}-quiz')
+      if w in [320,375,390,844]:await pg.screenshot(path=str(OUT/f'responsive-{w}x{h}-quiz.png'))
+      await pg.click(f"#quiz-opts .opt:nth-child({(st['quiz']['answer']+1)%3+1})")
+      await check(pg,f'{w}x{h}-quiz-clue')
       await pg.click(f"#quiz-opts .opt:nth-child({st['quiz']['answer']+1})")
       await pg.wait_for_timeout(2000);await check(pg,f'{w}x{h}-reward')
       await pg.click('#rw-next')
@@ -121,6 +125,13 @@ async def main():
     im=Image.open(OUT/name).convert('RGB');im.thumbnail((300,650));sheet.paste(im,(i*300,0))
   data=io.BytesIO();sheet.save(data,format='JPEG',quality=85)
   print('HELP_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
+
+  names=['responsive-320x480-quiz.png','responsive-375x667-quiz.png','responsive-390x844-quiz.png']
+  sheet=Image.new('RGB',(900,650),'#0b3c6e')
+  for i,name in enumerate(names):
+    im=Image.open(OUT/name).convert('RGB');im.thumbnail((300,650));sheet.paste(im,(i*300,0))
+  data=io.BytesIO();sheet.save(data,format='JPEG',quality=85)
+  print('QUIZ_LAYOUT_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
 
 asyncio.run(main())
 

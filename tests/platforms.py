@@ -50,6 +50,12 @@ async def main():
     await pg.click('#hint-home')
     st=await pg.evaluate("KASIF.stations.find(s=>s.id==='korfez')")
     await pg.goto(B+'#s='+st['code']);await pg.click('#learn-next')
+    await bounds(pg,f'{engine.name}-{w}-quiz')
+    if w==390:
+      r=await pg.locator('#quiz-art').bounding_box()
+      assert r['width']>=240 and r['height']>=180,(engine.name,'quiz art size',r)
+    await pg.click(f"#quiz-opts .opt:nth-child({(st['quiz']['answer']+1)%3+1})")
+    await bounds(pg,f'{engine.name}-{w}-quiz-clue')
     await pg.click(f"#quiz-opts .opt:nth-child({st['quiz']['answer']+1})")
     await pg.wait_for_timeout(1800);await bounds(pg,f'{engine.name}-{w}-stamp')
     assert await pg.evaluate("""()=>{const a=document.querySelector('.rw-page').getBoundingClientRect(),b=document.querySelector('.big-stamp').getBoundingClientRect(),m=new DOMMatrix(getComputedStyle(document.querySelector('.big-stamp')).transform);return b.left>=a.left-1&&b.right<=a.right+1&&b.top>=a.top-1&&b.bottom<=a.bottom+1&&Math.abs(m.b)<.001&&Math.abs(m.c)<.001}"""),(engine.name,w,'stamp containment')
