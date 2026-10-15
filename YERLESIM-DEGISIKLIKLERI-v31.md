@@ -8,3 +8,13 @@
 - Sürüm ve çevrimdışı önbellek v31.
 
 Doğrulama: yardım penceresinin görünür alanda kalması, dört adımın kaydırmadan görünmesi, simge/metin hizası ve taşma için 16 ekran düzenine kontrol eklendi. Chromium/WebKit'te üçer telefon boyutunda yardım penceresi ayrıca kontrol edilir.
+
+## Sonuçlar
+
+- mobile-layout, mobile-flow ve browser-platforms başarılı.
+- 16 ekran/tarayıcı çubuğu düzeninde yardım adımlarının kaydırmadan okunması, metin/simge hizası, çakışma ve pencere sınırları geçti.
+- Chromium ve WebKit'te üçer telefon boyutunda yardım penceresi kontrolü geçti.
+- Mevcut dokuz görev, QR, kayıt ve çevrimdışı akış testleri de başarılı.
+- Test kaydı: https://github.com/KorfezAquaFoto/kasif/actions/runs/38706667400
+- Gerçek tarayıcı ekran görüntüsü: tests/out/v31-help-layout.jpg.
+- Testler otomatik ekran ve tarayıcı simülasyonudur; fiziksel telefon testi yapılmadı.
