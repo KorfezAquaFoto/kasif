@@ -217,8 +217,6 @@ body.scan-mode .ocean{filter:brightness(.4)}
 @media (prefers-reduced-motion:reduce){.rw-tool{display:none}.big-stamp{animation-delay:0s}.opening .passport{animation-duration:.01s}}
 
 /* ---------- Çocuğu yönlendiren öğeler ---------- */
-  border-radius:16px;padding:7px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;line-height:1.1;transition:background .2s,color .2s}
-  background:linear-gradient(135deg,#fff3c4,#ffe08a);color:#4a2d00;border:0;border-radius:20px;padding:12px 14px;box-shadow:0 10px 24px rgba(0,0,0,.25);cursor:pointer}
 .howto{list-style:none;padding:0;margin:.4em 0 0;display:grid;gap:.45em}
 .howto li{display:flex;align-items:center;gap:.6em;background:#fff;border-radius:1em;padding:.45em .7em;box-shadow:0 2px 0 #eadfc6}
 .howto li span{flex:none;width:2em;height:2em;border-radius:50%;background:#e3f0fb;display:grid;place-items:center;font-size:1.1em}
@@ -612,3 +610,21 @@ html[data-layout=tiny][data-narrow=true] .reward .rw-page{--stamp-limit:72px}
 @supports(width:1cqh){
  html[data-layout] .reward .rw-page .stamp-stage{width:min(var(--stamp-limit),calc(100cqh - var(--stamp-heading)));height:min(var(--stamp-limit),calc(100cqh - var(--stamp-heading)))}
 }
+
+/* v31: yardım adımları tek hizaya gelir, görünür telefon alanında kalır. */
+#help{align-items:center;padding:calc(var(--safe-t) + 12px) 12px calc(var(--safe-b) + 12px)}
+#help .drawer-box{width:100%;max-width:440px;max-height:100%;min-height:0;display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:24px;overflow:hidden;box-shadow:0 16px 45px #0005}
+#help h3{flex:none;margin:0;text-align:center;font-size:24px;line-height:1.2;color:#10264d}
+#help .howto{min-height:0;list-style:none;display:grid;gap:9px;margin:0;padding:0;overflow-y:auto;overscroll-behavior:contain;font-size:17px}
+#help .howto li{min-width:0;display:grid;grid-template-columns:38px minmax(0,1fr);align-items:center;gap:10px;padding:10px;border:1px solid #d2e2eb;border-radius:16px;background:#fff;box-shadow:none}
+#help .howto li span{width:38px;height:38px;display:grid;place-items:center;flex:none;font-size:22px;line-height:1;color:#0b4f70;background:#e4f2f8}
+#help .howto li p{min-width:0;margin:0;text-align:left;font-size:17px;font-weight:600;line-height:1.35;color:#173951;overflow-wrap:break-word}
+#help-close{flex:none;min-height:48px;margin:0;padding:11px 12px;font-size:18px;line-height:1.25}
+html[data-layout=tiny] #help .drawer-box{gap:9px;padding:12px}
+html[data-layout=tiny] #help h3{font-size:21px}
+html[data-layout=tiny] #help .howto{gap:6px}
+html[data-layout=tiny] #help .howto li{grid-template-columns:32px minmax(0,1fr);padding:7px;gap:8px;border-radius:13px}
+html[data-layout=tiny] #help .howto li span{width:32px;height:32px;font-size:20px}
+html[data-layout=tiny] #help .howto li p{font-size:15px;line-height:1.3}
+html[data-layout=tiny] #help-close{min-height:44px;padding:9px;font-size:17px}
+@media(orientation:landscape) and (max-height:520px){#help .drawer-box{max-width:620px}#help .howto{grid-template-columns:repeat(2,minmax(0,1fr))}}

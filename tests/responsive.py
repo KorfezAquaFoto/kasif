@@ -33,6 +33,29 @@ async def check(pg,label):
       print('FAIL_QA_BASE64:'+base64.b64encode(await pg.screenshot(type='jpeg',quality=75)).decode(),flush=True)
     assert not result['issues'] and not result['overflow'],(label,result)
 
+
+async def check_help(pg,label):
+    await pg.wait_for_timeout(400)
+    result=await pg.evaluate("""()=>{
+      const box=document.querySelector('#help .drawer-box'),b=box.getBoundingClientRect(),issues=[];
+      const root=document.documentElement,vh=parseFloat(getComputedStyle(root).getPropertyValue('--app-height'));
+      if(b.left<0||b.right>innerWidth+1||b.top<0||b.bottom>vh+1)issues.push('dialog outside viewport');
+      const list=document.querySelector('#howto'),lr=list.getBoundingClientRect();
+      if(list.scrollHeight>list.clientHeight+1)issues.push('help needs scrolling');
+      for(const e of box.querySelectorAll('h3,li,li>span,li>p,#help-close')){
+        const r=e.getBoundingClientRect();
+        if(r.left<b.left-1||r.right>b.right+1||r.top<b.top-1||r.bottom>b.bottom+1||e.scrollWidth>e.clientWidth+1)issues.push('outside/clipped '+e.tagName);
+      }
+      const rows=[...list.children].map(e=>e.getBoundingClientRect());
+      for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++){const a=rows[i],c=rows[j];if(a.left<c.right-1&&a.right>c.left+1&&a.top<c.bottom-1&&a.bottom>c.top+1)issues.push('overlapping help steps');}
+      for(const li of list.children){const icon=li.querySelector('span').getBoundingClientRect(),copy=li.querySelector('p').getBoundingClientRect();if(copy.left<icon.right+5||getComputedStyle(li.querySelector('p')).textAlign!=='left'||Math.abs(icon.top+icon.height/2-copy.top-copy.height/2)>1)issues.push('step alignment');}
+      return issues;
+    }""")
+    if result:
+      import base64
+      print('FAIL_QA_BASE64:'+base64.b64encode(await pg.screenshot(type='jpeg',quality=80)).decode(),flush=True)
+    assert not result,(label,result)
+
 async def main():
   server=http.server.ThreadingHTTPServer(('127.0.0.1',8766),functools.partial(http.server.SimpleHTTPRequestHandler,directory=str(ROOT)))
   threading.Thread(target=server.serve_forever,daemon=True).start()
@@ -48,7 +71,9 @@ async def main():
       await check(pg,f'{w}x{h}-welcome')
       if w in [280,320,375]: await pg.screenshot(path=str(OUT/f'responsive-{w}x{h}-welcome.png'))
       await pg.evaluate("localStorage.setItem('okyanus-kasifi-v1',JSON.stringify({v:1,id:'1234',name:'Uzun Kaşif Adı',avatar:'vatoz',badges:{},created:Date.now()}))")
-      await pg.reload();await pg.click('#btn-hints')
+      await pg.reload();await pg.click('#btn-help');await check_help(pg,f'{w}x{h}-help')
+      if w in [253,320,375,390,844]:await pg.screenshot(path=str(OUT/f'responsive-{w}x{h}-help.png'))
+      await pg.click('#help-close');await pg.click('#btn-hints')
       for i in range(9):
         await check(pg,f'{w}x{h}-hint-{i}')
         if i==0 and w in [280,320,375]:await pg.screenshot(path=str(OUT/f'responsive-{w}x{h}-hints.png'))
@@ -89,6 +114,13 @@ async def main():
     im=Image.open(OUT/name).convert('RGB');im.thumbnail((300,650));sheet.paste(im,(i*300,0))
   data=io.BytesIO();sheet.save(data,format='JPEG',quality=85)
   print('CENTERED_HINTS_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
+
+  names=['responsive-320x480-help.png','responsive-375x667-help.png','responsive-390x844-help.png']
+  sheet=Image.new('RGB',(900,650),'#0b3c6e')
+  for i,name in enumerate(names):
+    im=Image.open(OUT/name).convert('RGB');im.thumbnail((300,650));sheet.paste(im,(i*300,0))
+  data=io.BytesIO();sheet.save(data,format='JPEG',quality=85)
+  print('HELP_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
 
 asyncio.run(main())
 

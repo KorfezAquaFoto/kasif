@@ -40,7 +40,9 @@ async def main():
     await pg.press('#in-name','Enter');assert await pg.evaluate('document.activeElement.id')!='in-name'
     await pg.set_viewport_size({'width':w,'height':h});await bounds(pg,f'{engine.name}-{w}-keyboard-close')
     await pg.evaluate('(s)=>localStorage.setItem("okyanus-kasifi-v1",JSON.stringify(s))',SEED)
-    await pg.reload();await pg.click('#btn-hints')
+    await pg.reload();await pg.click('#btn-help');await pg.wait_for_timeout(400)
+    assert await pg.evaluate("""()=>{const d=document.querySelector('#help .drawer-box').getBoundingClientRect(),l=document.querySelector('#howto'),b=document.querySelector('#help-close').getBoundingClientRect();return d.top>=0&&d.bottom<=visualViewport.height+1&&b.bottom<=d.bottom+1&&l.scrollHeight<=l.clientHeight+1&&[...l.querySelectorAll('p')].every(e=>getComputedStyle(e).textAlign==='left')}"""),(engine.name,w,'help layout')
+    await pg.click('#help-close');await pg.click('#btn-hints')
     for i in range(9):
      await bounds(pg,f'{engine.name}-{w}-hint-{i}')
      if i<8:await pg.click('#hint-next')
