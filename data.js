@@ -90,7 +90,7 @@ window.KASIF = {
         "🛡️",
         "🌡️"
       ],
-      "tip": "Piranalar birlikte yüzerek tehlikelerden korunabilir. Güney Amerika bölümündeki tankta onları izle: birbirlerine yakın mı yüzüyorlar?"
+      "tip": "Piranalar birlikte yüzerek korunabilir. Güney Amerika bölümünde onları izle: birbirlerine yakın mı yüzüyorlar?"
     },
     {
       "id": "mersin",
@@ -120,7 +120,7 @@ window.KASIF = {
         "🎨",
         "🛡️"
       ],
-      "tip": "Mersin balığının vücudunda zırh gibi sert plakalar bulunur. Asya bölümündeki tankta, sırtındaki ve yanlarındaki bu parçaları bul!"
+      "tip": "Mersin balığının sert plakaları zırh gibidir. Asya bölümündeki tankta, sırtındaki ve yanlarındaki bu parçaları bul!"
     },
     {
       "id": "kesis",
@@ -150,7 +150,7 @@ window.KASIF = {
         "🫧",
         "🎨"
       ],
-      "tip": "Keşiş yengeci, boş bir deniz salyangozu kabuğunu ev olarak kullanır. Avustralya bölümünde kabuğunu taşıyan bu küçük kaşifi ara!"
+      "tip": "Keşiş yengeci, boş deniz salyangozu kabuğunu ev olarak kullanır. Avustralya bölümünde kabuğunu taşıyan bu küçük kaşifi ara!"
     },
     {
       "id": "fosil",
@@ -180,7 +180,7 @@ window.KASIF = {
         "🦕",
         "🌡️"
       ],
-      "tip": "Fosiller, çok eski canlılardan kalan kalıntılar ve izlerdir. Afrika bölümünde başını kaldır; duvarların yukarısında hangi şekilleri görüyorsun?"
+      "tip": "Fosiller, çok eski canlıların kalıntıları ve izleridir. Afrika bölümünde başını kaldır; duvarların yukarısındaki şekilleri incele!"
     },
     {
       "id": "orfoz",
@@ -210,7 +210,7 @@ window.KASIF = {
         "🏖️",
         "🪨"
       ],
-      "tip": "Orfozlar kaya oyuklarını saklanmak için kullanabilir. Avrupa bölümündeki tankı incele; kayaların çevresinde orfozu bulabilir misin?"
+      "tip": "Orfozlar kaya oyuklarında saklanabilir. Avrupa bölümündeki tankta kayaların çevresine bak; orfozu bulabilir misin?"
     },
     {
       "id": "korfez",
@@ -241,7 +241,7 @@ window.KASIF = {
         "🐟",
         "❄️"
       ],
-      "tip": "Karagöz, mırmır ve sargos İzmit Körfezi’nde de yaşar. Körfez akvaryumundaki balıkları izle; temiz bir deniz onlar için neden önemli olabilir?"
+      "tip": "Karagöz, mırmır ve sargos İzmit Körfezi’nde de yaşar. Körfez akvaryumundaki balıkları izle; temiz bir deniz neden önemli?"
     },
     {
       "id": "kabuk",
@@ -271,7 +271,7 @@ window.KASIF = {
         "🐚",
         "🦀"
       ],
-      "tip": "Salyangoz ve midye gibi canlılar kendi kabuklarını oluşturur. Kabuk sergisindeki vitrinde kıvrımlı ve iki parçalı kabukları bul!"
+      "tip": "Salyangoz ve midye kendi kabuklarını oluşturur. Kabuk sergisinde kıvrımlı ve iki parçalı kabukları bul!"
     },
     {
       "id": "megalodon",
@@ -301,7 +301,7 @@ window.KASIF = {
         "☝️",
         "🍚"
       ],
-      "tip": "Megalodon, çok eskiden yaşamış dev bir köpekbalığıydı. Sergideki çene modelinin dişlerine bak; elinle dokunmadan boyutlarını karşılaştır!"
+      "tip": "Megalodon, eskiden yaşamış dev bir köpekbalığıydı. Sergideki çene modelinin dişlerini, dokunmadan elinle karşılaştır!"
     },
     {
       "id": "vatoz",
@@ -331,7 +331,7 @@ window.KASIF = {
         "🐟",
         "〰️"
       ],
-      "tip": "Vatoz, geniş ve yassı gövdeli bir balıktır. Büyük tünelde etrafına ve yukarıya bak; kanat gibi görünen kısımlarının hareketini izle!"
+      "tip": "Vatoz, yassı gövdeli bir balıktır. Büyük tünelde etrafına ve yukarıya bak; kanat gibi görünen kısımlarını izle!"
     }
   ],
   "regionOrder": [

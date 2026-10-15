@@ -30,7 +30,7 @@ Sonra: Güney Amerika bölümündeki pirana tankını dikkatle incele!
 
 Önce: Piranalar Güney Amerika’da yaşar. Bu bölümdeki pirana tankına bak: tek tek mi, birlikte mi yüzüyorlar?
 
-Sonra: Piranalar birlikte yüzerek tehlikelerden korunabilir. Güney Amerika bölümündeki tankta onları izle: birbirlerine yakın mı yüzüyorlar?
+Sonra: Piranalar birlikte yüzerek korunabilir. Güney Amerika bölümünde onları izle: birbirlerine yakın mı yüzüyorlar?
 
 ### Damga bilgisi
 
@@ -94,7 +94,7 @@ Sonra: Asya bölümündeki mersin balığı tankını dikkatle incele!
 
 Önce: Mersin balığının vücudunda sert plakalar vardır. Asya bölümündeki tankta bu plakaları dikkatle incele!
 
-Sonra: Mersin balığının vücudunda zırh gibi sert plakalar bulunur. Asya bölümündeki tankta, sırtındaki ve yanlarındaki bu parçaları bul!
+Sonra: Mersin balığının sert plakaları zırh gibidir. Asya bölümündeki tankta, sırtındaki ve yanlarındaki bu parçaları bul!
 
 ### Damga bilgisi
 
@@ -158,7 +158,7 @@ Sonra: Avustralya bölümündeki keşiş yengeci tankını dikkatle incele!
 
 Önce: Keşiş yengeci boş bir kabuğu ev olarak kullanır. Avustralya bölümünde kabuğunu taşıyan bu küçük kaşifi ara!
 
-Sonra: Keşiş yengeci, boş bir deniz salyangozu kabuğunu ev olarak kullanır. Avustralya bölümünde kabuğunu taşıyan bu küçük kaşifi ara!
+Sonra: Keşiş yengeci, boş deniz salyangozu kabuğunu ev olarak kullanır. Avustralya bölümünde kabuğunu taşıyan bu küçük kaşifi ara!
 
 ### Damga bilgisi
 
@@ -222,7 +222,7 @@ Sonra: Afrika bölümünde başını kaldır: duvarların yukarısındaki fosill
 
 Önce: Fosiller, çok eski canlıların izleridir. Afrika bölümünde başını kaldır; duvarların yukarısındaki şekilleri incele!
 
-Sonra: Fosiller, çok eski canlılardan kalan kalıntılar ve izlerdir. Afrika bölümünde başını kaldır; duvarların yukarısında hangi şekilleri görüyorsun?
+Sonra: Fosiller, çok eski canlıların kalıntıları ve izleridir. Afrika bölümünde başını kaldır; duvarların yukarısındaki şekilleri incele!
 
 ### Damga bilgisi (korundu)
 
@@ -286,7 +286,7 @@ Sonra: Avrupa bölümündeki orfoz tankını incele; kaya oyuklarına da bak!
 
 Önce: Orfoz, iri gövdeli bir balıktır. Avrupa bölümündeki tankı incele; kayaların çevresinde onu bulabilir misin?
 
-Sonra: Orfozlar kaya oyuklarını saklanmak için kullanabilir. Avrupa bölümündeki tankı incele; kayaların çevresinde orfozu bulabilir misin?
+Sonra: Orfozlar kaya oyuklarında saklanabilir. Avrupa bölümündeki tankta kayaların çevresine bak; orfozu bulabilir misin?
 
 ### Damga bilgisi
 
@@ -350,7 +350,7 @@ Sonra: Körfez akvaryumundaki balıkları dikkatle incele!
 
 Önce: Karagöz, mırmır ve sargos bizim Körfez’imizde yaşar. Körfez akvaryumundaki balıkları izle: temiz bir deniz onlar için neden önemli?
 
-Sonra: Karagöz, mırmır ve sargos İzmit Körfezi’nde de yaşar. Körfez akvaryumundaki balıkları izle; temiz bir deniz onlar için neden önemli olabilir?
+Sonra: Karagöz, mırmır ve sargos İzmit Körfezi’nde de yaşar. Körfez akvaryumundaki balıkları izle; temiz bir deniz neden önemli?
 
 ### Damga bilgisi
 
@@ -420,7 +420,7 @@ Sonra: Kabuk sergisindeki vitrinleri dikkatle incele!
 
 Önce: Deniz kabuklarının pek çok şekli vardır. Vitrindeki kıvrımlı ve iki parçalı kabukları incele; içlerinde kim yaşamış olabilir?
 
-Sonra: Salyangoz ve midye gibi canlılar kendi kabuklarını oluşturur. Kabuk sergisindeki vitrinde kıvrımlı ve iki parçalı kabukları bul!
+Sonra: Salyangoz ve midye kendi kabuklarını oluşturur. Kabuk sergisinde kıvrımlı ve iki parçalı kabukları bul!
 
 ### Damga bilgisi
 
@@ -484,7 +484,7 @@ Sonra: Megalodon sergisindeki çene modelini ve dişleri dikkatle incele!
 
 Önce: Megalodon, çok eskiden yaşamış dev bir köpekbalığıydı. Sergideki dişlerini kendi elinle karşılaştır; ne kadar büyükler?
 
-Sonra: Megalodon, çok eskiden yaşamış dev bir köpekbalığıydı. Sergideki çene modelinin dişlerine bak; elinle dokunmadan boyutlarını karşılaştır!
+Sonra: Megalodon, eskiden yaşamış dev bir köpekbalığıydı. Sergideki çene modelinin dişlerini, dokunmadan elinle karşılaştır!
 
 ### Damga bilgisi
 
@@ -548,7 +548,7 @@ Sonra: Büyük tünelde etrafına ve yukarıya bak; vatozu ara!
 
 Önce: Vatoz, geniş ve yassı gövdeli bir balıktır. Büyük tünelde yukarıya bak; kanat gibi görünen kısımlarının hareketini izle!
 
-Sonra: Vatoz, geniş ve yassı gövdeli bir balıktır. Büyük tünelde etrafına ve yukarıya bak; kanat gibi görünen kısımlarının hareketini izle!
+Sonra: Vatoz, yassı gövdeli bir balıktır. Büyük tünelde etrafına ve yukarıya bak; kanat gibi görünen kısımlarını izle!
 
 ### Damga bilgisi
 
