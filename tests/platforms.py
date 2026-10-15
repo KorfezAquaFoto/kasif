@@ -17,6 +17,52 @@ async def bounds(pg,label):
   extra=await pg.evaluate('({height:innerHeight,visual:visualViewport.height,app:getComputedStyle(document.documentElement).getPropertyValue("--app-height"),scrollY,layout:document.documentElement.dataset.layout})')
   print('PLATFORM_BOUNDS:'+str(extra),flush=True)
  assert not result,(label,result)
+
+async def certificate_cases(pg,engine):
+ await pg.add_init_script("""()=>{
+  window.__certTexts=[];window.__certArcs=[];
+  const proto=CanvasRenderingContext2D.prototype,fill=proto.fillText,arc=proto.arc;
+  proto.fillText=function(value,x,y,...rest){
+   if(this.canvas.width===1080&&this.canvas.height===1350){
+    const m=this.measureText(value);
+    window.__certTexts.push({value:String(value),left:x-m.actualBoundingBoxLeft,right:x+m.actualBoundingBoxRight,top:y-m.actualBoundingBoxAscent,bottom:y+m.actualBoundingBoxDescent});
+   }
+   return fill.call(this,value,x,y,...rest);
+  };
+  proto.arc=function(x,y,r,...rest){
+   if(this.canvas.width===1080&&this.canvas.height===1350)window.__certArcs.push({x,y,r});
+   return arc.call(this,x,y,r,...rest);
+  };
+ }""")
+ cases=[('Deniz',a) for a in ['kesis','vatoz','orfoz','pirana','mersin','karagoz']]
+ cases += [('WWWWWWWWWWWWWWWW','mersin'),('Çağrı İpek','vatoz')]
+ for index,(name,avatar) in enumerate(cases):
+  await pg.evaluate("""({name,avatar})=>{
+   const time=Date.parse('2026-10-15T10:00:00Z');
+   localStorage.setItem('okyanus-kasifi-v1',JSON.stringify({v:1,id:'2026',name,avatar,badges:Object.fromEntries(KASIF.stations.map(s=>[s.id,time])),created:time}));
+  }""",{'name':name,'avatar':avatar})
+  await pg.reload();await pg.click('#btn-cert');await pg.click('#btn-preview')
+  await pg.wait_for_function('document.querySelector("#cert-img").naturalWidth===1080')
+  result=await pg.evaluate("""name=>{
+   const texts=__certTexts,hero=texts.find(t=>t.value===name&&t.top<400),circle=__certArcs.find(t=>t.r===80);
+   const problems=[];
+   if(!hero||!circle||Math.abs((hero.top+hero.bottom)/2-circle.y)>1)problems.push('avatar/name vertical alignment');
+   if(hero&&circle&&(hero.left<circle.x+circle.r+20||hero.right>1010))problems.push('name overlaps or clips');
+   if(texts.some(t=>t.left<65||t.right>1015||t.top<60||t.bottom>1245))problems.push('certificate text outside page');
+   if(texts.some(t=>/tamamlayarak|oldun|hepsini keşfetti/.test(t.value)))problems.push('removed sentence returned');
+   if(texts.filter(t=>t.value==='15 Ekim 2026').length!==1)problems.push('single completion date');
+   for(const st of KASIF.stations){
+    if(!texts.some(t=>t.value===st.name&&t.top>500))problems.push('missing creature caption '+st.id);
+    const svg=stampSVG(st,{certificate:true});
+    if(/2026|KÖRFEZ AQUA/.test(svg)||!svg.includes('★ ★ ★')||new DOMParser().parseFromString(svg,'image/svg+xml').querySelector('parsererror'))problems.push('certificate stamp '+st.id);
+   }
+   return {problems,hero,circle};
+  }""",name)
+  assert not result['problems'],(engine,name,avatar,result)
+  await bounds(pg,f'{engine}-certificate-{index}')
+  data=await pg.locator('#cert-img').get_attribute('src')
+  (OUT/f'certificate-{engine}-{index}.png').write_bytes(base64.b64decode(data.split(',',1)[1]))
+
 async def main():
  server=http.server.ThreadingHTTPServer(('127.0.0.1',8767),functools.partial(http.server.SimpleHTTPRequestHandler,directory=str(ROOT)))
  threading.Thread(target=server.serve_forever,daemon=True).start()
@@ -75,6 +121,7 @@ async def main():
      assert await pg.locator('#hint-copy').inner_text()
      r=await pg.locator('#hint-copy').bounding_box();c=await card.bounding_box();assert r['y']+r['height']<=c['y']+c['height']+2,(engine.name,w,'large-font',i,r,c)
      if i<8:await pg.click('#hint-next')
+    if w==390:await certificate_cases(pg,engine.name)
     await ctx.close()
    await br.close()
   # Başarısız kaydı görünür bildir, izin düzelince yeniden kaydet.
@@ -102,4 +149,9 @@ async def main():
  print('PASS: Chromium + WebKit, keyboard, 24px text, storage retry, camera cleanup and isolated cache cleanup',flush=True)
  from PIL import Image
  im=Image.open(OUT/'storage-warning.png').convert('RGB');im.thumbnail((390,844));b=io.BytesIO();im.save(b,format='JPEG',quality=80);print('STORAGE_QA_BASE64:'+base64.b64encode(b.getvalue()).decode(),flush=True)
+ sheet=Image.new('RGB',(1080,675),'#0b3c6e')
+ for i,index in enumerate([0,6]):
+  im=Image.open(OUT/f'certificate-chromium-{index}.png').convert('RGB');im.thumbnail((540,675));sheet.paste(im,(i*540,0))
+ b=io.BytesIO();sheet.save(b,format='JPEG',quality=85)
+ print('CERTIFICATE_QA_BASE64:'+base64.b64encode(b.getvalue()).decode(),flush=True)
 asyncio.run(main())

@@ -565,58 +565,114 @@ function brandImage(){
   return logoImagePromise;
 }
 
-// Dolu pasaport sayfası (1080x1350): altın başlık, kaşif kartı, 9 damga, final damgası
+// Dolu sertifika (1080×1350): örnekteki çerçeve, ortalı kimlik ve dokuz keşif.
 async function drawCert(){
   const F = '"DynaPuff",ui-rounded,system-ui,sans-serif';
-  try { await Promise.all([document.fonts.load(`700 40px "DynaPuff"`, "ŞĞİ"), document.fonts.load(`600 40px "DynaPuff"`, "ŞĞİ")]); } catch(e){}
-  const W = 1080, H = 1350, c = document.createElement("canvas"); c.width = W; c.height = H;
-  const x = c.getContext("2d");
-  const g = x.createLinearGradient(0,0,0,H); g.addColorStop(0,"#1677b8"); g.addColorStop(.5,"#0b3c6e"); g.addColorStop(1,"#061f40");
-  x.fillStyle = g; x.fillRect(0,0,W,H);
-  x.strokeStyle = "rgba(255,255,255,.14)"; x.lineWidth = 3;
-  for (let i=0;i<30;i++){ x.beginPath(); x.arc((i*397)%W, (i*613)%H, 6+(i*7)%22, 0, 7); x.stroke(); }
-  // pasaport sayfası
-  x.save(); x.shadowColor = "rgba(0,0,0,.35)"; x.shadowBlur = 40; x.shadowOffsetY = 16;
-  rr(x,60,50,W-120,H-150,48); x.fillStyle = "#fff8ec"; x.fill(); x.restore();
-  x.save(); rr(x,60,50,W-120,H-150,48); x.clip();
-  x.strokeStyle = "rgba(56,182,216,.16)"; x.lineWidth = 3;
-  for (let i=0;i<60;i++){ x.beginPath(); x.arc(60+(i*263)%960, 50+(i*181)%1200, 6+(i*5)%16, 0, 7); x.stroke(); }
-  // altın başlık bandı
-  const gg = x.createLinearGradient(0,50,0,240); gg.addColorStop(0,"#ffe38a"); gg.addColorStop(1,"#f5bd3a");
-  x.fillStyle = gg; x.fillRect(60,50,W-120,190);
+  await Promise.all([
+    document.fonts.load('700 40px "DynaPuff"', "ÇĞİÖŞÜçğıöşü"),
+    document.fonts.load('600 40px "DynaPuff"', "ÇĞİÖŞÜçğıöşü"),
+    document.fonts.load('800 20px "Baloo 2"', "ÇĞİÖŞÜçğıöşü")
+  ]);
+  const W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;
+  const x=c.getContext("2d"),navy="#10264d",gold="#f5bd3a",ivory="#fff8ec";
+  const gradient=x.createLinearGradient(0,0,0,H);
+  gradient.addColorStop(0,"#1677b8");gradient.addColorStop(1,"#061f40");
+  x.fillStyle=gradient;x.fillRect(0,0,W,H);
+  const star=(cx,cy,r,color)=>{
+    x.beginPath();
+    for(let i=0;i<10;i++){
+      const a=-Math.PI/2+i*Math.PI/5,k=i%2?r*.45:r;
+      const px=cx+Math.cos(a)*k,py=cy+Math.sin(a)*k;
+      if(i)x.lineTo(px,py);else x.moveTo(px,py);
+    }
+    x.closePath();x.fillStyle=color;x.fill();
+  };
+  // Lejand ve isimlerde uzun Türkçe metinleri alanına sığdır.
+  const text=(value,cx,cy,size,maxWidth,color=navy,weight=700)=>{
+    let fs=size;x.font=weight+" "+fs+"px "+F;
+    while(x.measureText(value).width>maxWidth&&fs>18){fs--;x.font=weight+" "+fs+"px "+F;}
+    const m=x.measureText(value);
+    x.fillStyle=color;x.textAlign="center";x.textBaseline="alphabetic";
+    x.fillText(value,cx,cy+(m.actualBoundingBoxAscent-m.actualBoundingBoxDescent)/2);
+  };
+  const coral=(cx,base,flip,scale,color)=>{
+    x.save();x.translate(cx,base);x.scale(flip*scale,scale);
+    x.strokeStyle=color;x.lineCap="round";x.lineJoin="round";x.lineWidth=13;
+    const strokes=[
+      [0,0,9,-30,0,-64,12,-102],
+      [3,-24,-18,-40,-22,-55,-20,-70],
+      [4,-43,28,-53,32,-75,30,-86],
+      [-2,-4,-30,-15,-38,-32,-42,-48],
+      [4,-12,30,-21,45,-35,46,-53],
+      [-18,-18,-27,-38,-18,-46,-21,-56]
+    ];
+    strokes.forEach(a=>{x.beginPath();x.moveTo(a[0],a[1]);x.bezierCurveTo(...a.slice(2));x.stroke();});
+    x.restore();
+  };
+  coral(33,1350,1,.8,"#10588a");coral(1047,1350,-1,.8,"#10588a");
+  // Krem sayfa ve çift kenar.
+  x.save();x.shadowColor="#0004";x.shadowBlur=28;x.shadowOffsetY=12;
+  rr(x,50,45,980,1200,58);x.fillStyle=ivory;x.fill();x.restore();
+  x.lineWidth=7;x.strokeStyle=gold;rr(x,50,45,980,1200,58);x.stroke();
+  x.lineWidth=1.5;x.strokeStyle="#e4c880";rr(x,60,55,960,1180,49);x.stroke();
+  x.save();rr(x,64,59,952,1172,46);x.clip();
+  coral(106,1240,1,.87,"#0f6698");coral(974,1240,-1,.87,"#0f6698");
+  // Baloncuklar yalnızca kenarlarda; yazı alanı temiz kalır.
+  x.strokeStyle="#cce5e6";x.lineWidth=3;
+  [[94,100,8],[139,92,15],[970,102,11],[985,207,15],[94,246,11],
+    [987,342,13],[93,438,9],[981,530,10],[92,685,12],[987,758,10],
+    [91,870,9],[986,999,13],[87,1086,9],[990,1118,8]].forEach(([a,b,r])=>{
+      x.beginPath();x.arc(a,b,r,0,Math.PI*2);x.stroke();
+    });
   x.restore();
-  x.textAlign = "left";
-  x.fillStyle = "#7a4a00"; x.font = `700 24px ${F}`; x.fillText("KEŞİF PASAPORTU", 120, 110);
-  const brand=await brandImage();
-  x.drawImage(brand,637,332,646,399,475,1257,130,80.3);
-  x.fillStyle = "#10264d"; x.font = `700 58px ${F}`; x.fillText("Okyanus Kaşifi", 120, 186);
-  x.fillStyle = "#7a4a00"; x.font = `600 34px ${F}`; x.fillText("pasaportu tamamlandı!", 120, 226);
-  // kaşif kartı
-  const avImg = await svgImg(artSVG(S.avatar));
-  x.beginPath(); x.arc(210, 380, 96, 0, 7); x.fillStyle = "#e3f0fb"; x.fill(); x.lineWidth = 10; x.strokeStyle = "#f5bd3a"; x.stroke();
-  if (avImg) x.drawImage(avImg, 130, 300, 160, 160);
-  x.fillStyle = "#10264d"; let fs = 80; x.font = `700 ${fs}px ${F}`;
-  while (x.measureText(S.name).width > 470 && fs > 40) { fs -= 4; x.font = `700 ${fs}px ${F}`; }
-  x.fillText(S.name, 336, 380);
-  const d = new Date().toLocaleDateString("tr-TR", { day:"numeric", month:"long", year:"numeric" });
-  x.fillStyle = "#0f5a96"; x.font = `700 32px ${F}`; x.fillText(`Kaşif #${S.id}`, 338, 428);
-  x.fillStyle = "#6a7891"; x.font = `600 30px ${F}`; x.fillText(d, 338, 468);
-  x.textAlign = "center"; x.fillStyle = "#6a7891"; x.font = `600 34px ${F}`;
-  x.fillText(`${D.aquarium}'daki ${ST.length} bölgenin hepsini keşfetti!`, W/2, 560);
-  // damgalar: 3x3
-  const imgs = await Promise.all(ST.map(st => svgImg(stampSVG(st, { date: S.badges[st.id] }))));
-  const size = 210, cols = 3, gapX = 64;
-  ST.forEach((st, i) => {
-    if (!imgs[i]) return;
-    const col = i % cols, row = Math.floor(i / cols);
-    const cx = (W - (cols*size + (cols-1)*gapX))/2 + col*(size+gapX) + size/2, cy = 705 + row*212;
-    x.save(); x.translate(cx, cy); x.rotate(ROT[i % ROT.length] * Math.PI / 180);
-    x.drawImage(imgs[i], -size/2, -size/2, size, size); x.restore();
+  text("OKYANUS KAŞİFİ",540,119,76,900);
+  text("SERTİFİKASI",540,180,47,680);
+  x.strokeStyle="#b78624";x.lineWidth=2.5;
+  x.beginPath();x.moveTo(356,215);x.lineTo(505,215);x.moveTo(575,215);x.lineTo(724,215);x.stroke();
+  star(540,215,18,gold);
+  // İsim ve kaşif dostu tek bir grup: görsel mürekkep merkezleri aynı yatay çizgide.
+  const name=String(S.name||"Kaşif"),r=80,gap=34,cy=315;
+  let fs=104;x.font="700 "+fs+"px "+F;
+  while(x.measureText(name).width>600&&fs>24){fs--;x.font="700 "+fs+"px "+F;}
+  const metrics=x.measureText(name),groupWidth=r*2+gap+metrics.width,left=(W-groupWidth)/2;
+  const avatarX=left+r,nameX=left+r*2+gap;
+  x.beginPath();x.arc(avatarX,cy,r,0,Math.PI*2);
+  x.fillStyle="#e4f2f8";x.fill();x.lineWidth=8;x.strokeStyle=gold;x.stroke();
+  const avatarImage=await svgImg(artSVG(S.avatar));
+  if(avatarImage)x.drawImage(avatarImage,avatarX-68,cy-68,136,136);
+  x.font="700 "+fs+"px "+F;x.textAlign="left";x.textBaseline="alphabetic";x.fillStyle=navy;
+  x.fillText(name,nameX,cy+(metrics.actualBoundingBoxAscent-metrics.actualBoundingBoxDescent)/2);
+  // Tarihsiz, düz duran koleksiyon damgaları ve canlı/nesne adları.
+  const stamps=await Promise.all(ST.map(st=>svgImg(stampSVG(st,{certificate:true}))));
+  const centers=[250,540,830],rows=[510,770,1030],size=212;
+  ST.forEach((st,i)=>{
+    const cx=centers[i%3],sy=rows[Math.floor(i/3)];
+    if(stamps[i])x.drawImage(stamps[i],cx-size/2,sy-size/2,size,size);
+    text(st.name,cx,sy+132,27,268);
   });
-  // final damgası sağ üstte, başlığa taşarak
-  const seal = await svgImg(finalSealSVG());
-  if (seal) { x.save(); x.translate(900, 390); x.rotate(-8 * Math.PI / 180); x.drawImage(seal, -90, -104, 180, 207); x.restore(); }
-  return new Promise(r => c.toBlob(r, "image/png"));
+  // Tamamlanma tarihi bir kez: son keşfin tarihi.
+  const finishedAt=Math.max(...ST.map(st=>Number(S.badges[st.id])||0))||Date.now();
+  const date=new Date(finishedAt).toLocaleDateString("tr-TR",{day:"numeric",month:"long",year:"numeric"});
+  text(date,500,1210,28,300);
+  x.strokeStyle="#c6952c";x.lineWidth=2;
+  x.beginPath();x.moveTo(203,1210);x.lineTo(325,1210);x.moveTo(817,1210);x.lineTo(926,1210);x.stroke();
+  // Küçük başarı mührü: bütün tamamlanma bilgisi burada.
+  const sealX=748,sealY=1205;
+  x.fillStyle="#137594";
+  [[-26,-7], [26,7]].forEach(([dx,dir])=>{
+    x.beginPath();x.moveTo(sealX+dx,sealY+25);x.lineTo(sealX+dx+dir,sealY+58);
+    x.lineTo(sealX+dx+12,sealY+49);x.lineTo(sealX+dx+22,sealY+54);x.lineTo(sealX+dx+17,sealY+24);x.fill();
+  });
+  x.fillStyle="#e9a916";
+  for(let i=0;i<18;i++){const a=i*Math.PI/9;x.beginPath();x.arc(sealX+Math.cos(a)*37,sealY+Math.sin(a)*37,8,0,Math.PI*2);x.fill();}
+  x.beginPath();x.arc(sealX,sealY,36,0,Math.PI*2);x.fillStyle="#ffe38a";x.fill();
+  x.lineWidth=2;x.strokeStyle=gold;x.stroke();
+  text(ST.length+" / "+ST.length,sealX,sealY-6,26,72);
+  text("keşif",sealX,sealY+18,15,60);
+  // Orijinal marka, navy zemine çerçevesiz oturur.
+  const brand=await brandImage();
+  x.drawImage(brand,637,332,646,399,477,1264,126,77.8);
+  return new Promise(resolve=>c.toBlob(resolve,"image/png"));
 }
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
@@ -641,7 +697,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v32`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v33`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
