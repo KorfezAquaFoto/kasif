@@ -93,7 +93,7 @@ async def main():
       assert await pg.locator('#rw-fact').inner_text()==await pg.evaluate('KASIF.stations[0].reward')
       assert await pg.locator('#rw-fact-title').text_content()=='Biliyor muydun?'
       assert await pg.locator('#rw-fact-title').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
-      assert await pg.locator('.fact-card').evaluate('(e)=>getComputedStyle(e).textAlign')=='left'
+      assert await pg.locator('.fact-card').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
       assert await pg.locator('.leaf-hd').evaluate('(e)=>getComputedStyle(e).color')=='rgb(11, 79, 112)'
       for selector in ['.rw-page','.stamp-stage']:
         bounds=await pg.locator(selector).bounding_box()
