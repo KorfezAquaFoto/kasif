@@ -1,4 +1,4 @@
-"""Tablet y�n de�i�imi, i�erik s�n�rlar� ve performans regresyonlar�."""
+"""Tablet yön değişimi, içerik sınırları ve performans regresyonları."""
 import asyncio,os,pathlib,functools,http.server,threading
 from playwright.async_api import async_playwright
 ROOT=pathlib.Path(__file__).resolve().parent.parent
@@ -31,7 +31,7 @@ async def tablet_cases(br,engine,base,configs=None):
   await fits(pg,label+'-welcome');await pg.screenshot(path=str(OUT/(label+'-welcome.png')))
   perf=await pg.evaluate("""async()=>{await new Promise(r=>setTimeout(r,200));const original=requestAnimationFrame;let calls=0;window.requestAnimationFrame=fn=>{calls++;return original(fn)};for(let i=0;i<20;i++)dispatchEvent(new Event('resize'));await new Promise(r=>setTimeout(r,250));window.requestAnimationFrame=original;return calls}""")
   assert perf<=4,(label,'resize burst',perf)
-  await pg.evaluate("localStorage.setItem('okyanus-kasifi-v1',JSON.stringify({v:1,id:'tablet',name:'Uzun Ka�if Ad�',avatar:'vatoz',badges:{},created:1}))")
+  await pg.evaluate("localStorage.setItem('okyanus-kasifi-v1',JSON.stringify({v:1,id:'tablet',name:'Uzun Kaşif Adı',avatar:'vatoz',badges:{},created:1}))")
   await pg.reload();await fits(pg,label+'-home');await pg.screenshot(path=str(OUT/(label+'-home.png')))
   width=await pg.locator('#v-home').evaluate('(e)=>e.clientWidth');assert width>=w*.75,(label,'phone column',width)
   await pg.click('#btn-help');await pg.wait_for_timeout(400)
@@ -62,7 +62,7 @@ async def tablet_cases(br,engine,base,configs=None):
   await pg.set_viewport_size({'width':540,'height':720});await fits(pg,label+'-split-home')
   assert await pg.evaluate("document.documentElement.dataset.tablet==='false'"),(label,'split screen fallback')
   await pg.set_viewport_size({'width':w,'height':h})
-  await pg.evaluate("localStorage.setItem('okyanus-kasifi-v1',JSON.stringify({v:1,id:'tablet',name:'Uzun Ka�if Ad�',avatar:'vatoz',badges:Object.fromEntries(KASIF.stations.map(s=>[s.id,Date.now()])),created:1}))")
+  await pg.evaluate("localStorage.setItem('okyanus-kasifi-v1',JSON.stringify({v:1,id:'tablet',name:'Uzun Kaşif Adı',avatar:'vatoz',badges:Object.fromEntries(KASIF.stations.map(s=>[s.id,Date.now()])),created:1}))")
   await pg.reload();await pg.click('#btn-cert');await pg.wait_for_timeout(2200);await fits(pg,label+'-final')
   await pg.screenshot(path=str(OUT/(label+'-final.png')))
   await pg.click('#btn-preview');await pg.wait_for_function("document.querySelector('#cert-img').naturalWidth===1080");await fits(pg,label+'-preview')
