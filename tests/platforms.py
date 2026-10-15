@@ -88,7 +88,8 @@ async def main():
     await pg.set_viewport_size({'width':w,'height':h});await bounds(pg,f'{engine.name}-{w}-keyboard-close')
     await pg.evaluate('(s)=>localStorage.setItem("okyanus-kasifi-v1",JSON.stringify(s))',SEED)
     await pg.reload();await pg.click('#btn-help');await pg.wait_for_timeout(400)
-    assert await pg.evaluate("""()=>{const d=document.querySelector('#help .drawer-box').getBoundingClientRect(),l=document.querySelector('#howto'),b=document.querySelector('#help-close').getBoundingClientRect();return d.top>=0&&d.bottom<=visualViewport.height+1&&b.bottom<=d.bottom+1&&l.scrollHeight<=l.clientHeight+1&&[...l.querySelectorAll('p')].every(e=>getComputedStyle(e).textAlign==='left')}"""),(engine.name,w,'help layout')
+    # WebKit'te pencere açılış animasyonu ve alt piksel yuvarlaması yerleşene kadar bekle.
+    await pg.wait_for_function("""()=>{const d=document.querySelector('#help .drawer-box').getBoundingClientRect(),l=document.querySelector('#howto'),b=document.querySelector('#help-close').getBoundingClientRect();window.__helpLayout={top:d.top,bottom:d.bottom,viewport:visualViewport.height,scroll:l.scrollHeight,client:l.clientHeight};return d.top>=0&&d.bottom<=visualViewport.height+2&&b.bottom<=d.bottom+2&&l.scrollHeight<=l.clientHeight+2&&[...l.querySelectorAll('p')].every(e=>getComputedStyle(e).textAlign==='left')}""",timeout=3000)
     await pg.click('#help-close');await pg.click('#btn-hints')
     for i in range(9):
      await bounds(pg,f'{engine.name}-{w}-hint-{i}')
