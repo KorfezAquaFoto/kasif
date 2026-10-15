@@ -44,6 +44,14 @@ async def main():
     for i in range(9):
      await bounds(pg,f'{engine.name}-{w}-hint-{i}')
      if i<8:await pg.click('#hint-next')
+    # Yeni damga, her iki tarayıcıda da karta sığmalı ve düz durmalı.
+    await pg.click('#hint-home')
+    st=await pg.evaluate("KASIF.stations.find(s=>s.id==='korfez')")
+    await pg.goto(B+'#s='+st['code']);await pg.click('#learn-next')
+    await pg.click(f"#quiz-opts .opt:nth-child({st['quiz']['answer']+1})")
+    await pg.wait_for_timeout(1800);await bounds(pg,f'{engine.name}-{w}-stamp')
+    assert await pg.evaluate("""()=>{const a=document.querySelector('.rw-page').getBoundingClientRect(),b=document.querySelector('.big-stamp').getBoundingClientRect(),m=new DOMMatrix(getComputedStyle(document.querySelector('.big-stamp')).transform);return b.left>=a.left-1&&b.right<=a.right+1&&b.top>=a.top-1&&b.bottom<=a.bottom+1&&Math.abs(m.b)<.001&&Math.abs(m.c)<.001}"""),(engine.name,w,'stamp containment')
+    await pg.click('#rw-next');await pg.click('#btn-hints')
     # Azaltılmış hareket tercihinde canlı hareketi durmalı.
     await pg.emulate_media(reduced_motion='reduce')
     await pg.click('#hint-home');await pg.click('#target-learn')
