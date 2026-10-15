@@ -91,7 +91,7 @@ async def main():
       await pg.wait_for_timeout(1300)
       await fits(pg,prefix+'-reward')
       assert await pg.locator('#rw-fact').inner_text()==await pg.evaluate('KASIF.stations[0].reward')
-      assert await pg.locator('#rw-fact-title').inner_text()=='Biliyor muydun?'
+      assert await pg.locator('#rw-fact-title').text_content()=='Biliyor muydun?'
       assert await pg.locator('#rw-fact-title').evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
       assert await pg.locator('.fact-card').evaluate('(e)=>getComputedStyle(e).textAlign')=='left'
       assert await pg.locator('.leaf-hd').evaluate('(e)=>getComputedStyle(e).color')=='rgb(11, 79, 112)'
