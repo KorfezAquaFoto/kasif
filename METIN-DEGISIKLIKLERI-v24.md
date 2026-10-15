@@ -754,3 +754,14 @@ Sonra: Vatoz bir kuş değil, bir balık. Balıkların yüzmek için neleri vard
 ## Kontroller
 
 Otomatik içerik kontrolü: 9 durak, değişmeyen QR kodları/kimlikleri/cevap konumları, üç seçenek, en fazla 30 kelimelik tek ipucu, boş olmayan soru ve bilgiler; eski kullanılmayan alanların kaldırılması. Tarayıcı, telefon yerleşimi, görev akışı ve çevrimdışı kontrollerin sonucu ayrıca GitHub Actions üzerinden doğrulanır.
+
+### Tamamlanan doğrulama — 15 Ekim 2026
+
+- Üç test grubu başarılı: mobile-flow, mobile-layout, browser-platforms.
+- 10 telefon düzeninde dokuz ipucu ve görev öncesi ekranı; dar ekran, ekran taşması ve dokunma alanları kontrol edildi.
+- 5 ekran boyutunda dokuz görevin soruları, yanlış cevap ipuçları ve damga bilgileri; QR çözümü, pasaport görseli, kayıt ve çevrimdışı açılış kontrol edildi.
+- Chromium ve WebKit; klavye, büyütülmüş yazı, kayıt hatası ve yeniden deneme, kamera kapanışı ve önbellek kapsamı kontrolleri başarılı.
+- Son ipuçları 13–17 kelime aralığında. 253×429 düzeninde bulunan pirana metni sıkışması, bilgi korunarak cümleler kısaltılıp giderildi.
+- QR görüntü işleme alanının her taramada boyutlandırıldığı kamera kodu değiştirilmedi.
+- Test kaydı: https://github.com/KorfezAquaFoto/kasif/actions/runs/38688225767
+- Bunlar otomatik tarayıcı ve ekran boyutu testleridir; fiziksel telefon ve basılı QR ile yerinde deneme yapılmadı.
