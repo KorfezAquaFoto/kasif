@@ -54,7 +54,7 @@
   </div></div>
   <p class="ready-msg" id="ready-msg"></p>
   <div class="sheet">
-    <p class="sheet-lead"><span class="sheet-lead-full">Akvaryumda saklanan QR kodları bul, soruları bil, <b>9 damgayı</b> topla!</span><span class="sheet-lead-short">QR’ları bul, <b>9 damgayı</b> topla!</span></p>
+    <p class="sheet-lead"><span class="sheet-lead-full">Keşfet, QR kodlarını bul, soruları cevapla ve <b>9 damgayı</b> topla!</span><span class="sheet-lead-short">QR kodlarını bul, <b>9 damgayı</b> topla!</span></p>
     <label class="field">
       <span>Kaşif adın</span>
       <input id="in-name" maxlength="16" autocomplete="off" placeholder="Adını yaz" enterkeyhint="done">
@@ -108,7 +108,7 @@
     <div class="guide-bubble"><span class="guide-avatar" id="hint-guide" aria-hidden="true"></span><div class="guide-content"><b id="hint-greeting"></b><p id="hint-copy" aria-live="polite"></p></div></div>
 
   </div>
-  <div class="hint-actions"><button class="btn btn-gold" id="hint-go">Bu göreve git →</button><button class="btn btn-ghost" id="hint-home">← Pasaportuma geri dön</button></div>
+  <div class="hint-actions"><button class="btn btn-gold" id="hint-go">Bu göreve git →</button><button class="btn btn-ghost" id="hint-home">← Pasaportuma dön</button></div>
 </section>
 
 <!-- TARAYICI -->
@@ -120,7 +120,7 @@
     <p class="cam-msg hidden" id="cam-msg"></p>
   </div>
   <div class="manual">
-    <p>Kamera çalışmıyor mu? QR'ın altındaki kodu yaz:</p>
+    <p>Kamera çalışmıyor mu? QR kodunun altındaki kodu yaz:</p>
     <form id="manual-form" class="row">
       <input id="in-code" placeholder="Örn. PRN-3T9F" autocapitalize="characters" autocomplete="off">
       <button class="btn btn-gold sm">Onayla</button>
@@ -130,10 +130,10 @@
 
 <!-- GÖREV ÖNCESİ: TANIŞ / GÖZLEMLE -->
 <section id="v-learn" class="view">
-  <header class="topbar"><button class="icon-btn" id="learn-back" aria-label="Geri">←</button><b class="tb-title" id="learn-heading">Canlıyla tanış</b><button class="listen-btn" data-listen>♪ Dinle</button></header>
+  <header class="topbar"><button class="icon-btn" id="learn-back" aria-label="Geri">←</button><b class="tb-title" id="learn-heading">Tanış ve bul</b><button class="listen-btn" data-listen>♪ Dinle</button></header>
   <div class="task-progress" aria-label="Görev aşamaları"><span class="active">1 · Tanış ve bul</span><span>2 · Cevapla</span></div>
   <div class="learn-card paper"><p class="eyebrow center" id="learn-region"></p><h2 class="center" id="learn-name"></h2><div class="learn-art" id="learn-art"></div><div id="learn-copy" aria-live="polite"></div></div>
-  <button class="btn btn-gold" id="learn-next">Haydi onu bul!</button>
+  <button class="btn btn-gold" id="learn-next">Haydi keşfe!</button>
 </section>
 
 <!-- SORU -->
@@ -170,7 +170,7 @@
     </div>
     <p class="rw-name" id="rw-name"></p>
     <h2 id="rw-title"></h2>
-    <div class="fact-card"><b id="rw-fact-title">Biliyor muydun?</b><p id="rw-fact"></p></div>
+    <div class="fact-card"><b id="rw-fact-title">Keşfettiğin bilgi</b><p id="rw-fact"></p></div>
     <p class="rw-count" id="rw-count"></p>
     <button class="btn btn-gold" id="rw-next">Devam</button>
   </div>
@@ -201,7 +201,7 @@
         <rect x="18" y="98" width="84" height="12" rx="4" fill="#f5bd3a"/>
       </svg>
     </div>
-    <h2 class="final-h">Artık gerçek bir Okyanus Kaşifisin!</h2>
+    <h2 class="final-h">Tebrikler, Okyanus Kaşifi!</h2>
     <p class="final-p" id="final-p"></p>
     <button class="btn btn-gold" id="btn-preview">Dolu pasaportumu gör →</button>
     <img id="cert-img" alt="Tamamlanmış Okyanus Kaşifi pasaportu">

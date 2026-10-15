@@ -102,7 +102,7 @@ $("#btn-start").onclick = () => {
 
 // ---------- Simgelerle nasıl oynanır ----------
 const FLOW = `<span>🔍</span><i>›</i><span>📷</span><i>›</i><span>❓</span><i>›</i><span>⭐</span>`;
-const HOWTO = [["🔍", "İpucunu oku, canlıyı bul"], ["📷", "Yanındaki QR'ı <b>QR Tara</b> ile okut"], ["❓", "Soruyu bil"], ["⭐", "Damgan pasaportuna basılsın!"]];
+const HOWTO = [["🔍", "İpucunu oku, keşfini bul"], ["📷", "Görev tabelasındaki QR kodunu <b>QR Tara</b> ile okut"], ["❓", "Soruyu cevapla"], ["⭐", "Damgan pasaportuna basılsın!"]];
 const howtoHTML = () => HOWTO.map(([i, t]) => `<li><span>${i}</span><p>${t}</p></li>`).join("");
 function helloHTML(){
   return `<div class="hello"><div class="hello-av">${av(S.avatar)}</div><p class="hello-hi">Merhaba ${esc(S.name)}!</p>
@@ -133,7 +133,7 @@ function locationCue(st){
 function renderTarget(){
   const st = ST.find(s => s.id === target), box = $("#target");
   box.classList.toggle("hidden", !st); if (!st) return;
-  box.innerHTML = `<div class="target-heading"><span class="target-art" aria-hidden="true">${artSVG(st.art)}<span class="target-step">${ST.indexOf(st)+1}</span></span><div class="tg-txt"><p class="target-kicker">SIRADAKİ KEŞFİN</p><h2 class="tg-k">${esc(st.name)}</h2></div></div><p class="tg-where location-cue">${locationCue(st)}</p><button class="btn btn-gold" id="target-learn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5Q7 2 2 4v15q5-2 10 1q5-3 10-1V4q-5-2-10 1Z M12 5v15"/></svg>${S.flow && S.flow.id === st.id ? "Kaldığın yerden devam et →" : "Tanış ve keşfet →"}</button>`;
+  box.innerHTML = `<div class="target-heading"><span class="target-art" aria-hidden="true">${artSVG(st.art)}<span class="target-step">${ST.indexOf(st)+1}</span></span><div class="tg-txt"><p class="target-kicker">SIRADAKİ KEŞFİN</p><h2 class="tg-k">${esc(st.name)}</h2></div></div><p class="tg-where location-cue">${locationCue(st)}</p><button class="btn btn-gold" id="target-learn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5Q7 2 2 4v15q5-2 10 1q5-3 10-1V4q-5-2-10 1Z M12 5v15"/></svg>${S.flow && S.flow.id === st.id ? "Kaldığın yerden devam et →" : "Tanış ve bul →"}</button>`;
   $("#target-learn").onclick = () => {
     if (S.flow && S.flow.id === st.id) resumeTask(); else openLesson(st, false);
   };
@@ -156,7 +156,7 @@ $("#road-nodes").addEventListener("click", e => {
   target = st.id; S.target = target; save(); renderTarget(); renderRoad();
 });
 $("#road-end").onclick = () => count() === ST.length ? openCert()
-  : modal("🎁", "Hazine burada!", `${ST.length} damganın hepsini topla, hazineyi aç!`, [{ label: "Tamam" }]);
+  : modal("🎁", "Hazine burada!", `${ST.length} damgayı topla, tamamlanmış pasaportunu aç!`, [{ label: "Tamam" }]);
 function openDrawer(st, got){
   const art = $("#dr-art"); art.innerHTML = got ? stampSVG(st, { date: S.badges[st.id] }) : artSVG(st.art);
   art.classList.toggle("sil", !got);
@@ -223,7 +223,7 @@ function renderHints(){
   $("#hint-greeting").textContent=`${S.name}, keşfe hazır mısın?`;
   $("#hint-copy").innerHTML=tipMarkup(st);
   $("#hint-prev").disabled=hintIndex===0;$("#hint-next").disabled=hintIndex===ST.length-1;
-  $("#hint-go").textContent=S.badges[st.id] ? "Öğrendiklerime bak →" : "Buldum, QR’ını tara →";
+  $("#hint-go").textContent=S.badges[st.id] ? "Öğrendiklerime bak →" : "Buldum! QR kodunu tara →";
 }
 $("#btn-hints").onclick=openHints;
 $("#hint-home").onclick=()=>{stack=[];show("v-home",false);};
@@ -304,13 +304,13 @@ function handleText(text){
   const p = parse(text);
   if (!S) return goHome();
   if (p.type === "code") return handleCode(p.value);
-  if (p.type === "entry") return modal("🚪","Bu giriş QR'ı","Pasaportun zaten açık! Şimdi akvaryumdaki görev QR'larını bul.",[{label:"Tamam",onClick:goHome}]);
-  modal("🤔","Bu QR bizim değil","Bu kod Okyanus Kaşifi görevlerinden biri değil. Görev tabelalarındaki QR'ları ara!",[{label:"Tekrar dene",onClick:retry},{label:"Damga sayfama dön",cls:"btn-ghost",onClick:goHome}]);
+  if (p.type === "entry") return modal("🚪","Bu, giriş QR kodu","Pasaportun zaten açık! Şimdi akvaryumdaki görev QR kodlarını bul.",[{label:"Tamam",onClick:goHome}]);
+  modal("🤔","Bu QR bizim değil","Bu kod Okyanus Kaşifi görevlerinden biri değil. Görev tabelalarındaki QR'ları ara!",[{label:"Tekrar dene",onClick:retry},{label:"Pasaportuma dön",cls:"btn-ghost",onClick:goHome}]);
 }
 function handleCode(code){
   const st = ST.find(s => s.code === code);
-  if (!st) return modal("🤔","Kod bulunamadı","Bu kodu tanıyamadık. Harfleri kontrol edip tekrar dene.",[{label:"Tekrar dene",onClick:retry},{label:"Damga sayfama dön",cls:"btn-ghost",onClick:goHome}]);
-  if (S.badges[st.id]) return modal(st.art,"Bu damga zaten sende!",`“${st.title}” görevini daha önce tamamladın. Diğer canlıları bul!`,[{label:"Damga sayfam",onClick:goHome}]);
+  if (!st) return modal("🤔","Kod bulunamadı","Bu kodu tanıyamadık. Harfleri kontrol edip tekrar dene.",[{label:"Tekrar dene",onClick:retry},{label:"Pasaportuma dön",cls:"btn-ghost",onClick:goHome}]);
+  if (S.badges[st.id]) return modal(st.art,"Bu damga zaten sende!",`“${st.title}” görevini daha önce tamamladın. Diğer görevleri keşfet!`,[{label:"Pasaportuma dön",onClick:goHome}]);
   if (st.quiz) {
     if (S.flow && S.flow.id === st.id && S.flow.step === "find") { S.flow.verified = true; save(); openQuiz(st); }
     else openLesson(st, true);
@@ -340,7 +340,7 @@ function renderLesson(){
   $("#learn-name").textContent=st.name;
   $("#learn-art").innerHTML=artSVG(st.art);
   $("#learn-copy").innerHTML=`<div class="quick-tip"><div class="tip-heading"><span>${bulbIcon}</span>Keşif ipucun</div><p>${tipMarkup(st)}</p></div>`;
-  $("#learn-next").textContent=S.flow.verified ? "Haydi soruyu çöz →" : "Buldum, QR’ını tara →";
+  $("#learn-next").textContent=S.flow.verified ? "Haydi soruyu cevapla →" : "Buldum! QR kodunu tara →";
 }
 $("#learn-next").onclick=()=>{
   if(S.flow.verified)openQuiz(lesson);
@@ -428,7 +428,7 @@ function openQuiz(st){
       } else {
         el.classList.add("wrong");
         // Kaybetmek yok: yanlış cevapta yön gösteren ipucu, istediği kadar deneyebilir
-        msg.textContent = "Neredeyse! 💡 İpucu: " + (st.quiz.clue || "Tabelaya bir daha bak."); msg.style.color = "var(--sea2)";
+        msg.textContent = "Bir daha düşün! 💡 İpucu: " + (st.quiz.clue || "Tabelaya bir daha bak."); msg.style.color = "var(--sea2)";
         if (navigator.vibrate) navigator.vibrate([40,40,40]);
       }
     };
@@ -449,7 +449,7 @@ function award(st){
   [stage, ring, tool].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
   $("#rw-name").textContent = REG[st.region].label + " · " + st.name;
   $("#rw-title").textContent = st.title;
-  $("#rw-fact-title").textContent = st.factTitle || "Biliyor muydun?";
+  $("#rw-fact-title").textContent = st.factTitle || "Keşfettiğin bilgi";
   $(".fact-card").classList.toggle("eco", !!st.factTitle);
   $("#rw-fact").textContent = st.reward || st.fact;
   const n = count(), t = ST.length;
@@ -489,7 +489,7 @@ function openCert(){
   certBlob=null; $("#btn-save").disabled=true; $("#btn-share").disabled=true;
   document.querySelectorAll("#v-cert [data-aq]").forEach(el => el.textContent = D.aquarium);
   $("#final-name").textContent = S.name;
-  $("#final-p").textContent = `${S.name}, ${D.aquarium}'daki ${ST.length} bölgenin hepsini keşfettin. Pasaportun artık altın!`;
+  $("#final-p").textContent = `${S.name}, ${D.aquarium} içindeki ${ST.length} görevi tamamladın. Pasaportun tamamlandı!`;
   const cover = $("#final-cover"), seal = $("#final-seal"), tool = $("#final-tool");
   seal.innerHTML = finalSealSVG(); cover.classList.remove("gold");
   [seal, tool].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
@@ -605,7 +605,7 @@ async function drawCert(){
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v23`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v24`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall(); }
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
@@ -625,7 +625,7 @@ renderWelcome();
 show(S ? "v-home" : "v-welcome", false);
 readHash();
 if (S && S.flow && !location.hash && current === "v-home") resumeTask();
-if (pending && !S) setTimeout(() => modal("🐠","Bir canlı buldun!","Önce kaşif adını yaz. Sonra canlıyı tanıyıp görevini çözebilirsin.",[{label:"Tamam"}]), 300);
+if (pending && !S) setTimeout(() => modal("🐠","Bir görev buldun!","Önce kaşif adını yaz. Sonra keşfine başlayıp soruyu cevaplayabilirsin.",[{label:"Tamam"}]), 300);
 
 // Service worker: çevrimdışı çalışma
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
