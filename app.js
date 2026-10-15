@@ -400,6 +400,8 @@ let viewportState="";
 function fitViewport(){
   const vp=window.visualViewport,h=vp?vp.height:innerHeight,w=vp?vp.width:innerWidth;
   const input=document.activeElement.matches('input'),keyboard=h<400&&input;
+  // Sayfa sabittir; klavye açılırken WebKit önceki odak kaydırmasını tutmamalı.
+  if(window.scrollY)window.scrollTo(0,0);
   const state=[w,h,keyboard].join(":");
   if(state===viewportState)return;
   viewportState=state;
@@ -409,7 +411,6 @@ function fitViewport(){
   root.dataset.narrow=w<360?'true':'false';
   root.dataset.tablet=w>=600&&h>=600?'true':'false';
   root.classList.toggle('keyboard-open',keyboard);
-  if(!input&&window.scrollY)window.scrollTo(0,0);
   scheduleFit();
 }
 let viewportTimer=0,viewportFrame=0;

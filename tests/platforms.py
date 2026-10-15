@@ -117,7 +117,12 @@ async def main():
       if(solid<2500)throw new Error('Yeni çizim tarayıcıda boş');
      }''')
     await pg.focus('#in-name');await pg.set_viewport_size({'width':w,'height':300});await pg.fill('#in-name','Kaşif')
-    await pg.wait_for_function("""()=>{const r=document.querySelector('#in-name').getBoundingClientRect();return r.top>=0&&r.bottom<=visualViewport.height+2}""",timeout=3000)
+    try:
+     await pg.wait_for_function("""()=>{const r=document.querySelector('#in-name').getBoundingClientRect();return r.top>=0&&r.bottom<=visualViewport.height+2}""",timeout=3000)
+    except Exception:
+     print('KEYBOARD_DIAGNOSTIC',engine.name,w,await pg.evaluate("""()=>({scrollY,active:document.activeElement.id,layout:document.documentElement.dataset,classes:document.documentElement.className,input:document.querySelector('#in-name').getBoundingClientRect().toJSON(),view:document.querySelector('.view.active').getBoundingClientRect().toJSON(),sheet:document.querySelector('.sheet').getBoundingClientRect().toJSON(),viewport:{width:visualViewport.width,height:visualViewport.height,top:visualViewport.offsetTop}})"""),flush=True)
+     await pg.screenshot(path=str(OUT/f'keyboard-failure-{engine.name}-{w}.png'))
+     raise
     r=await pg.locator('#in-name').bounding_box();assert r['y']>=0 and r['y']+r['height']<=302,(engine.name,'keyboard',r)
     await pg.press('#in-name','Enter');assert await pg.evaluate('document.activeElement.id')!='in-name'
     await pg.set_viewport_size({'width':w,'height':h});await bounds(pg,f'{engine.name}-{w}-keyboard-close')
