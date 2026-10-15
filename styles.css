@@ -610,5 +610,5 @@ html[data-layout=short] .reward .rw-page{--stamp-limit:145px}
 html[data-layout=tiny] .reward .rw-page{--stamp-limit:84px;--stamp-heading:12px}
 html[data-layout=tiny][data-narrow=true] .reward .rw-page{--stamp-limit:72px}
 @supports(width:1cqh){
- .reward .rw-page .stamp-stage{width:min(var(--stamp-limit),calc(100cqh - var(--stamp-heading)));height:min(var(--stamp-limit),calc(100cqh - var(--stamp-heading)))}
+ html[data-layout] .reward .rw-page .stamp-stage{width:min(var(--stamp-limit),calc(100cqh - var(--stamp-heading)));height:min(var(--stamp-limit),calc(100cqh - var(--stamp-heading)))}
 }
