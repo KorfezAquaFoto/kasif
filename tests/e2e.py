@@ -173,6 +173,11 @@ async def main():
       g.innerHTML=KASIF.stations.map(s=>'<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:18px"><div style="width:155px;height:155px">'+artSVG(s.art)+'</div>'+s.name+'</div>').join('');document.body.append(g);
     }''')
     await pg.screenshot(path=str(OUT/'art-gallery.png'))
+    await pg.goto(B+'qr-kodlari.html')
+    assert await pg.locator('.poster').count()==10
+    assert await pg.locator('.poster .em image').count()==10
+    assert await pg.locator('.code').all_text_contents()==codes
+    await pg.evaluate("async()=>{const i=new Image();i.src=KASIF_ART_PACK.src;await i.decode()}")
     await br.close()
   # Küçük bir görsel kontrol şeridi, test günlüğünden incelenebilir.
   import base64, io
