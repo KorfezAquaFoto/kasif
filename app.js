@@ -392,20 +392,30 @@ function fitContent(){
   }
 }
 let fitFrame=0;
-function scheduleFit(){cancelAnimationFrame(fitFrame);fitFrame=requestAnimationFrame(fitContent);}
+function scheduleFit(){
+  if(fitFrame)return;
+  fitFrame=requestAnimationFrame(()=>{fitFrame=0;fitContent();});
+}
+let viewportState="";
 function fitViewport(){
   const vp=window.visualViewport,h=vp?vp.height:innerHeight,w=vp?vp.width:innerWidth;
-  const root=document.documentElement;root.style.setProperty('--app-height',h+'px');
+  const input=document.activeElement.matches('input'),keyboard=h<400&&input;
+  const state=[w,h,keyboard].join(":");
+  if(state===viewportState)return;
+  viewportState=state;
+  const root=document.documentElement;
+  root.style.setProperty('--app-height',h+'px');
   root.dataset.layout=h<530?'tiny':h<690?'short':'roomy';
   root.dataset.narrow=w<360?'true':'false';
-  root.classList.toggle('keyboard-open',h<400 && document.activeElement.matches('input'));
-  if(!document.activeElement.matches('input'))window.scrollTo(0,0);
+  root.dataset.tablet=w>=600&&h>=600?'true':'false';
+  root.classList.toggle('keyboard-open',keyboard);
+  if(!input&&window.scrollY)window.scrollTo(0,0);
   scheduleFit();
 }
-let viewportTimer=0;
+let viewportTimer=0,viewportFrame=0;
 function refreshViewport(){
-  fitViewport();clearTimeout(viewportTimer);
-  requestAnimationFrame(fitViewport);viewportTimer=setTimeout(fitViewport,120);
+  if(!viewportFrame)viewportFrame=requestAnimationFrame(()=>{viewportFrame=0;fitViewport();});
+  clearTimeout(viewportTimer);viewportTimer=setTimeout(fitViewport,120);
 }
 window.addEventListener('resize',refreshViewport);
 if(window.visualViewport){visualViewport.addEventListener('resize',refreshViewport);visualViewport.addEventListener('scroll',refreshViewport);}
@@ -467,19 +477,21 @@ function award(st){
 }
 function confetti(N, sel = "#confetti", view = "v-reward"){
   if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const c = $(sel), x = c.getContext("2d"), dpr = Math.min(devicePixelRatio || 1,2);
+  const c = $(sel), x = c.getContext("2d"), dpr = Math.min(devicePixelRatio || 1,2,Math.sqrt(3000000/(innerWidth*innerHeight)));
+  const token=Symbol("confetti");c.confettiToken=token;
   c.width = innerWidth * dpr; c.height = innerHeight * dpr; x.setTransform(dpr,0,0,dpr,0,0);
   const cols = ["#f5bd3a","#7fe3ff","#ff7b54","#7be08f","#ffffff","#c08cff"];
   const P = Array.from({length:N}, () => ({ x:innerWidth/2, y:innerHeight*0.3, vx:(Math.random()-.5)*13, vy:-Math.random()*13-3,
     s:Math.random()*7+4, r:Math.random()*6, vr:(Math.random()-.5)*.3, c:cols[Math.random()*cols.length|0], o:Math.random() < .3 }));
   let f = 0;
   (function tick(){
+    if(c.confettiToken!==token)return;
     x.clearRect(0,0,innerWidth,innerHeight);
     P.forEach(p => { p.vy += .32; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
       x.save(); x.translate(p.x,p.y); x.rotate(p.r); x.fillStyle = p.c;
       if (p.o) { x.beginPath(); x.arc(0,0,p.s/2.4,0,7); x.fill(); } else x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);
       x.restore(); });
-    if (++f < (view === "v-cert" ? 170 : 80) && current === view && !document.hidden) requestAnimationFrame(tick); else x.clearRect(0,0,innerWidth,innerHeight);
+    if (++f < (view === "v-cert" ? 170 : 80) && current === view && !document.hidden) requestAnimationFrame(tick); else {x.clearRect(0,0,innerWidth,innerHeight);c.width=c.height=1;}
   })();
 }
 
@@ -732,7 +744,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v36`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v37`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},

@@ -1,6 +1,7 @@
 """WebKit, klavye, büyük yazı, kayıt hatası, kamera yaşamı ve cache kapsamı."""
 import asyncio,functools,http.server,pathlib,threading,base64,io
 from playwright.async_api import async_playwright
+from tablets import tablet_cases
 ROOT=pathlib.Path(__file__).resolve().parent.parent
 OUT=ROOT/'tests'/'out';OUT.mkdir(exist_ok=True)
 B='http://127.0.0.1:8767/'
@@ -159,6 +160,7 @@ async def main():
      if i<8:await pg.click('#hint-next')
     if w==390:await certificate_cases(pg,engine.name)
     await ctx.close()
+   await tablet_cases(br,engine.name,B)
    await br.close()
   # Başarısız kaydı görünür bildir, izin düzelince yeniden kaydet.
   br=await p.chromium.launch(args=['--use-fake-device-for-media-stream','--use-fake-ui-for-media-stream'])
