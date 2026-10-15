@@ -649,3 +649,11 @@ html[data-layout=tiny] #quiz-msg{font-size:14px;line-height:1.25;margin:8px 0 0;
  #v-quiz .quiz .paper{flex:1;min-width:0}
  #v-quiz #quiz-opts{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
+
+/* En dar ekranlarda yanlış yanıt ipucuna da alt boşluk bırak. */
+@media(max-width:280px){
+ html[data-layout=tiny] #v-quiz .tb-title{font-size:15px;line-height:1.15}
+ html[data-layout=tiny] #v-quiz .quiz .paper{padding:8px}
+ html[data-layout=tiny] #quiz-q{font-size:16px;margin-bottom:6px}
+ html[data-layout=tiny] #quiz-msg{font-size:13.5px;margin-top:6px}
+}
