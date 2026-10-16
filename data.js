@@ -83,7 +83,7 @@ window.KASIF = {
         "answer": 1,
         "clue": "Bir tehlike olduğunda tek başına olmak mı, bir grupla birlikte olmak mı daha güvenli olabilir?"
       },
-      "fact": "Bazı piranalar doğada balıkların yanı sıra meyve ve başka bitkisel besinlerle de beslenir. Keskin dişlere sahip olmaları, yalnızca et yedikleri anlamına gelmez.",
+      "fact": "Piranaların dişleri makas gibi keskindir. Dişleri dökülünce yerine yenileri çıkar!",
       "reward": "Bazı piranalar doğada meyve de yer. Menülerinde yalnızca başka hayvanlar yoktur!",
       "icons": [
         "💤",
@@ -113,14 +113,14 @@ window.KASIF = {
         "answer": 2,
         "clue": "Bu sert plakaları bir zırh gibi düşün. Zırh ne işe yarar?"
       },
-      "fact": "Mersin balığının ağzıyla burnunun ucu arasında dört küçük bıyık bulunur. Bunlar dipteki yiyecekleri bulmasına yardımcı olan algılayıcılardır. Yiyeceğini ağzıyla emerek alabilir.",
-      "reward": "Mersin balığının ağzının yakınında dört küçük bıyık bulunur. Bu bıyıklar, dipteki yiyecekleri bulmasına yardım eder!",
+      "fact": "Ağzının yanındaki 4 küçük bıyıkla dipteki yiyecekleri bulur. Bıyıklarını görebildin mi?",
+      "reward": "Mersin balıkları dinozorlar zamanında da yaşıyordu!",
       "icons": [
         "💨",
         "🎨",
         "🛡️"
       ],
-      "tip": "Mersin balığının sert plakaları zırh gibidir. Asya bölümündeki tankta, sırtındaki ve yanlarındaki bu parçaları bul!"
+      "tip": "Mersin balığının sert plakaları zırh gibi onu korur. Asya bölümündeki tankta sırtındaki bu zırh parçalarını bul!"
     },
     {
       "id": "kesis",
@@ -143,14 +143,14 @@ window.KASIF = {
         "answer": 0,
         "clue": "Ayakkabıların sana küçük gelince ne yaparsın?"
       },
-      "fact": "Keşiş yengecinin bütün bacaklarını dışarıdan göremezsin. Arka bacakları kabuğun içinde kalır ve kabuğu sıkıca tutmasına yardım eder.",
-      "reward": "Keşiş yengeci, kabuğunu düşürmemek için arka bacaklarıyla içeriden sıkıca tutar!",
+      "fact": "Kabuğunu düşürmemek için arka bacaklarıyla içeriden sıkıca tutar.",
+      "reward": "Keşiş yengeçleri bazen sıraya girip kabuk değiş tokuşu yapar!",
       "icons": [
         "📏",
         "🫧",
         "🎨"
       ],
-      "tip": "Keşiş yengeci, boş deniz salyangozu kabuğunu ev olarak kullanır. Avustralya bölümünde kabuğunu taşıyan bu küçük kaşifi ara!"
+      "tip": "Büyüdükçe kabuğu dar gelen keşiş yengeci, daha büyük bir kabuk arar. Avustralya bölümünde kabuğunu taşıyan bu kaşifi ara!"
     },
     {
       "id": "fosil",
@@ -173,14 +173,14 @@ window.KASIF = {
         "answer": 1,
         "clue": "Fosiller eski canlılardan kalan izler ve kalıntılardır. Bize geçmişi mi, geleceği mi anlatır?"
       },
-      "fact": "Fosil olmak için geride bir kemik kalması gerekmez. Korunmuş ayak izleri de fosil olabilir. Bu izler, eski canlıların adımlarını ve hareketlerini araştırmamıza yardımcı olur.",
+      "fact": "Bir fosilin taşa dönüşmesi binlerce, hatta milyonlarca yıl sürer!",
       "reward": "Ayak izleri de fosilleşebilir! Bilim insanları bu izlerden, eski canlıların nasıl yürüdüğünü araştırır.",
       "icons": [
         "☁️",
         "🦕",
         "🌡️"
       ],
-      "tip": "Fosiller, çok eski canlıların kalıntıları ve izleridir. Afrika bölümünde başını kaldır; duvarların yukarısındaki şekilleri incele!"
+      "tip": "Fosiller, çok eski canlıların kalıntıları ve izleridir. Afrika bölümünde başını kaldır, duvarlardaki şekilleri incele!"
     },
     {
       "id": "orfoz",
@@ -203,8 +203,8 @@ window.KASIF = {
         "answer": 2,
         "clue": "Görevin adı “Kaya Bekçisi”. Kayaların arasında saklanabileceği bir yer var mı?"
       },
-      "fact": "Orfozun gözleri başının ön tarafına yakındır. Bu yerleşim, kaya oyuğunda saklanırken dışarıyı görmesine yardımcı olur.",
-      "reward": "Orfozun öne yakın gözleri, kaya oyuğundayken dışarıyı görmesine yardımcı olur.",
+      "fact": "Gözleri başının önündedir. Kaya oyuğunda saklanırken dışarıyı rahatça görür.",
+      "reward": "Orfozlar 50 yıl kadar yaşayabilir. Belki dedenden bile yaşlıdır!",
       "icons": [
         "🌊",
         "🏖️",
@@ -241,7 +241,7 @@ window.KASIF = {
         "🐟",
         "❄️"
       ],
-      "tip": "Karagöz, mırmır ve sargos İzmit Körfezi’nde de yaşar. Körfez akvaryumundaki balıkları izle; temiz bir deniz neden önemli?"
+      "tip": "Temiz bir deniz, karagöz, mırmır ve sargosa sağlıklı bir ev olur. Körfez akvaryumunda bu balıkları izle!"
     },
     {
       "id": "kabuk",
@@ -294,8 +294,8 @@ window.KASIF = {
         "answer": 0,
         "clue": "Sergideki büyük dişleri düşün. Bir parmak ucuna mı, bir yetişkinin eline mi daha yakın büyüklükteler?"
       },
-      "fact": "Megalodonun iskeleti kemikten değil, kıkırdaktandı. Kıkırdak öldükten sonra kolayca parçalanabildiği için çok azı korunur. Megalodonu çoğunlukla daha dayanıklı olan fosil dişlerinden tanıyoruz.",
-      "reward": "Megalodonun iskeleti kemikten değil, kıkırdaktandı. Bu yüzden onu çoğunlukla daha dayanıklı olan fosil dişlerinden tanıyoruz!",
+      "fact": "İskeleti kıkırdaktı, bu yüzden bugün onu en çok fosil dişlerinden tanıyoruz.",
+      "reward": "Megalodon bir otobüsten bile uzun olabilirdi!",
       "icons": [
         "✋",
         "☝️",
@@ -324,14 +324,14 @@ window.KASIF = {
         "answer": 1,
         "clue": "Vatoz bir kuş değil, bir balık. Balıkların yüzmek için neleri vardır?"
       },
-      "fact": "Çoğu vatozun gözleri üst tarafta, ağzı ise gövdesinin altındadır. Bu yerleşim, dipteki yiyecekleri almasına yardımcı olur. Tünelde üzerinden geçen bir vatozun alt tarafını inceleyebilirsin.",
+      "fact": "Vatozlar köpekbalıklarının akrabasıdır. Onların da iskeleti kıkırdaktan!",
       "reward": "Çoğu vatozun ağzı gövdesinin altındadır. Tünelde üzerinden geçerse alt tarafını dikkatle incele!",
       "icons": [
         "🪽",
         "🐟",
         "〰️"
       ],
-      "tip": "Vatoz, yassı gövdeli bir balıktır. Büyük tünelde etrafına ve yukarıya bak; kanat gibi görünen kısımlarını izle!"
+      "tip": "Vatozun kanat gibi görünen kısımları aslında yüzgeçleridir. Büyük tünelde yukarıya bak, yüzgeçlerini izle!"
     }
   ],
   "regionOrder": [
