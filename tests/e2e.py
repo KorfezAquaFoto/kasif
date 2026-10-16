@@ -141,7 +141,9 @@ async def main():
           await pg.screenshot(path=str(OUT/(prefix+'-'+st['id']+'-new-fact.png')))
         await pg.click('#rw-next')
       await pg.locator('#v-cert.active').wait_for();await pg.wait_for_timeout(2100);await fits(pg,prefix+'-final')
-      await pg.click('#btn-preview');await pg.wait_for_function('document.querySelector("#cert-img").naturalWidth===1080')
+      # v42: hazine sandığından sonra sertifika önizlemesi doğrudan açılır
+      if not await pg.evaluate("document.querySelector('#v-cert').classList.contains('preview-passport')"):await pg.click('#btn-preview')
+      await pg.wait_for_function('document.querySelector("#cert-img").naturalWidth===1080')
       await fits(pg,prefix+'-passport')
       await pg.click('#v-cert [data-back]');await fits(pg,prefix+'-complete')
       await pg.click('#btn-help');await pg.click('#help-close');await pg.click('#btn-menu');await fits(pg,prefix+'-menu')

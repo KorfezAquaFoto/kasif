@@ -173,7 +173,7 @@ function renderRoad(){
   const end = $("#road-end");
   end.classList.toggle("done", done);
   if (FX.sandik) {
-    if (!end.querySelector(".chest-svg")) end.querySelector(".chest").innerHTML = '<span class="chest-rays" aria-hidden="true"></span>' + chestSVG() + '<span class="chest-seal">' + finalSealSVG() + '</span>';
+    if (!end.querySelector(".chest-svg")) end.querySelector(".chest").innerHTML = '<span class="chest-rays" aria-hidden="true"></span>' + chestSVG();
     end.classList.toggle("open", done && !chestSeq);
   } else end.querySelector(".chest").innerHTML = done ? finalSealSVG() : "🎁";
   updateRoadFx();
@@ -258,25 +258,52 @@ function updateRoadFx(){
 window.addEventListener("resize", () => { if (FX.yol && current === "v-home" && walkerAt !== null && S) updateRoadFx(); });
 
 // 9/9: kaşif dostu hazineye gider, sandık sallanır ve açılır, ardından final ekranı. Dokunmak atlatır.
+// Sertifika resmi sandık açılırken arka planda hazırlanır.
+let chestCertPromise = null;
 function runChestSequence(){
-  const end = $("#road-end");
-  const finish = () => {
-    clearTimeout(chestTimer); document.removeEventListener("pointerdown", skip, true);
-    if (!chestSeq) return; chestSeq = false; end.classList.remove("shaking"); end.classList.add("open");
-    if (current === "v-home") openCert();
+  const end = $("#road-end"), box = $("#chest-show"), timers = [];
+  const later = (ms, fn) => timers.push(setTimeout(fn, ms));
+  let certUrl = null, done = false;
+  if (!chestCertPromise) chestCertPromise = drawCert().catch(() => null);
+  const putCert = blob => {
+    if (!blob || done) return; certUrl = URL.createObjectURL(blob);
+    const card = box.querySelector(".cs-cert"); if (card) card.innerHTML = '<img alt="" src="' + certUrl + '">';
+  };
+  chestCertPromise.then(putCert);
+  const finish = async () => {
+    if (done) return; done = true;
+    timers.forEach(clearTimeout); document.removeEventListener("pointerdown", skip, true);
+    chestSeq = false; end.classList.remove("shaking", "lifted"); end.classList.add("open");
+    const blob = await chestCertPromise; chestCertPromise = null;
+    if (current === "v-home") { openCert({ blob, preview: true }); confetti(70, "#confetti2", "v-cert"); }
+    box.classList.add("leaving");
+    setTimeout(() => { box.className = "chest-show hidden"; box.innerHTML = ""; if (certUrl) URL.revokeObjectURL(certUrl); }, 500);
   };
   const skip = e => { e.preventDefault(); e.stopPropagation(); finish(); };
   document.addEventListener("pointerdown", skip, true);
-  end.classList.remove("open", "shaking");
-  chestTimer = setTimeout(() => {
-    end.classList.add("shaking");
-    chestTimer = setTimeout(() => {
-      end.classList.remove("shaking"); end.classList.add("open");
-      if (navigator.vibrate) navigator.vibrate([30, 40, 60]);
-      playStampSound();
-      chestTimer = setTimeout(finish, 1800);
-    }, 800);
-  }, 1500);
+  end.classList.remove("open", "shaking", "lifted");
+  // 1) Kaşif dostu hazineye varır, sandık yerinde sallanır
+  later(1400, () => end.classList.add("shaking"));
+  // 2) Sandık yerinden kalkıp ekranın ortasına büyüyerek gelir
+  later(2200, () => {
+    const from = end.querySelector(".chest").getBoundingClientRect();
+    box.innerHTML = '<div class="cs-back"></div><div class="cs-rays"></div><div class="cs-chest"><span class="cs-leak"></span>' + chestSVG() + '</div><div class="cs-flash"></div><div class="cs-cert"><div class="cs-ph"><b>OKYANUS KAŞİFİ</b><span>SERTİFİKASI</span></div></div>';
+    box.className = "chest-show";
+    const big = box.querySelector(".cs-chest"), to = big.getBoundingClientRect();
+    big.style.setProperty("--dx", (from.left + from.width / 2 - (to.left + to.width / 2)).toFixed(1) + "px");
+    big.style.setProperty("--dy", (from.top + from.height / 2 - (to.top + to.height / 2)).toFixed(1) + "px");
+    big.style.setProperty("--s0", (from.width / to.width).toFixed(3));
+    end.classList.remove("shaking"); end.classList.add("lifted");
+    chestCertPromise.then(putCert);
+    void big.offsetWidth; requestAnimationFrame(() => box.classList.add("center"));
+  });
+  // 3) İçinden ışık sızar, sandık titrer
+  later(3100, () => box.classList.add("glow"));
+  // 4) Kapak açılır, ışık patlar
+  later(3900, () => { box.classList.add("open"); if (navigator.vibrate) navigator.vibrate([30, 40, 70]); playStampSound(); });
+  // 5) Sertifika sandıktan yükselip ekranı doldurur
+  later(4450, () => box.classList.add("reveal"));
+  later(6400, finish);
 }
 $("#road-nodes").addEventListener("click", e => {
   const b = e.target.closest(".stop"); if (!b) return;
@@ -665,10 +692,10 @@ function confetti(N, sel = "#confetti", view = "v-reward"){
 // Damga aleti büyük altın "Okyanus Kaşifi" damgasını kapağa basar, kapak altına döner.
 // Paylaşılan resim sertifika değil, çocuğun dolu pasaportu.
 let certBlob = null, certAnimationRun = 0;
-function openCert(){
+function openCert(opts = {}){
   if (count() < ST.length) return show("v-home", false);
   stack = ["v-home"]; show("v-cert", false);
-  $("#v-cert").classList.remove("preview-passport");
+  $("#v-cert").classList.toggle("preview-passport", !!opts.preview);
   certBlob=null; $("#btn-save").disabled=true; $("#btn-share").disabled=true; $("#btn-story").disabled=true;
   $("#btn-story").classList.toggle("hidden", !FX.hikaye);
   document.querySelectorAll("#v-cert [data-aq]").forEach(el => el.textContent = D.aquarium);
@@ -696,7 +723,7 @@ function openCert(){
   }, reduced ? 0 : 1400);
   $("#cert-img").removeAttribute("src");
   setupSave();
-  drawCert().then(blob => {
+  (opts.blob ? Promise.resolve(opts.blob) : drawCert()).then(blob => {
     certBlob = blob;
     $("#btn-save").disabled=false; $("#btn-share").disabled=false; $("#btn-story").disabled=false;
     // data: adresi, resme basılı tutunca iPhone'da "Fotoğraflara Ekle", Android'de "Resmi indir" çıkmasını garantiler
@@ -950,7 +977,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v41`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v42`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},

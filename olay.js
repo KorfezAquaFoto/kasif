@@ -3,7 +3,7 @@
 (function(){
 const URL_ = "https://jusssskyelfizcuejytf.supabase.co/rest/v1/events";
 const KEY_ = "sb_publishable_kAKGNIYcCSIomQpxdpqODg_alO04cLQ";
-const QUEUE = "kasif-olaylar", DEVICE = "kasif-cihaz", MAX = 300, VERSION = "v41";
+const QUEUE = "kasif-olaylar", DEVICE = "kasif-cihaz", MAX = 300, VERSION = "v42";
 // Yerel geliştirme ve testler gerçek istatistiğe karışmasın; denemek için localStorage "kasif-istatistik-test" = "1".
 const LOCAL = location.protocol === "file:" || /^(localhost|127\.0\.0\.1|\[::1\]|.*\.localhost|.*\.test)$/.test(location.hostname);
 const store = {
