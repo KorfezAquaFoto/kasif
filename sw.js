@@ -1,8 +1,8 @@
 // Çevrimdışı çalışma: ilk açılışta tüm dosyalar telefona kaydedilir.
 // İçerik değiştiğinde VERSION'ı artırın; telefonlar bir sonraki internet bağlantısında günceller.
-const VERSION = "kasif-v37";
+const VERSION = "kasif-v38";
 const FILES = [
-  "./", "./logo2.png", "./index.html", "./styles.css", "./app.js", "./data.js", "./art.js", "./art-assets.js", "./assets/art-atlas-v27.webp",
+  "./", "./logo2.png", "./index.html", "./styles.css", "./app.js", "./olay.js", "./data.js", "./art.js", "./art-assets.js", "./assets/art-atlas-v27.webp",
   "./vendor/jsQR.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/apple-touch-icon.png",
   "./fonts/dynapuff-variable.woff2", "./fonts/baloo-2-latin-600-normal.woff2", "./fonts/baloo-2-latin-ext-600-normal.woff2",
@@ -26,11 +26,12 @@ self.addEventListener("fetch", e => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
   // Sayfa açılışları (QR'dan gelen ?s=KOD dahil) her zaman önbellekteki index.html ile karşılanır
-  if (req.mode === "navigate" && !url.pathname.endsWith("qr-kodlari.html")) {
+  if (req.mode === "navigate" && !/(qr-kodlari|istatistik)\.html$/.test(url.pathname)) {
     e.respondWith(caches.match("./index.html").then(r => r || fetch(req)));
     return;
   }
   // Poster sayfası her zaman güncel data.js/art.js ile çalışsın (internet yoksa önbellek)
+  if (url.pathname.endsWith("istatistik.html")) return;
   if (url.pathname.endsWith("qr-kodlari.html") || req.referrer.includes("qr-kodlari.html")) {
     e.respondWith(fetch(req, { cache: "no-store" }).catch(() => caches.match(req, { ignoreSearch: true })));
     return;

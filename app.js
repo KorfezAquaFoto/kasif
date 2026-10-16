@@ -9,6 +9,8 @@ const AVATARS = ["vatoz","kesis","orfoz","pirana","mersin","karagoz"];
 const REG = D.regions;
 const ROT = [-9, 7, -5, 10, -12, 6, -7, 8, -4, 11];
 const $ = s => document.querySelector(s);
+const olay = (...a) => { try { window.kasifOlay && window.kasifOlay(...a); } catch(e){} };
+let scanSource = "link";
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 // ---------- Kayıt ----------
@@ -87,7 +89,7 @@ $("#in-name").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefaul
 $("#btn-start").onclick = () => {
   const name = $("#in-name").value.trim().slice(0,16) || "Kaşif";
   S = { v:1, id:newId(), name, avatar, badges:{}, created:Date.now() };
-  save(); requestPersist();
+  save(); requestPersist(); olay("start");
   // Kapak kitap gibi açılır, altında kaşif dostu ve "Merhaba" görünür
   $("#idpage-w").innerHTML = helloHTML();
   $("#ready-msg").textContent = `Pasaportun hazır, ${S.name}!`;
@@ -287,12 +289,12 @@ function loop(){
 function onScan(text){
   if (current !== "v-scan") return;
   stopCam(); if (navigator.vibrate) navigator.vibrate(60);
-  handleText(text);
+  scanSource = "qr"; handleText(text);
 }
 $("#manual-form").onsubmit = e => {
   e.preventDefault();
   const v = $("#in-code").value.trim(); if (!v) return;
-  $("#in-code").value = ""; $("#in-code").blur(); stopCam(); handleText(v);
+  $("#in-code").value = ""; $("#in-code").blur(); stopCam(); scanSource = "kod"; handleText(v);
 };
 
 // QR içeriğini çöz: istasyon kodu, kurtarma kodu ya da giriş QR'ı
@@ -313,9 +315,10 @@ function handleText(text){
   modal("🤔","Bu QR bizim değil","Bu kod Okyanus Kaşifi görevlerinden biri değil. Görev tabelalarındaki QR'ları ara!",[{label:"Tekrar dene",onClick:retry},{label:"Pasaportuma dön",cls:"btn-ghost",onClick:goHome}]);
 }
 function handleCode(code){
-  const st = ST.find(s => s.code === code);
+  const st = ST.find(s => s.code === code), src = scanSource; scanSource = "link";
   if (!st) return modal("🤔","Kod bulunamadı","Bu kodu tanıyamadık. Harfleri kontrol edip tekrar dene.",[{label:"Tekrar dene",onClick:retry},{label:"Pasaportuma dön",cls:"btn-ghost",onClick:goHome}]);
   if (S.badges[st.id]) return modal(st.art,"Bu damga zaten sende!",`“${st.title}” görevini daha önce tamamladın. Diğer görevleri keşfet!`,[{label:"Pasaportuma dön",onClick:goHome}]);
+  olay("scan", st.id, src);
   if (st.quiz) {
     if (S.flow && S.flow.id === st.id && S.flow.step === "find") { S.flow.verified = true; save(); openQuiz(st); }
     else openLesson(st, true);
@@ -326,7 +329,7 @@ function handleCode(code){
 let lesson = null;
 function openLesson(st, verified){
   lesson = st; target = st.id; S.target = target;
-  S.flow = {id:st.id, step:"find", verified:!!verified}; save();
+  S.flow = {id:st.id, step:"find", verified:!!verified}; save(); olay("learn", st.id);
   stack = ["v-home"]; show("v-learn", false); renderLesson();
 }
 function resumeTask(){
@@ -442,7 +445,7 @@ function openQuiz(st){
         msg.textContent = "Doğru! Damgan geliyor…"; msg.style.color = "var(--ok)";
         setTimeout(() => award(st), 800);
       } else {
-        el.classList.add("wrong");
+        el.classList.add("wrong"); olay("wrong", st.id, i);
         // Kaybetmek yok: yanlış cevapta yön gösteren ipucu, istediği kadar deneyebilir
         msg.textContent = "Bir daha düşün! 💡 İpucu: " + (st.quiz.clue || "Tabelaya bir daha bak."); msg.style.color = "var(--sea2)";
         if (navigator.vibrate) navigator.vibrate([40,40,40]);
@@ -456,6 +459,7 @@ function openQuiz(st){
 // ---------- Damga ----------
 function award(st){
   S.badges[st.id] = Date.now(); S.flow=null; save();
+  olay("stamp", st.id); if (count() === ST.length) olay("complete");
   S.last = st.id;   // haritada yeni yanan bölge parlasın
   // Damga aleti pasaport sayfasına iner, damga basılır
   const stage = $("#rw-stamp"), ring = $("#ink-ring"), tool = $("#rw-tool");
@@ -564,11 +568,13 @@ async function shareFile(){
 }
 $("#btn-save").onclick = async () => {
   if (!certBlob) return;
+  olay("save");
   if (IOS && canShareFile() && await shareFile()) return;
   download();
 };
 $("#btn-share").onclick = async () => {
   if (!certBlob) return;
+  olay("share");
   if (canShareFile() && await shareFile()) return;
   if (navigator.share) { try { await navigator.share({ title:"Okyanus Kaşifi", text:`${D.aquarium}'da Okyanus Kaşifi oldum!`, url: location.origin + location.pathname }); return; } catch(e){ if (e && e.name === "AbortError") return; } }
   download();
@@ -745,7 +751,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v37`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v38`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},

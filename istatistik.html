@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Okyanus Kaşifi – İstatistik</title>
+<link rel="icon" href="icons/icon-192.png">
+<style>
+@font-face{font-family:"Baloo 2";font-weight:600;src:url(fonts/baloo-2-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Baloo 2";font-weight:600;src:url(fonts/baloo-2-latin-ext-600-normal.woff2) format("woff2");unicode-range:U+0100-024F,U+0130-0131,U+015E-015F}
+@font-face{font-family:"Baloo 2";font-weight:800;src:url(fonts/baloo-2-latin-800-normal.woff2) format("woff2")}
+@font-face{font-family:"Baloo 2";font-weight:800;src:url(fonts/baloo-2-latin-ext-800-normal.woff2) format("woff2");unicode-range:U+0100-024F,U+0130-0131,U+015E-015F}
+:root{--navy:#0b3c6e;--sea:#1d6fb8;--gold:#f5bd3a;--paper:#fffaf0;--ink:#16324d;--muted:#5d7189;--line:#e6dcc4;--ok:#2e9b63;--warn:#d9822b}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Baloo 2",system-ui,sans-serif;font-weight:600;color:var(--ink);background:linear-gradient(180deg,#0b3c6e 0,#11528f 240px,#eef4fb 240px)}
+header{color:#fff;padding:20px 16px 8px;max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{margin:0;font-size:24px;font-weight:800;flex:1}
+header small{display:block;font-size:14px;opacity:.8;font-weight:600}
+main{max-width:1080px;margin:0 auto;padding:8px 16px 40px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 4px 0 #0b3c6e14}
+h2{margin:0 0 10px;font-size:18px;font-weight:800;color:var(--navy)}
+button,input{font:inherit}
+.btn{border:0;border-radius:99px;padding:8px 16px;font-weight:800;cursor:pointer;background:var(--gold);color:#3a2a00}
+.btn.ghost{background:#ffffff26;color:#fff;border:1px solid #ffffff55}
+.ranges{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.ranges button{border:1px solid #ffffff55;background:#ffffff1f;color:#fff;border-radius:99px;padding:6px 12px;cursor:pointer;font-weight:700}
+.ranges button.on{background:var(--gold);color:#3a2a00;border-color:var(--gold)}
+.ranges input{border:1px solid #ffffff55;background:#fff;border-radius:10px;padding:4px 8px;color:var(--ink)}
+.ranges span{color:#fff}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.kpi .v{font-size:34px;font-weight:800;color:var(--navy);line-height:1.1}
+.kpi .l{color:var(--muted);font-size:15px}
+.kpi .s{color:var(--sea);font-size:14px}
+.two{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.bars{display:flex;align-items:flex-end;gap:3px;height:160px;padding-top:6px;overflow-x:auto}
+.bars .b{flex:1 0 14px;min-width:14px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.bars .b i{display:block;width:100%;background:var(--sea);border-radius:5px 5px 0 0;min-height:2px}
+.bars .b span{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap}
+.bars .b em{font-style:normal;font-size:11px;color:var(--navy)}
+.hbar{display:grid;grid-template-columns:120px 1fr 56px;gap:8px;align-items:center;margin:6px 0;font-size:15px}
+.hbar .t{height:18px;background:#e7eef6;border-radius:99px;overflow:hidden}
+.hbar .t i{display:block;height:100%;background:var(--gold);border-radius:99px}
+.hbar b{text-align:right}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:700;font-size:13px}
+.scroll{overflow-x:auto}
+.pct{color:var(--muted);font-size:13px}
+.hard{color:var(--warn);font-weight:800}
+.note{color:var(--muted);font-size:14px;margin:6px 0 0}
+#login{max-width:380px;margin:30px auto}
+#login label{display:block;margin:10px 0 4px;color:var(--muted)}
+#login input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+#login .btn{width:100%;margin-top:16px;padding:12px}
+#err{color:#b3261e;min-height:22px;margin:8px 0 0}
+.hidden{display:none!important}
+@media(max-width:520px){.hbar{grid-template-columns:96px 1fr 48px}.kpi .v{font-size:28px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Okyanus Kaşifi · İstatistik<small id="sub">Körfez Aqua</small></h1>
+  <button class="btn ghost hidden" id="logout">Çıkış</button>
+</header>
+<main>
+  <form class="card" id="login">
+    <h2>Yönetici girişi</h2>
+    <label for="email">E-posta</label><input id="email" type="email" autocomplete="username" required>
+    <label for="pass">Şifre</label><input id="pass" type="password" autocomplete="current-password" required>
+    <button class="btn">Giriş yap</button>
+    <p id="err" role="alert"></p>
+  </form>
+
+  <div id="dash" class="hidden">
+    <div class="ranges" id="ranges">
+      <button data-r="0">Bugün</button><button data-r="6" class="on">Son 7 gün</button><button data-r="29">Son 30 gün</button><button data-r="all">Tümü</button>
+      <input type="date" id="from" aria-label="Başlangıç"><span>–</span><input type="date" id="to" aria-label="Bitiş">
+    </div>
+    <div class="grid kpis" id="kpis"></div>
+    <div class="grid two" style="margin-top:14px">
+      <section class="card"><h2>Günlük oyuncu</h2><div class="bars" id="daily"></div><p class="note">Pasaportunu ilk kez açan kişi sayısı.</p></section>
+      <section class="card"><h2>Oyunda ilerleme</h2><div id="funnel"></div><p class="note">Oyuna başlayanların kaçı ne kadar damga topladı.</p></section>
+      <section class="card"><h2>Saatlere göre</h2><div class="bars" id="hourly"></div><p class="note">O saatte oyunu kullanan telefon sayısı.</p></section>
+      <section class="card"><h2>Telefon türü</h2><div id="platform"></div></section>
+    </div>
+    <section class="card" style="margin-top:14px"><h2>Görevler</h2><div class="scroll"><table id="stations"></table></div>
+      <p class="note">Sayılar kişi (telefon) sayısıdır. <span class="hard">Turuncu</span>: bulmakta ya da cevaplamakta zorlanılan görev.</p></section>
+    <p class="note" id="foot"></p>
+  </div>
+</main>
+<script src="data.js"></script>
+<script>
+(function(){
+const BASE = "https://jusssskyelfizcuejytf.supabase.co";
+const KEY = "sb_publishable_kAKGNIYcCSIomQpxdpqODg_alO04cLQ";
+const START = "2026-10-01";
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const NAMES = Object.fromEntries((window.KASIF ? KASIF.stations : []).map(s => [s.id, s.name]));
+const ORDER = (window.KASIF ? KASIF.stations : []).map(s => s.id);
+const fmt = n => Number(n || 0).toLocaleString("tr-TR");
+const pct = (a, b) => b ? Math.round(a * 100 / b) : 0;
+const ymd = d => { const p = n => String(n).padStart(2, "0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; };
+
+let session = null;
+try { session = JSON.parse(sessionStorage.getItem("kasif-yonetici")); } catch(e){}
+function keep(s){ session = s; try { s ? sessionStorage.setItem("kasif-yonetici", JSON.stringify(s)) : sessionStorage.removeItem("kasif-yonetici"); } catch(e){} }
+
+async function auth(body, grant){
+  const r = await fetch(`${BASE}/auth/v1/token?grant_type=${grant}`, { method:"POST", headers:{ apikey:KEY, "Content-Type":"application/json" }, body:JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error_description || j.msg || "Giriş başarısız");
+  keep({ token:j.access_token, refresh:j.refresh_token, until:Date.now() + (j.expires_in - 60) * 1000 });
+}
+async function token(){
+  if (!session) throw new Error("Giriş gerekli");
+  if (Date.now() > session.until) await auth({ refresh_token:session.refresh }, "refresh_token");
+  return session.token;
+}
+async function stats(from, to){
+  const r = await fetch(`${BASE}/rest/v1/rpc/kasif_stats`, { method:"POST",
+    headers:{ apikey:KEY, Authorization:"Bearer " + await token(), "Content-Type":"application/json" },
+    body:JSON.stringify({ baslangic:from, bitis:to }) });
+  if (r.status === 401 || r.status === 403) { keep(null); throw new Error("Oturum süresi doldu, yeniden giriş yap."); }
+  if (!r.ok) throw new Error("Veri alınamadı (" + r.status + ")");
+  return r.json();
+}
+
+function bars(el, rows, label, value){
+  const max = Math.max(1, ...rows.map(value));
+  el.innerHTML = rows.length ? rows.map(r => `<div class="b" title="${esc(label(r))}: ${fmt(value(r))}"><em>${value(r) ? fmt(value(r)) : ""}</em><i style="height:${value(r) / max * 100}%"></i><span>${esc(label(r))}</span></div>`).join("")
+    : '<p class="note">Bu aralıkta kayıt yok.</p>';
+}
+function hbars(el, rows){
+  const max = Math.max(1, ...rows.map(r => r[1]));
+  el.innerHTML = rows.map(([l, v, extra]) => `<div class="hbar"><span>${esc(l)}</span><div class="t"><i style="width:${v / max * 100}%"></i></div><b>${fmt(v)}${extra ? ` <span class="pct">${extra}</span>` : ""}</b></div>`).join("");
+}
+
+function render(d, from, to){
+  const o = d.ozet || {}, h = d.huni || {}, sure = d.sure_dk || {};
+  const kpi = (v, l, s) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div>${s ? `<div class="s">${s}</div>` : ""}</div>`;
+  $("#kpis").innerHTML =
+    kpi(fmt(o.oyuncu), "Oyuna başlayan", `${fmt(o.cihaz)} telefon siteyi açtı`) +
+    kpi(fmt(o.damga), "Toplam damga", o.oyuncu ? `kişi başı ${(o.damga / o.oyuncu).toLocaleString("tr-TR",{maximumFractionDigits:1})}` : "") +
+    kpi(fmt(o.tamamlayan), "9/9 tamamlayan", o.oyuncu ? `başlayanların %${pct(o.tamamlayan, o.oyuncu)}'i` : "") +
+    kpi(sure.ortanca ? Math.round(sure.ortanca) + " dk" : "–", "Tamamlama süresi", sure.adet ? `ortanca, ${fmt(sure.adet)} kişiden` : "") +
+    kpi(fmt((o.kaydetme || 0) + (o.paylasma || 0)), "Pasaport kaydı / paylaşım", `${fmt(o.kaydetme)} kaydetme · ${fmt(o.paylasma)} paylaşım`);
+
+  // Günlük: aralıktaki her günü göster (kayıt olmayan günler 0)
+  const byDay = Object.fromEntries((d.gunluk || []).map(g => [g.gun, g]));
+  const days = []; for (let t = new Date(from + "T12:00:00"); ymd(t) <= to && days.length < 120; t.setDate(t.getDate() + 1)) days.push(ymd(t));
+  const shown = days.length > 60 ? (d.gunluk || []).map(g => g.gun) : days;
+  bars($("#daily"), shown.map(g => byDay[g] || { gun:g, oyuncu:0 }), r => r.gun.slice(8) + "." + r.gun.slice(5, 7), r => r.oyuncu);
+
+  const byHour = Object.fromEntries((d.saatlik || []).map(s => [s.saat, s.cihaz]));
+  bars($("#hourly"), Array.from({ length:13 }, (_, i) => ({ saat:i + 8, cihaz:byHour[i + 8] || 0 })), r => String(r.saat).padStart(2, "0"), r => r.cihaz);
+
+  const b = h.basladi || 0;
+  hbars($("#funnel"), [["Başladı", b, ""], ["1+ damga", h.en_az_1, `%${pct(h.en_az_1, b)}`], ["5+ damga", h.en_az_5, `%${pct(h.en_az_5, b)}`], ["9 damga", h.tumu_9, `%${pct(h.tumu_9, b)}`]]);
+
+  const pn = { ios:"iPhone / iPad", android:"Android", diger:"Diğer" }, tot = (d.cihaz_turu || []).reduce((a, p) => a + p.cihaz, 0);
+  hbars($("#platform"), (d.cihaz_turu || []).sort((a, z) => z.cihaz - a.cihaz).map(p => [pn[p.tur] || p.tur, p.cihaz, `%${pct(p.cihaz, tot)}`]));
+
+  const st = Object.fromEntries((d.gorevler || []).map(s => [s.station, s]));
+  const maxStamp = Math.max(1, ...ORDER.map(id => (st[id] || {}).damga || 0));
+  $("#stations").innerHTML = `<tr><th>Görev</th><th>Tanıştı</th><th>QR okuttu</th><th>Damga aldı</th><th>Yanlış yapan</th><th>Elle kod</th></tr>` +
+    ORDER.map((id, i) => {
+      const s = st[id] || {}, wrongP = pct(s.yanlis_yapan, s.okuttu), low = s.damga < maxStamp * 0.6;
+      return `<tr><td>${i + 1}. ${esc(NAMES[id] || id)}</td><td>${fmt(s.tanisti)}</td><td>${fmt(s.okuttu)}</td><td class="${low && maxStamp > 4 ? "hard" : ""}">${fmt(s.damga)}</td><td class="${wrongP >= 40 && s.okuttu > 4 ? "hard" : ""}">${fmt(s.yanlis_yapan)} <span class="pct">%${wrongP}</span></td><td>${fmt(s.elle_kod)}</td></tr>`;
+    }).join("");
+
+  $("#sub").textContent = `Körfez Aqua · ${from.split("-").reverse().join(".")} – ${to.split("-").reverse().join(".")}`;
+  $("#foot").textContent = (o.son_kayit ? `Son kayıt: ${new Date(o.son_kayit).toLocaleString("tr-TR")}. ` : "") +
+    "İnternetsiz oynanan kısımlar telefon internete bağlanınca gelir; sayılar \"en az bu kadar\" olarak okunmalı. İsim veya kişisel bilgi tutulmaz.";
+}
+
+async function load(){
+  const from = $("#from").value, to = $("#to").value;
+  if (!from || !to || from > to) return;
+  $("#kpis").innerHTML = '<p class="note" style="color:#fff">Yükleniyor…</p>';
+  try { render(await stats(from, to), from, to); }
+  catch(e){ if (!session) return showLogin(e.message); $("#kpis").innerHTML = `<p class="note" style="color:#fff">${esc(e.message)}</p>`; }
+}
+function setRange(r){
+  const today = new Date(); let from = new Date(today);
+  if (r === "all") from = new Date(START + "T12:00:00"); else from.setDate(today.getDate() - Number(r));
+  $("#from").value = ymd(from); $("#to").value = ymd(today);
+  document.querySelectorAll("#ranges button").forEach(b => b.classList.toggle("on", b.dataset.r === String(r)));
+  load();
+}
+function showLogin(msg){ $("#login").classList.remove("hidden"); $("#dash").classList.add("hidden"); $("#logout").classList.add("hidden"); $("#err").textContent = msg || ""; }
+function showDash(){ $("#login").classList.add("hidden"); $("#dash").classList.remove("hidden"); $("#logout").classList.remove("hidden"); setRange(6); }
+
+$("#login").onsubmit = async e => {
+  e.preventDefault(); $("#err").textContent = "Giriş yapılıyor…";
+  try { await auth({ email:$("#email").value.trim(), password:$("#pass").value }, "password"); $("#pass").value = ""; showDash(); }
+  catch(err){ $("#err").textContent = /invalid/i.test(err.message) ? "E-posta veya şifre hatalı." : err.message; }
+};
+$("#logout").onclick = () => { keep(null); showLogin(); };
+document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => setRange(b.dataset.r));
+$("#from").onchange = $("#to").onchange = () => { document.querySelectorAll("#ranges button").forEach(b => b.classList.remove("on")); load(); };
+session ? showDash() : showLogin();
+})();
+</script>
+</body>
+</html>
