@@ -52,7 +52,41 @@ function stampSVG(st, opts = {}){
     <text font-size="8" ${lower}><textPath href="#${id}b" startOffset="50%" text-anchor="middle">${bottom}</textPath></text>
     <text x="13.5" y="63" font-size="8" ${TXT} fill="#fff">★</text><text x="106.5" y="63" font-size="8" ${TXT} fill="#fff">★</text>
     ${art(60, 61, .6)}`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="stamp-svg" aria-hidden="true">${grad}${body}</svg>`;
+  // v41 parlak damga: damganın kendi şekline kırpılmış, kayan yumuşak hologram bandı (opts.shine)
+  let shine = "";
+  if (opts.shine) {
+    const shape = reg.kind === "korfez" ? `<rect x="2" y="2" width="116" height="116" rx="20"/>`
+      : reg.kind === "ozel" ? `<polygon points="${octagon(62)}"/>` : `<circle cx="60" cy="60" r="57"/>`;
+    shine = `<defs><clipPath id="${id}c">${shape}</clipPath><linearGradient id="${id}h" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".38" stop-color="#fff6c8" stop-opacity=".55"/>
+      <stop offset=".5" stop-color="#ffffff" stop-opacity=".9"/><stop offset=".62" stop-color="#b8f3ff" stop-opacity=".55"/>
+      <stop offset=".8" stop-color="#ffc6f2" stop-opacity=".3"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+      <g class="shine" clip-path="url(#${id}c)"><rect class="shine-band" x="-40" y="-40" width="44" height="200" fill="url(#${id}h)"/></g>`;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" class="stamp-svg" aria-hidden="true">${grad}${body}${shine}</svg>`;
+}
+// v41 hazine sandığı: kapak (.lid) ayrı grup; açılınca içinden ışık yükselir.
+function chestSVG(){
+  const id = uid("ch"), O = "#1f2440";
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 104" class="chest-svg" aria-hidden="true">
+    <defs><radialGradient id="${id}g" cx="50%" cy="100%" r="80%"><stop offset="0" stop-color="#fff7c2"/><stop offset=".45" stop-color="#ffd54a" stop-opacity=".85"/><stop offset="1" stop-color="#ffb300" stop-opacity="0"/></radialGradient>
+      <linearGradient id="${id}w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c47a3c"/><stop offset="1" stop-color="#8e4f22"/></linearGradient>
+      <linearGradient id="${id}l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d88d4a"/><stop offset="1" stop-color="#a7612d"/></linearGradient></defs>
+    <ellipse cx="60" cy="98" rx="46" ry="5" fill="#000" opacity=".22"/>
+    <g class="chest-glow"><ellipse cx="60" cy="52" rx="44" ry="30" fill="url(#${id}g)"/></g>
+    <rect x="12" y="50" width="96" height="44" rx="7" fill="url(#${id}w)" stroke="${O}" stroke-width="4"/>
+    <path d="M14 66h92M14 80h92" stroke="#7a4219" stroke-width="2.5" opacity=".7"/>
+    <rect x="24" y="50" width="11" height="44" fill="#f5bd3a" stroke="${O}" stroke-width="3"/>
+    <rect x="85" y="50" width="11" height="44" fill="#f5bd3a" stroke="${O}" stroke-width="3"/>
+    <rect x="50" y="56" width="20" height="22" rx="4" fill="#ffd45c" stroke="${O}" stroke-width="3"/>
+    <path d="M60 63a3 3 0 1 1-.01 0M58.6 66h2.8l1 6h-4.8z" fill="${O}"/>
+    <g class="lid">
+      <path d="M12 52V36Q12 14 60 14Q108 14 108 36V52Z" fill="url(#${id}l)" stroke="${O}" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M24 52V30Q26 20 35 18.2V52ZM85 18.2Q94 20 96 30V52H85Z" fill="#f5bd3a" stroke="${O}" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M22 26Q60 12 98 26" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".35" fill="none"/>
+      <rect x="10" y="46" width="100" height="9" rx="4" fill="#f5bd3a" stroke="${O}" stroke-width="3.5"/>
+    </g>
+  </svg>`;
 }
 // Final damgası: 9 damga tamamlanınca pasaporta basılan büyük altın "Okyanus Kaşifi" damgası
 function finalSealSVG(){
@@ -73,6 +107,6 @@ function finalSealSVG(){
 function artSVG(key, cls = ""){
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="${cls}" aria-hidden="true">${ART[key]()}</svg>`;
 }
-window.ART = ART; window.stampSVG = stampSVG; window.finalSealSVG = finalSealSVG; window.artSVG = artSVG;
+window.ART = ART; window.stampSVG = stampSVG; window.chestSVG = chestSVG; window.finalSealSVG = finalSealSVG; window.artSVG = artSVG;
 })();
 

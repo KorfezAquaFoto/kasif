@@ -796,3 +796,113 @@ html[data-tablet=true] .menu{width:100%;max-width:760px;margin:0 auto}
  html[data-tablet=true] .menu{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
  html[data-tablet=true] .menu>.note{grid-column:1/-1}
 }
+
+/* ================= v41 görsel yenilikler =================
+   Her parça <html class="fx-..."> ile açılır; app.js'teki FX ayarından false yapılırsa CSS de devre dışı kalır.
+   "Hareketi azalt" açık telefonlarda genel kural tüm animasyonları zaten kapatır. */
+
+/* --- Parlak damgalar: damga şekline kırpılmış yumuşak hologram bandı --- */
+.shine{display:none}
+.fx-parlak .shine{display:inline}
+.fx-parlak .shine-band{transform-box:fill-box;transform-origin:center;transform:translateX(-30px) rotate(18deg);mix-blend-mode:screen;animation:fx-shine 6s ease-in-out infinite}
+@keyframes fx-shine{0%,64%{transform:translateX(-30px) rotate(18deg)}86%,100%{transform:translateX(160px) rotate(18deg)}}
+.fx-parlak .stop:nth-child(2) .shine-band{animation-delay:.4s}.fx-parlak .stop:nth-child(3) .shine-band{animation-delay:.8s}
+.fx-parlak .stop:nth-child(4) .shine-band{animation-delay:1.2s}.fx-parlak .stop:nth-child(5) .shine-band{animation-delay:1.6s}
+.fx-parlak .stop:nth-child(6) .shine-band{animation-delay:2s}.fx-parlak .stop:nth-child(7) .shine-band{animation-delay:2.4s}
+.fx-parlak .stop:nth-child(8) .shine-band{animation-delay:2.8s}.fx-parlak .stop:nth-child(9) .shine-band{animation-delay:3.2s}
+.fx-parlak .big-stamp .shine-band{animation:fx-shine-once 1.1s 1s ease-out both,fx-shine 6s 3s ease-in-out infinite}
+@keyframes fx-shine-once{from{transform:translateX(-30px) rotate(18deg)}to{transform:translateX(160px) rotate(18deg)}}
+.fx-parlak .drawer-art{touch-action:none;transition:transform .3s ease-out;will-change:transform}
+.fx-parlak .drawer-art .shine-band{animation-duration:4s}
+.fx-parlak .drawer-art.tilting{transition:transform .06s linear}
+.fx-parlak .drawer-art.tilting .shine-band{animation:none;transform:translateX(var(--sx,60px)) rotate(18deg)}
+
+/* --- QR bulundu: çerçeve altın/yeşil yanar, kabarcıklar patlar --- */
+.found-burst{position:absolute;inset:0;display:none;place-items:center;pointer-events:none;z-index:3}
+.fx-qrEfekt .cam.found .found-burst{display:grid}
+.fx-qrEfekt .cam.found video{filter:brightness(.7) saturate(1.2);transition:filter .2s}
+.fx-qrEfekt .cam.found .frame{animation:fx-frame .55s cubic-bezier(.3,1.6,.5,1) both}
+.fx-qrEfekt .cam.found .frame i{border-color:#7be08f;filter:drop-shadow(0 0 8px #7be08f)}
+.fx-qrEfekt .cam.found .frame::after{display:none}
+@keyframes fx-frame{0%{transform:scale(1)}45%{transform:scale(1.1)}100%{transform:scale(.94)}}
+.found-burst b{position:relative;z-index:1;background:var(--gold);color:#4a2d00;font-family:var(--display-font);font-weight:700;font-size:30px;padding:6px 24px;border-radius:99px;box-shadow:0 6px 0 #b06f00,0 0 0 10px rgba(245,189,58,.3);animation:fx-pop .45s .05s cubic-bezier(.3,1.7,.5,1) both}
+.found-burst i{position:absolute;left:50%;top:50%;width:20px;height:20px;border-radius:50%;border:3px solid #fff;background:rgba(127,227,255,.35);opacity:0;animation:fx-bubble .75s ease-out both}
+.found-burst i:nth-of-type(1){--dx:-110px;--dy:-90px}.found-burst i:nth-of-type(2){--dx:105px;--dy:-100px;width:14px;height:14px}
+.found-burst i:nth-of-type(3){--dx:-130px;--dy:30px;width:26px;height:26px}.found-burst i:nth-of-type(4){--dx:125px;--dy:45px}
+.found-burst i:nth-of-type(5){--dx:-60px;--dy:120px;width:14px;height:14px}.found-burst i:nth-of-type(6){--dx:70px;--dy:125px;width:24px;height:24px}
+.found-burst i:nth-of-type(7){--dx:-20px;--dy:-140px;width:16px;height:16px}.found-burst i:nth-of-type(8){--dx:20px;--dy:150px;width:12px;height:12px}
+@keyframes fx-bubble{0%{transform:translate(-50%,-50%) scale(.3);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.15);opacity:0}}
+@keyframes fx-pop{0%{transform:scale(0)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+
+/* --- Bölge renkleri: arka plan bölgenin havasına bürünür --- */
+.bolge-tint{position:absolute;inset:0;opacity:0;transition:opacity .8s ease}
+.fx-bolgeRenk[data-bolge] .bolge-tint{opacity:1}
+[data-bolge="guney-amerika"] .bolge-tint{background:radial-gradient(120% 60% at 15% 100%,rgba(122,214,120,.35),transparent 60%),linear-gradient(180deg,#2c9a78 0%,#17705a 30%,#0d4a43 62%,#062a2e 100%)}
+[data-bolge="asya"] .bolge-tint{background:radial-gradient(90% 50% at 85% 10%,rgba(255,214,150,.28),transparent 60%),linear-gradient(180deg,#2a9fa0 0%,#1b7486 30%,#124a68 62%,#08233f 100%)}
+[data-bolge="avustralya"] .bolge-tint{background:radial-gradient(110% 55% at 50% 105%,rgba(255,138,101,.38),transparent 60%),linear-gradient(180deg,#25b9d0 0%,#168cb0 30%,#0f5684 62%,#08284d 100%)}
+[data-bolge="afrika"] .bolge-tint{background:radial-gradient(100% 50% at 50% 0%,rgba(255,206,120,.42),transparent 62%),linear-gradient(180deg,#c48a46 0%,#8c6036 30%,#4e3b3c 62%,#1e2138 100%)}
+[data-bolge="avrupa"] .bolge-tint{background:radial-gradient(100% 50% at 20% 100%,rgba(160,190,220,.25),transparent 60%),linear-gradient(180deg,#5583ad 0%,#3a6690 30%,#244469 62%,#0f2340 100%)}
+[data-bolge="izmit"] .bolge-tint{background:radial-gradient(110% 55% at 50% 0%,rgba(140,240,210,.3),transparent 60%),linear-gradient(180deg,#1fa8a2 0%,#137c80 30%,#0c5061 62%,#062b40 100%)}
+[data-bolge="kabuk"] .bolge-tint{background:radial-gradient(100% 55% at 80% 100%,rgba(255,182,214,.35),transparent 60%),linear-gradient(180deg,#8c90d8 0%,#6a70b8 30%,#434c8c 62%,#1c2452 100%)}
+[data-bolge="megalodon"] .bolge-tint{background:radial-gradient(80% 40% at 50% 0%,rgba(120,170,255,.22),transparent 60%),linear-gradient(180deg,#25386d 0%,#182751 30%,#0e1838 62%,#04081a 100%)}
+[data-bolge="tunel"] .bolge-tint{background:radial-gradient(70% 45% at 50% -5%,rgba(190,240,255,.45),transparent 65%),linear-gradient(180deg,#1b86d6 0%,#0f5ea4 30%,#093b74 62%,#041b3c 100%)}
+.fx-bolgeRenk[data-bolge="tunel"] .rays i{opacity:1}
+.fx-bolgeRenk[data-bolge] .reward-view.active{background:radial-gradient(circle at 50% 32%,rgba(255,255,255,.14),rgba(3,12,30,.45) 72%)}
+
+/* --- Macera yolu: altın iz ve yürüyen kaşif dostu --- */
+.road-gold,.road-gold-glow{display:none;fill:none;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.fx-yol .road-gold,.fx-yol .road-gold-glow{display:inline}
+.road-gold{stroke:#f5bd3a;stroke-width:22px}
+.road-gold-glow{stroke:#ffe38a;stroke-width:36px;opacity:.38}
+.walker{display:none;position:absolute;z-index:4;width:46px;pointer-events:none;will-change:left,top,transform}
+.road.has-walker .walker{display:block}
+.fx-yol .road.has-walker .here-pin{display:none}
+.walker-av{display:block;aspect-ratio:1;border-radius:50%;background:#e3f0fb;border:3px solid var(--gold);padding:3px;box-shadow:0 5px 10px rgba(0,0,0,.35)}
+.walker-av svg{width:100%;height:100%;display:block}
+.walker i{display:block;margin-top:-3px;text-align:center;font-style:normal;font-size:12px;line-height:1;color:var(--gold);text-shadow:0 2px 2px rgba(0,0,0,.35)}
+.walker:not(.walking) .walker-av{animation:fx-idle 1.8s ease-in-out infinite}
+@keyframes fx-idle{50%{transform:translateY(-4px) rotate(-2deg)}}
+html[data-tablet=true] .walker{width:58px}
+
+/* --- Hazine sandığı --- */
+.fx-sandik .road-end .chest{position:relative;width:64px;font-size:0;line-height:0}
+.fx-sandik .road-end.done .chest{width:64px;animation:none}
+.chest-svg{width:100%;display:block;overflow:visible;position:relative;z-index:1}
+.chest-svg .lid{transform-box:fill-box;transform-origin:8% 100%;transition:transform .55s cubic-bezier(.3,1.5,.5,1)}
+.chest-svg .chest-glow{opacity:0;transition:opacity .4s .15s}
+.road-end.open .chest-svg .lid{transform:translateY(-3px) rotate(-26deg)}
+.road-end.open .chest-svg .chest-glow{opacity:1}
+.chest-rays{position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;opacity:0;pointer-events:none;
+  background:repeating-conic-gradient(rgba(255,227,138,.6) 0 9deg,rgba(255,227,138,0) 9deg 30deg);
+  -webkit-mask:radial-gradient(circle,#000 22%,transparent 68%);mask:radial-gradient(circle,#000 22%,transparent 68%);transition:opacity .5s}
+.road-end.open .chest-rays{opacity:1;animation:fx-spin 10s linear infinite}
+@keyframes fx-spin{to{transform:rotate(360deg)}}
+.chest-seal{position:absolute;left:50%;top:0;width:40px;z-index:2;opacity:0;transform:translate(-50%,40%) scale(.3);transition:transform .7s .25s cubic-bezier(.3,1.6,.5,1),opacity .3s .25s;filter:drop-shadow(0 4px 6px rgba(0,0,0,.35))}
+.chest-seal svg{width:100%;display:block}
+.road-end.open .chest-seal{opacity:1;transform:translate(-50%,2%) scale(.92)}
+.road-end.shaking .chest{animation:fx-shake .8s ease-in-out}
+@keyframes fx-shake{0%,100%{transform:rotate(0)}15%{transform:rotate(-9deg) scale(1.04)}30%{transform:rotate(8deg) scale(1.06)}45%{transform:rotate(-6deg) scale(1.06)}60%{transform:rotate(5deg) scale(1.04)}80%{transform:rotate(-2deg)}}
+html[data-tablet=true].fx-sandik .road-end .chest{width:78px}
+
+/* --- Kaşif unvanı --- */
+.me-txt{display:flex;flex-direction:column;min-width:0;gap:2px}
+.rank{font-family:var(--display-font);font-weight:700;font-size:12px;line-height:1.1;color:#ffe38a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rw-count.rank-up{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px 8px}
+.rank-new{display:inline-block;background:linear-gradient(100deg,#f5bd3a 0%,#ffe9a0 45%,#f5bd3a 60%);background-size:220% 100%;color:#4a2d00;border-radius:99px;padding:1px 12px;font-family:var(--display-font);font-weight:700;font-size:15px;box-shadow:0 3px 0 #b06f00;animation:fx-pop .5s 1.15s cubic-bezier(.3,1.7,.5,1) both,fx-glint 2.6s 1.8s ease-in-out infinite}
+@keyframes fx-glint{0%,55%{background-position:100% 0}90%,100%{background-position:-20% 0}}
+
+/* --- Soru ekranında kaşif dostunun tepkisi --- */
+.quiz .paper{position:relative}
+.quiz-buddy{position:absolute;right:-6px;top:-16px;width:50px;z-index:2;pointer-events:none}
+.buddy-av{display:block;aspect-ratio:1;border-radius:50%;background:#e3f0fb;border:3px solid var(--gold);padding:3px;box-shadow:0 4px 10px rgba(0,0,0,.3)}
+.buddy-av svg{width:100%;height:100%;display:block}
+.buddy-say{position:absolute;left:-18px;bottom:-6px;width:28px;height:28px;border-radius:50%;background:#fff;color:var(--sea);font-style:normal;font-family:var(--display-font);font-weight:700;font-size:17px;line-height:1;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.25);opacity:0;transform:scale(0)}
+.quiz-buddy.happy .buddy-av{animation:fx-jump .75s cubic-bezier(.3,1.6,.5,1)}
+.quiz-buddy.think .buddy-av{animation:fx-wobble .6s ease-in-out}
+.quiz-buddy.happy .buddy-say,.quiz-buddy.think .buddy-say{animation:fx-pop .35s .1s both}
+@keyframes fx-jump{0%{transform:translateY(0)}35%{transform:translateY(-22px) rotate(-8deg)}65%{transform:translateY(0) scaleY(.9)}80%{transform:translateY(-6px)}100%{transform:none}}
+@keyframes fx-wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}50%{transform:rotate(10deg)}75%{transform:rotate(-6deg)}}
+html[data-layout=tiny] .quiz-buddy{display:none}
+
+/* --- Hikâye paylaşımı: yalnızca dolu pasaport önizlemesinde --- */
+#v-cert:not(.preview-passport) #btn-story{display:none!important}
