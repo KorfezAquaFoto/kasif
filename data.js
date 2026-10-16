@@ -234,8 +234,8 @@ window.KASIF = {
         "clue": "Balıkların evi denizdir. Temiz bir ev, içinde yaşayanlar için neden iyidir?"
       },
       "factTitle": "Temiz Körfez",
-      "fact": "Balıklar da bizim gibi oksijene ihtiyaç duyar. Suyu ağızlarından alıp solungaçlarının üzerinden geçirirler. Solungaçlar, suda çözünmüş oksijeni almalarını sağlar.",
-      "reward": "Balıklar da oksijene ihtiyaç duyar. Solungaçları, suda çözünmüş oksijeni almalarını sağlar.",
+      "fact": "Körfezin dibinde yıllarca biriken kirli çamur çıkarıldı. Karagöz, mırmır ve sargos artık daha temiz bir evde yaşıyor!",
+      "reward": "Körfezimizin dibinden kirli çamur çıkarıldı. Temiz bir deniz dibi, balıklar için daha sağlıklı bir ev!",
       "icons": [
         "🚢",
         "🐟",
