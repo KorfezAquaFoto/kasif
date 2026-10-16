@@ -22,30 +22,41 @@ body{margin:0;background:#e9f1f6;color:var(--ink);font:600 18px/1.35 'Baloo 2',s
 .grid{max-width:1480px;margin:0 auto;padding:20px 24px 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,390px),1fr));gap:24px;align-items:start}
 .sheet{position:relative;width:100%;aspect-ratio:210/297;box-shadow:0 9px 28px #17345225;background:white}
 .poster{position:absolute;top:0;left:0;width:210mm;height:297mm;padding:7mm;color:var(--ink);background:var(--paper);transform:scale(var(--preview-scale,1));transform-origin:top left}
-.poster-frame{height:100%;border:1.2mm solid var(--ocean);border-radius:7mm;padding:6mm;display:flex;flex-direction:column;justify-content:space-between;gap:3mm}
-.entry .poster-frame{border-color:var(--gold)}
-.topline{height:16mm;flex:none;display:flex;align-items:center;justify-content:space-between;gap:5mm}
-.tag{margin:0;font-size:16pt;line-height:1.1;color:var(--ocean);font-weight:600}
-.tag strong{font-family:DynaPuff,sans-serif;font-size:16pt;font-weight:700}
-.tag .region{display:inline;margin-left:1.5mm;font-size:16pt}
-.corner-star{width:12mm;height:12mm;flex:none;fill:var(--gold);stroke:#b87900;stroke-width:1}
+.poster-frame{height:100%;border:1mm solid var(--ocean);border-radius:10mm 3mm 10mm 3mm;padding:5mm 6mm;display:flex;flex-direction:column;justify-content:space-between;gap:2mm;position:relative}
+.poster-frame:before{content:"";position:absolute;inset:2mm;border:.3mm solid #aac5d0;border-radius:7mm 1mm 7mm 1mm;pointer-events:none}
+.entry .poster-frame{border-color:#c18a14}.entry .poster-frame:before{border-color:#edcf86}
+.topline{height:15mm;flex:none;display:flex;align-items:center;justify-content:space-between;gap:3mm;position:relative;z-index:1}
+.tag{margin:0;display:flex;align-items:center;gap:3mm;color:var(--ocean);font-size:15pt;line-height:1.05}
+.task-number{display:grid;place-items:center;width:16mm;height:16mm;flex:none;border:.65mm solid #bc8309;border-radius:50%;background:#ffe4a0;font:700 23pt/1 DynaPuff,sans-serif;color:var(--ocean);box-shadow:1mm 1mm 0 #edcf86}
+.tag-copy{display:flex;flex-direction:column;gap:1mm}.tag strong{font:700 11pt/1 DynaPuff,sans-serif;letter-spacing:.08em}.tag .region{font-size:18pt;line-height:1;font-weight:600}
+.entry .tag{max-width:110mm}.entry .tag strong{font-size:13pt}.entry .tag .region{font-size:16pt}
+.corner-star{width:11mm;height:11mm;flex:none;fill:var(--gold);stroke:#b87900;stroke-width:1}
 .brand-logo{width:29mm;height:17mm;display:block;flex:none}
-.hero{height:45mm;flex:none;display:grid;grid-template-columns:40mm minmax(0,1fr);align-items:center;gap:5mm;text-align:left}
-.em{width:40mm;height:40mm;display:grid;place-items:center}
-.em svg{display:block;width:100%;height:100%}
-.creature-name{font-size:14pt;line-height:1.1;margin:0 0 2mm;color:var(--ocean)}
-.poster h2{font:700 28pt/1.08 DynaPuff,sans-serif;margin:0 0 2mm;text-wrap:balance}
-.instruction{font-size:16pt;line-height:1.2;margin:0;color:var(--ink)}
-.instruction strong{font-weight:600;text-decoration:underline;text-decoration-color:#b87900;text-underline-offset:1mm}
-.qr{width:160mm;height:160mm;flex:none;align-self:center;background:#fff;isolation:isolate}
+.hero{height:56mm;flex:none;display:grid;grid-template-columns:56mm minmax(0,1fr);align-items:center;gap:4mm;text-align:left;position:relative;z-index:1}
+.em{width:56mm;height:54mm;display:grid;place-items:center;position:relative}
+.em:before{content:"";position:absolute;width:48mm;height:48mm;border-radius:45% 55% 58% 42%;background:#e3f1ec;border:.5mm solid #b6d7d0;transform:rotate(-12deg)}
+.em:after{content:"";position:absolute;width:5mm;height:5mm;right:0;top:1mm;border:.6mm solid #c99a32;border-radius:50%;box-shadow:-49mm 39mm 0 -1mm #f5bd3a}
+.em svg{display:block;width:100%;height:100%;position:relative;z-index:1;filter:drop-shadow(0 1mm 0 #0b3c6e18)}
+.creature-name{font-size:15pt;line-height:1.05;margin:0 0 2mm;color:var(--ocean)}
+.poster h2{font:700 30pt/1.07 DynaPuff,sans-serif;letter-spacing:-.035em;margin:0 0 2mm;text-wrap:balance}
+.entry h2{font-size:34pt}
+.instruction{font-size:14pt;line-height:1.15;margin:0;color:var(--ink)}
+.instruction strong{font-weight:600;text-decoration:underline;text-decoration-color:#b87900;text-underline-offset:.7mm}
+.qr{width:152mm;height:152mm;flex:none;align-self:center;background:#fff;isolation:isolate;position:relative;outline:.45mm solid #c5d8df;outline-offset:1mm;border-radius:.2mm}
+.qr:before,.qr:after{content:"";position:absolute;width:9mm;height:9mm;pointer-events:none;border-color:var(--ocean);border-style:solid}
+.qr:before{left:-1.7mm;top:-1.7mm;border-width:1mm 0 0 1mm;border-radius:2mm 0 0 0}
+.qr:after{right:-1.7mm;bottom:-1.7mm;border-width:0 1mm 1mm 0;border-radius:0 0 2mm 0}
+.entry .qr:before,.entry .qr:after{border-color:#c18a14}
 .qr svg{width:100%;height:100%;display:block;background:#fff}
-.manual{height:29mm;flex:none;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:1mm}
-.manual-note{font-size:14pt;line-height:1.1;margin:0;color:var(--ink)}
+.entry .qr{width:154mm;height:154mm}
+.manual{height:27mm;flex:none;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:1mm;position:relative;z-index:1}
+.manual-note{font-size:12pt;line-height:1.1;margin:0;color:var(--ocean)}
+.mission .manual{width:152mm;height:32mm;padding:1mm;align-self:center;border:.4mm solid #d6b36a;border-radius:4mm;background:#fff1d1}
 .code{display:block;font:700 56pt/1.05 'Courier New',ui-monospace,monospace;letter-spacing:.035em;color:#000;white-space:nowrap;margin:0;font-variant-ligatures:none}
-.entry-steps{display:flex;justify-content:center;align-items:center;gap:6mm;flex-wrap:wrap;margin:0;font-size:16pt;line-height:1.2}
-.entry-steps span{white-space:nowrap}
-.entry-steps b{display:inline-grid;place-items:center;width:8mm;height:8mm;border:1mm solid var(--gold);border-radius:50%;font:700 13pt DynaPuff,sans-serif;color:var(--ocean);margin-right:2mm}
-.footer{height:4mm;flex:none;text-align:center;font-size:10pt;line-height:1.2;letter-spacing:.05em;color:var(--ocean);margin:0}
+.entry-steps{display:flex;justify-content:center;align-items:center;gap:5mm;flex-wrap:wrap;margin:0;font-size:15pt;line-height:1.2}
+.entry-steps span{white-space:nowrap}.entry-steps b{display:inline-grid;place-items:center;width:8mm;height:8mm;border:.65mm solid #bc8309;background:#ffe4a0;border-radius:50%;font:700 13pt DynaPuff,sans-serif;color:var(--ocean);margin-right:2mm}
+.footer{height:6mm;flex:none;text-align:center;font-size:10pt;line-height:1.2;letter-spacing:.03em;color:var(--ocean);margin:0;display:flex;justify-content:center;align-items:center;gap:3mm;position:relative;z-index:1}
+.trail{display:flex;gap:1.3mm;align-items:center}.trail i{width:2mm;height:2mm;border:.3mm solid #819ead;border-radius:50%;display:block}.trail i.current{width:3mm;height:3mm;background:var(--gold);border-color:#bc8309}
 @page{size:A4 portrait;margin:0}
 @media print{
  html,body{margin:0;padding:0;background:#fff;width:210mm}
@@ -63,7 +74,7 @@ body{margin:0;background:#e9f1f6;color:var(--ink);font:600 18px/1.35 'Baloo 2',s
 <body>
 <header class="bar">
  <h1>Okyanus Kaşifi - Görev Posterleri</h1>
- <p><b id="poster-count">10 poster</b> · A4 dikey · Her sayfada 1 poster · QR alanı 16 cm</p>
+ <p><b id="poster-count">10 poster</b> · A4 dikey · Her sayfada 1 poster · QR alanı en az 15,2 cm</p>
  <p class="details">Yazdırırken <b>A4</b>, <b>%100 / gerçek boyut</b> ve <b>kenar boşluğu yok</b> seç. Tarayıcı üstbilgi ve altbilgilerini kapat.</p>
  <p class="details">QR'lar bu yayın adresini açar: <b id="origin"></b></p>
  <p class="details">Telefonu parlamayı önleyecek açıyla tut. Loş alanlarda posteri aydınlat; kamera izni ve odaklaması cihazına bağlıdır.</p>
@@ -93,13 +104,14 @@ const star='<svg class="corner-star" viewBox="0 0 48 48" aria-hidden="true"><pat
 const logo='<svg class="brand-logo" viewBox="0 0 100 60" role="img" aria-label="Körfez Aqua"><rect width="100" height="60" rx="8" fill="#0b3c6e"/><svg x="8" y="4" width="84" height="52" viewBox="637 332 646 399"><image href="logo2.png" width="1920" height="1080"/></svg></svg>';
 function card(st,index){
  const entry=!st,url=entry?base:base+"#s="+st.code;
- const tag=entry?'<strong>KEŞFE BAŞLA</strong>':`<strong>GÖREV ${index+1}</strong><span class="region">· ${esc(KASIF.regions[st.region].label)}</span>`;
+ const tag=entry?'<span class="task-number">★</span><span class="tag-copy"><strong>KEŞFE BAŞLA</strong><span class="region">Macera seni bekliyor!</span></span>':`<span class="task-number">${String(index+1).padStart(2,'0')}</span><span class="tag-copy"><strong>GÖREV ${index+1}</strong><span class="region">${esc(KASIF.regions[st.region].label)}</span></span>`;
  const title=entry?"Okyanus Kaşifi Ol!":st.title;
  const name=entry?KASIF.stations.length+" keşif, bir macera!":st.name;
  const instruction=entry?'Telefonunun kamerasıyla okut, pasaportunu aç.':'Oyundaki <strong>QR Tara</strong> ile okut, soruyu bil, damganı kap!';
  const manual=entry?'<div class="entry-steps"><span><b>1</b>Pasaportunu aç</span><span><b>2</b>Kaşif dostunu seç</span></div>':`<p class="manual-note">Kamera okumazsa bu kodu oyuna yaz</p><p class="code">${esc(st.code)}</p>`;
+ const trail=entry?'':`<span class="trail" aria-hidden="true">${KASIF.stations.map((_,i)=>`<i class="${i===index?'current':''}"></i>`).join('')}</span>`;
  const sheet=document.createElement("section");sheet.className="sheet";
- sheet.innerHTML=`<article class="poster ${entry?'entry':'mission'}" data-station="${entry?'entry':esc(st.id)}" aria-label="${esc(title)} posteri"><div class="poster-frame"><div class="topline"><p class="tag">${tag}</p>${entry?logo:star}</div><div class="hero"><div class="em">${artSVG(entry?'vatoz':st.art)}</div><div><p class="creature-name">${esc(name)}</p><h2>${esc(title)}</h2><p class="instruction">${instruction}</p></div></div><div class="qr" data-url="${esc(url)}">${qrSVG(url)}</div><div class="manual">${manual}</div><p class="footer">${entry?'İlk açılışta internet bağlantısı gerekir.':'KÖRFEZ AQUA · OKYANUS KAŞİFİ'}</p></div></article>`;
+ sheet.innerHTML=`<article class="poster ${entry?'entry':'mission'}" data-station="${entry?'entry':esc(st.id)}" aria-label="${esc(title)} posteri"><div class="poster-frame"><div class="topline"><p class="tag">${tag}</p>${entry?logo:star}</div><div class="hero"><div class="em">${artSVG(entry?'vatoz':st.art)}</div><div><p class="creature-name">${esc(name)}</p><h2>${esc(title)}</h2><p class="instruction">${instruction}</p></div></div><div class="qr" data-url="${esc(url)}">${qrSVG(url)}</div><div class="manual">${manual}</div><p class="footer">${entry?'İlk açılışta internet bağlantısı gerekir.':'KÖRFEZ AQUA · OKYANUS KAŞİFİ'}${trail}</p></div></article>`;
  document.getElementById("grid").appendChild(sheet);
 }
 card(null,-1);KASIF.stations.forEach(card);

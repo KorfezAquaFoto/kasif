@@ -2,6 +2,8 @@
 
 Tarih: 16 Ekim 2026. Depo: `KorfezAquaFoto/kasif`.
 
+Görsel revizyon 2: İlk önizleme sonrasında canlı çizimleri büyütüldü, pastel çizim alanları, altın görev rozeti, çift ince çerçeve, QR dış köşe işaretleri ve belirgin kod kutusu eklendi. Bu dosya güncel ikinci tasarımı anlatır.
+
 ## Teslim ve kapsam
 
 İnceleme dalı: `poster-redesign-v1`. Tasarım ve test commit'i: `c86c9c6d062869d19151ee37d23b10efdcf746df`.
@@ -15,15 +17,15 @@ Uygulama tarafında yalnızca `qr-kodlari.html` değişti. İstenen doğrulama i
 | Alan | Önce | Sonra |
 | --- | --- | --- |
 | Sayfa düzeni | A4'te iki küçük poster | Her A4 dikey sayfada bir poster; toplam 10 sayfa |
-| QR boyutu | 220 piksel ekran ölçüsü | Beyaz boşluk dahil 160 mm; görevlerde siyah sembol alanı yaklaşık 129 mm |
+| QR boyutu | 220 piksel ekran ölçüsü | Beyaz boşluk dahil görevlerde 152 mm, girişte 154 mm; siyah sembol alanı her posterde en az 120 mm |
 | QR çevresi | 2 piksel kenar boşluğu | Dört yönde tam 4 modül saf beyaz boşluk |
 | QR görünümü | Küçük yerleşim | Vektörel saf siyah modüller ve opak saf beyaz zemin; önünde/arkasında görsel veya desen yok |
 | Elle giriş kodu | 20 piksel yazı | Kalın, eş aralıklı 56 punto; ölçülen görünür harf yüksekliği 12,44–12,70 mm |
-| Görev kimliği | Küçük kart başlığı | Görev numarası, bölge, onaylı canlı çizimi ve `data.js` görev başlığı |
+| Görev kimliği | Küçük kart başlığı | Altın numara rozeti, belirgin bölge adı, 56 mm çizim alanı ve `data.js` görev başlığı |
 | Yönlendirme | Eski kart açıklamaları | Tek kısa talimat ve QR altında kamera okumazsa kodu yazma notu |
 | Giriş posteri | Küçük giriş kartı | Altın çerçeve, mevcut logo2.png, Okyanus Kaşifi Ol! başlığı ve kamera talimatı |
 | Yazı tipi | Sistem yazısı | Yerel DynaPuff ve Türkçe karakterleri kapsayan Baloo 2 |
-| Renk ve baskı | Küçük kart görünümü | Krem zemin, ince okyanus mavisi/altın çerçeve; büyük koyu dolgu yok |
+| Renk ve baskı | Küçük kart görünümü | Krem zemin, ince çift çerçeve, açık turkuaz çizim alanı, açık altın kod kutusu; büyük koyu dolgu yok |
 | Ekran önizleme | Sabit küçük kartlar | Dar ve geniş ekranda A4 oranını koruyan ölçekli önizleme |
 | Otomatik kontrol | Poster odaklı test yok | QR çözme, loşluk, fiziksel ölçü, PDF sayfalama ve baskı testi |
 
@@ -51,7 +53,7 @@ Yerel Chrome çalıştırması ve GitHub Actions `poster-print` işi başarılı
 | 450 piksel genişliğe küçültülmüş poster + aynı loşluk/bulanıklık | Her iki bağlamda 10/10 |
 | QR saf siyah/beyaz pikselleri ve 4 modül beyaz çevre | 10/10 |
 | Görev kodu ile data.js eşleşmesi | 9/9 |
-| QR fiziksel ölçüsü | 160 mm, tüm posterlerde |
+| QR fiziksel ölçüsü | Görevler 152 mm, giriş 154 mm |
 | Kodun görünür harf yüksekliği | En az 12,44 mm |
 | Renkli A4 PDF | 10 sayfa, her sayfada tek poster; 10/10 QR çözüldü |
 | Arka plan grafikleri kapalı A4 PDF | 10 sayfa; 10/10 QR çözüldü; sayfa zemini beyaz |
@@ -64,7 +66,7 @@ Yerel Chrome çalıştırması ve GitHub Actions `poster-print` işi başarılı
 
 CI çalışması: https://github.com/KorfezAquaFoto/kasif/actions/runs/38858201612
 
-Dört işin tamamı ilk çalıştırmada geçti; mevcut oyun testleri değiştirilmedi. Raporun sonradan eklenmesi yalnızca belge değişikliğidir; yukarıdaki çalışma tasarım ve test commit'ini doğrular.
+Dört işin tamamı ilk tasarımın ilk çalıştırmasında geçti; mevcut oyun testleri değiştirilmedi. İkinci görsel revizyonda da aynı `tests/posters.py` yerel Chrome ile yeniden çalıştırıldı: normal/loş QR'lar, 450 piksel örnekler ve iki PDF'in toplam 20 QR çözümü başarılıdır. Oyun dosyaları ikinci revizyonda da değişmedi. İnceleme dalındaki son CI sonucu ayrıca kontrol edilmelidir.
 
 Çalıştırma: `pip install playwright pillow pypdf pymupdf`, `python -m playwright install --with-deps chromium`, ardından `python tests/posters.py`.
 
@@ -72,7 +74,7 @@ Test; PDF'leri, sayfa görsellerini, loşluk örneklerini, yan yana önizlemeyi 
 
 ## Önizleme ve baskı
 
-Teslim PDF'i: `../output/pdf/Korfez-Aqua-Posterler-v1.pdf`. Yan yana giriş + pirana önizlemesi: `../output/Poster-Onizleme-v1.png`. PDF içindeki QR'lar localhost yerine gerçek yayın adresini içerir.
+Teslim PDF'i: `../output/pdf/Korfez-Aqua-Posterler-v2.pdf`. Yan yana giriş + pirana önizlemesi: `../output/Poster-Onizleme-v2.png`. PDF içindeki QR'lar localhost yerine gerçek yayın adresini içerir.
 
 Chrome'da A4 dikey, yüzde 100/gerçek boyut, kenar boşluğu yok; tarayıcı üstbilgi/altbilgileri kapalı kullanılmalı. Arka plan grafikleri kapalıyken de QR ve kodlar okunur. Çerçeve kağıt kenarından 7 mm içeridedir.
 
