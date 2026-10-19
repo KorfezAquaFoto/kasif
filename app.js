@@ -21,7 +21,8 @@ const FX = {
   unvan: true,     // 3 / 6 / 9 damgada kaşif unvanı
   tepki: true,     // soru ekranında kaşif dostunun sevinci/düşünmesi
   sandik: true,    // 9/9'da hazine sandığının açılması
-  hikaye: true     // dolu pasaportu dik "hikâye" resmi olarak paylaşma
+  hikaye: true,    // dolu pasaportu dik "hikâye" resmi olarak paylaşma
+  izoYol: true     // v43 taslak: Chess.com tarzı izometrik küp yol + 3D deniz süsleri
 };
 Object.keys(FX).forEach(k => document.documentElement.classList.toggle("fx-" + k, !!FX[k]));
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -164,6 +165,9 @@ function renderTarget(){
 }
 function renderRoad(){
   const done = count() === ST.length;
+  const iso = isoActive();
+  document.documentElement.classList.toggle("iso-on", iso);
+  if (iso) { $("#road-nodes").innerHTML = ""; renderIso(); return; }
   $("#road-nodes").innerHTML = ST.map((st, i) => {
     const [x, y] = ROAD[i] || [50, 50], has = !!S.badges[st.id], on = st.id === target;
     return `<button type="button" class="stop ${has ? "got" : "locked"}${on ? " on" : ""}" data-id="${st.id}" style="left:${x}%;top:${y}%;--rot:${ROT[i % ROT.length]}deg" aria-label="${esc((i+1)+". durak: "+st.name+(has?", tamamlandı":on?", buradasın":""))}" aria-current="${on ? "step" : "false"}">
@@ -258,10 +262,133 @@ function updateRoadFx(){
 window.addEventListener("resize", () => { if (FX.yol && current === "v-home" && walkerAt !== null && S) updateRoadFx(); });
 
 // 9/9: kaşif dostu hazineye gider, sandık sallanır ve açılır, ardından final ekranı. Dokunmak atlatır.
+
+// ---------- v43 izometrik macera yolu (taslak) ----------
+// Küp basamaklar Başla iskelesinden hazine sandığına zikzak çıkar; aralarda tek renkli deniz süsleri.
+// Görseller assets/yol/ (Magnific ile üretildi). FX.izoYol=false → klasik yol.
+const ISO_DECOR = ["gemi", "mercan", "fener", "amfora", "kask", "kabuk", "capa", "kemer"];
+const ISO_RUN = 4;                 // her yönde kaç küp sonra dönülür
+const ISO_GAP = 2;                 // duraklar arasındaki bağlantı küpü sayısı
+let isoWalkerAt = null, isoStopWalk = null, isoBuilt = "", isoLastTarget = null;
+function isoActive(){ return FX.izoYol && document.documentElement.dataset.layout !== "tiny"; }
+// Yol dizisi: [bağlantı x2, durak, bağlantı x2, durak, …, durak, bağlantı x2]; sonra sandık.
+function isoSequence(){
+  const seq = [];
+  for (let i = 0; i < ISO_GAP; i++) seq.push({ type: "conn" });
+  ST.forEach((st, i) => { seq.push({ type: "stop", st, i }); for (let k = 0; k < ISO_GAP; k++) seq.push({ type: "conn" }); });
+  return seq;
+}
+function isoLayout(width){
+  const B = Math.round(Math.max(50, Math.min(document.documentElement.dataset.tablet === "true" ? 96 : 76, width * 0.17)));
+  const dx = B * 0.6, dy = B * 0.355, seq = isoSequence();
+  let x = 0, y = 0, dir = -1;
+  const pts = seq.map((b, k) => {
+    if (k && k % ISO_RUN === 0) dir = -dir;
+    x += dir * dx; y -= dy;
+    return Object.assign({ x, y, k }, b);
+  });
+  const end = { x: x + dir * dx * 1.1, y: y - dy * 1.6 };
+  // Süsler: her dönüş noktasının karşı tarafına
+  const xs = pts.map(p => p.x), minX = Math.min(...xs, end.x), maxX = Math.max(...xs, end.x), mid = (minX + maxX) / 2;
+  const decor = [];
+  for (let k = ISO_RUN - 1, d = 0; k < pts.length - 1 && d < ISO_DECOR.length; k += ISO_RUN, d++) {
+    const p = pts[k], right = p.x < mid;
+    decor.push({ key: ISO_DECOR[d], x: right ? maxX + B * 1.15 : minX - B * 1.15, y: p.y + dy * 0.5, w: B * (d % 3 === 0 ? 2.25 : 1.9) });
+  }
+  const start = { x: pts[0].x + dx * 1.3, y: pts[0].y + dy * 2.6 };
+  // Haritayı ekranın ortasına yerleştir
+  const ox = width / 2 - mid, top = B * 2.4, oy = top - end.y;
+  const tr = p => Object.assign(p, { x: p.x + ox, y: p.y + oy });
+  pts.forEach(tr); decor.forEach(tr); tr(end); tr(start);
+  const height = start.y + B * 1.6;
+  return { B, pts, decor, end, start, height };
+}
+function isoProgressIndex(L){
+  const n = count();
+  if (n === ST.length) return L.pts.length - 1;
+  if (!n) return -1;
+  return L.pts.findIndex(p => p.type === "stop" && p.i === n - 1);
+}
+function renderIso(){
+  const iso = $("#iso"), map = $("#iso-map"), layer = $("#iso-layer");
+  const width = iso.clientWidth; if (!width) return;
+  const L = isoLayout(width), done = count() === ST.length, prog = isoProgressIndex(L);
+  map.style.height = L.height + "px"; map.style.setProperty("--b", L.B + "px");
+  const z = y => Math.round(y);
+  let html = `<img class="iso-deco iso-start" src="assets/yol/iskele.webp" alt="" style="left:${L.start.x}px;top:${L.start.y}px;width:${L.B * 2.1}px;z-index:${z(L.start.y)}"><span class="iso-start-tag" style="left:${L.start.x}px;top:${L.start.y}px">🚩 Başla</span>`;
+  L.decor.forEach(d => { html += `<img class="iso-deco" src="assets/yol/${d.key}.webp" alt="" style="left:${d.x}px;top:${d.y}px;width:${d.w}px;z-index:${z(d.y)}">`; });
+  L.pts.forEach(p => {
+    if (p.type === "conn") {
+      const lit = p.k <= prog;
+      html += `<span class="iso-b conn${lit ? " lit" : ""}" style="left:${p.x}px;top:${p.y}px;z-index:${z(p.y)}"><img src="assets/yol/${lit ? "kup-tam" : "kup-kum"}.webp" alt=""></span>`;
+      return;
+    }
+    const st = p.st, has = !!S.badges[st.id], on = st.id === target;
+    html += `<button type="button" class="iso-b stop ${has ? "got" : "locked"}${on ? " on" : ""}" data-id="${st.id}" style="left:${p.x}px;top:${p.y}px;z-index:${z(p.y) + 1}" aria-label="${esc((p.i + 1) + ". durak: " + st.name + (has ? ", tamamlandı" : on ? ", buradasın" : ""))}" aria-current="${on ? "step" : "false"}">
+      <img src="assets/yol/${has ? "kup-tam" : "kup-kum"}.webp" alt="">
+      <span class="iso-token">${has ? stampSVG(st, { date: S.badges[st.id], shine: FX.parlak }) : `<span class="sil">${artSVG(st.art)}</span>`}<span class="num">${p.i + 1}</span>${has ? `<span class="stop-done" aria-hidden="true">✓</span>` : ""}</span>
+      ${on ? `<span class="here-pin">Buradasın<span aria-hidden="true">▼</span></span>` : ""}</button>`;
+  });
+  html += `<button type="button" class="iso-end${done && !chestSeq ? " open" : ""}${done ? " done" : ""}" id="iso-end" style="left:${L.end.x}px;top:${L.end.y}px;z-index:4000" aria-label="Hazine"><span class="chest"><img class="cl" src="assets/yol/sandik.webp" alt=""><img class="op" src="assets/yol/sandik-acik.webp" alt=""></span><b>Hazine</b></button>`;
+  layer.innerHTML = html;
+  $("#iso-end").onclick = () => count() === ST.length ? openCert() : modal("🎁", "Hazine burada!", `${ST.length} damgayı topla, tamamlanmış pasaportunu aç!`, [{ label: "Tamam" }]);
+  isoWalker(L);
+  // İlk açılışta ya da hedef değişince sıradaki durak görünür alana kayar
+  const key = width + ":" + target + ":" + count();
+  if (key !== isoBuilt) {
+    const goal = isoGoalPoint(L), smooth = isoBuilt !== "" && !reducedMotion();
+    isoBuilt = key;
+    requestAnimationFrame(() => iso.scrollTo({ top: Math.max(0, goal.y - iso.clientHeight * 0.55), behavior: smooth ? "smooth" : "auto" }));
+  }
+}
+function isoGoalIndex(L){
+  const i = L.pts.findIndex(p => p.type === "stop" && p.st.id === target);
+  return i < 0 ? (count() === ST.length ? L.pts.length : 0) : i;
+}
+function isoGoalPoint(L){ const i = isoGoalIndex(L); return i >= L.pts.length ? L.end : L.pts[i]; }
+function isoPointAt(L, p){
+  const all = [...L.pts, L.end], i = Math.max(0, Math.min(all.length - 2, Math.floor(p))), f = Math.max(0, Math.min(1, p - i));
+  return { x: all[i].x + (all[i + 1].x - all[i].x) * f, y: all[i].y + (all[i + 1].y - all[i].y) * f };
+}
+function isoWalker(L){
+  const map = $("#iso-map");
+  let w = $("#iso-walker");
+  if (!w) { w = document.createElement("div"); w.id = "iso-walker"; w.className = "walker iso-walker"; w.setAttribute("aria-hidden", "true"); map.appendChild(w); }
+  if (w.dataset.avatar !== S.avatar) { w.dataset.avatar = S.avatar; w.innerHTML = '<span class="walker-av">' + av(S.avatar) + '</span>'; }
+  const goal = isoGoalIndex(L);
+  const place = (p, hop = 0) => {
+    const pt = isoPointAt(L, p), atEnd = p > L.pts.length - .5;
+    w.style.left = (pt.x + (atEnd ? -L.B * 0.95 : 0)) + "px"; w.style.top = (pt.y - L.B * 0.36 - hop) + "px";
+    w.style.zIndex = Math.round(pt.y) + 5;
+  };
+  if (isoWalkerAt === null || reducedMotion() || Math.abs(goal - isoWalkerAt) < .01) {
+    if (isoStopWalk) isoStopWalk(); isoWalkerAt = goal; w.classList.remove("walking"); place(goal); return;
+  }
+  if (isoStopWalk) isoStopWalk();
+  const from = isoWalkerAt, steps = Math.abs(goal - from), hops = Math.max(1, Math.round(steps));
+  isoWalkerAt = goal; w.classList.add("walking"); place(from);
+  const t = setTimeout(() => {
+    isoStopWalk = animate(from, goal, Math.min(2600, 210 * hops + 250), p => {
+      const k = Math.abs(p - from) / (steps || 1);
+      place(p, Math.abs(Math.sin(Math.PI * hops * k)) * L.B * 0.22);
+    }, () => { w.classList.remove("walking"); place(goal); });
+  }, 350);
+  isoStopWalk = () => clearTimeout(t);
+}
+$("#iso-layer").addEventListener("click", e => {
+  const b = e.target.closest(".stop"); if (!b) return;
+  const st = ST.find(s => s.id === b.dataset.id);
+  if (S.badges[st.id]) return openDrawer(st, true);
+  target = st.id; S.target = target; save(); renderTarget(); renderRoad();
+});
+
+let isoResize = 0;
+window.addEventListener("resize", () => { clearTimeout(isoResize); isoResize = setTimeout(() => { if (current === "v-home" && S && FX.izoYol) renderRoad(); }, 160); });
+
 // Sertifika resmi sandık açılırken arka planda hazırlanır.
 let chestCertPromise = null;
 function runChestSequence(){
-  const end = $("#road-end"), box = $("#chest-show"), timers = [];
+  const iso = isoActive(), end = iso ? $("#iso-end") : $("#road-end"), box = $("#chest-show"), timers = [];
   const later = (ms, fn) => timers.push(setTimeout(fn, ms));
   let certUrl = null, done = false;
   if (!chestCertPromise) chestCertPromise = drawCert().catch(() => null);
@@ -287,7 +414,7 @@ function runChestSequence(){
   // 2) Sandık yerinden kalkıp ekranın ortasına büyüyerek gelir
   later(2200, () => {
     const from = end.querySelector(".chest").getBoundingClientRect();
-    box.innerHTML = '<div class="cs-back"></div><div class="cs-rays"></div><div class="cs-chest"><span class="cs-leak"></span>' + chestSVG() + '</div><div class="cs-flash"></div><div class="cs-cert"><div class="cs-ph"><b>OKYANUS KAŞİFİ</b><span>SERTİFİKASI</span></div></div>';
+    box.innerHTML = '<div class="cs-back"></div><div class="cs-rays"></div><div class="cs-chest"><span class="cs-leak"></span>' + (iso ? '<span class="cs-imgs"><img class="cl" src="assets/yol/sandik.webp" alt=""><img class="op" src="assets/yol/sandik-acik.webp" alt=""></span>' : chestSVG()) + '</div><div class="cs-flash"></div><div class="cs-cert"><div class="cs-ph"><b>OKYANUS KAŞİFİ</b><span>SERTİFİKASI</span></div></div>';
     box.className = "chest-show";
     const big = box.querySelector(".cs-chest"), to = big.getBoundingClientRect();
     big.style.setProperty("--dx", (from.left + from.width / 2 - (to.left + to.width / 2)).toFixed(1) + "px");
@@ -977,7 +1104,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v42`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v43`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},

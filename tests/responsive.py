@@ -8,7 +8,7 @@ async def check(pg,label):
     await pg.wait_for_timeout(100)
     result=await pg.evaluate('''()=>{
       const v=document.querySelector('.view.active'),vr=v.getBoundingClientRect();
-      const all=[...v.querySelectorAll('button,input,.field-label,.field>span,#hint-copy,#learn-copy,.hint-subject,.fact-card,#rw-title,#quiz-q,#quiz-msg,#quiz-art')];
+      const all=[...v.querySelectorAll('button,input,.field-label,.field>span,#hint-copy,#learn-copy,.hint-subject,.fact-card,#rw-title,#quiz-q,#quiz-msg,#quiz-art')].filter(e=>!e.closest('.iso'));
       const issues=[];
       for(const e of all){const r=e.getBoundingClientRect(),s=getComputedStyle(e);if(!r.width||!r.height||s.display==='none')continue;
         if(r.top<vr.top-2||r.bottom>vr.bottom-5||r.left<vr.left-2||r.right>vr.right+2)issues.push(e.id||e.className);

@@ -9,7 +9,7 @@ async def fits(pg, label, shot=True):
     await pg.wait_for_timeout(150)
     result = await pg.evaluate('''() => {
       const v=document.querySelector('.view.active'), r=v.getBoundingClientRect();
-      const bad=[...v.querySelectorAll('button,input,.quick-tip,#hint-copy,.quiz-msg,.fact-card')].filter(e=>{
+      const bad=[...v.querySelectorAll('button,input,.quick-tip,#hint-copy,.quiz-msg,.fact-card')].filter(e=>!e.closest('.iso')).filter(e=>{
         const b=e.getBoundingClientRect(),s=getComputedStyle(e);
         return b.width && b.height && s.visibility!=='hidden' && (b.bottom>innerHeight+2 || b.top < -2 || b.left < -2 || b.right > innerWidth+2);
       }).map(e=>e.id||e.className);

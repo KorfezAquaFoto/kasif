@@ -8,7 +8,7 @@ async def fits(pg,label):
  await pg.wait_for_timeout(330)
  result=await pg.evaluate("""()=>{
   const v=document.querySelector('.view.active'),box=v.getBoundingClientRect(),issues=[];
-  for(const e of v.querySelectorAll('button,input,h1,h2,#learn-copy,#hint-copy,.fact-card,.quiz-art,.target,.final-book,#cert-img')){
+  for(const e of [...v.querySelectorAll('button,input,h1,h2,#learn-copy,#hint-copy,.fact-card,.quiz-art,.target,.final-book,#cert-img')].filter(e=>!e.closest('.iso'))){
    const r=e.getBoundingClientRect(),s=getComputedStyle(e);if(!r.width||!r.height||s.display==='none')continue;
    if(r.left<box.left-2||r.right>box.right+2||r.top<box.top-2||r.bottom>box.bottom+2)issues.push('outside '+(e.id||e.className));
    if(e.scrollWidth>e.clientWidth+2&&s.overflowX!=='visible')issues.push('clipped '+(e.id||e.className));
