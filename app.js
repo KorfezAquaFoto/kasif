@@ -789,7 +789,7 @@ async function storyBlob(){
   rr(x, 90, 350, 900, 1125, 44); x.fillStyle = "#fff8ec"; x.fill(); x.restore();
   x.save(); rr(x, 90, 350, 900, 1125, 44); x.clip(); x.drawImage(cert, 90, 350, 900, 1125); x.restore();
   line("Sen de keşfe çık!", 1600, 60, "#ffffff");
-  try { const brand = await brandImage(); x.drawImage(brand, 637, 332, 646, 399, W / 2 - 130, 1662, 260, 160.6); } catch(e){}
+  try { const brand = await brandImage(); x.drawImage(brand, 637, 332, 646, 399, W / 2 - 170, 1650, 340, 210); } catch(e){}
   return new Promise(r => c.toBlob(r, "image/png"));
 }
 $("#btn-story").onclick = async () => {
@@ -872,6 +872,8 @@ async function drawCert(){
   };
   coral(33,1350,1,.8,"#10588a");coral(1047,1350,-1,.8,"#10588a");
   // Krem sayfa ve çift kenar.
+  // Kart %95 ölçekte çizilir; altta Körfez Aqua logosuna daha geniş yer kalır.
+  const CS=.95;x.save();x.translate(W/2*(1-CS),45*(1-CS));x.scale(CS,CS);
   x.save();x.shadowColor="#0004";x.shadowBlur=28;x.shadowOffsetY=12;
   rr(x,50,45,980,1200,58);x.fillStyle=ivory;x.fill();x.restore();
   x.lineWidth=7;x.strokeStyle=gold;rr(x,50,45,980,1200,58);x.stroke();
@@ -949,9 +951,10 @@ async function drawCert(){
   x.lineWidth=2;x.strokeStyle=gold;x.stroke();
   text(ST.length+" / "+ST.length,sealX,sealY-6,26,72);
   text("keşif",sealX,sealY+18,15,60);
+  x.restore();
   // Orijinal marka, navy zemine çerçevesiz oturur.
   const brand=await brandImage();
-  x.drawImage(brand,637,332,646,399,477,1264,126,77.8);
+  x.drawImage(brand,637,332,646,399,430,1197,220,135.9);
   return new Promise(resolve=>c.toBlob(resolve,"image/png"));
 }
 function rr(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
