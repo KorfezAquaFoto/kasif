@@ -965,3 +965,5 @@ html[data-layout=tiny] .quiz-buddy{display:none}
 html[data-layout=tiny] .gw-box{padding:44px 14px 14px;margin-top:36px}html[data-layout=tiny] .gw-art{width:80px;height:80px}
 html[data-layout=tiny] .gw-box h2{font-size:22px;margin-bottom:10px}html[data-layout=tiny] .gw-steps span{width:42px;height:42px;font-size:20px}
 html[data-layout=tiny] .gw-steps li{font-size:13px}html[data-layout=tiny] .gw-first{margin-bottom:10px;font-size:14px}html[data-layout=tiny] .gw-box .btn{min-height:46px;font-size:17px}
+/* v46: telefon karanlık modunda tarayıcının renkleri zorla koyulaştırmasını engelle (oyun aydınlık tasarlandı) */
+:root{color-scheme:only light}
