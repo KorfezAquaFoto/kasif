@@ -37,7 +37,7 @@ jobs:
           path: tests/out/*.png
   browser-platforms:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20   # Chromium + WebKit, onlarca ekran: 10 dakika sınırına takılıyordu
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
