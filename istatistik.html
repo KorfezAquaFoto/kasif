@@ -120,6 +120,10 @@ async function token(){
   if (Date.now() > session.until) await auth({ refresh_token:session.refresh }, "refresh_token");
   return session.token;
 }
+async function yolda(from, to){
+  const r = await fetch(`${BASE}/rest/v1/rpc/kasif_yolda`, { method:"POST", headers:{ apikey:KEY, Authorization:"Bearer " + await token(), "Content-Type":"application/json" }, body:JSON.stringify({ baslangic:from, bitis:to }) });
+  return r.ok ? r.json() : null;   // v44 SQL çalıştırılmadıysa sessizce atlanır
+}
 async function stats(from, to){
   const r = await fetch(`${BASE}/rest/v1/rpc/kasif_stats`, { method:"POST",
     headers:{ apikey:KEY, Authorization:"Bearer " + await token(), "Content-Type":"application/json" },
@@ -147,7 +151,8 @@ function render(d, from, to){
     kpi(fmt(o.damga), "Toplam damga", o.oyuncu ? `kişi başı ${(o.damga / o.oyuncu).toLocaleString("tr-TR",{maximumFractionDigits:1})}` : "") +
     kpi(fmt(o.tamamlayan), "9/9 tamamlayan", o.oyuncu ? `başlayanların %${pct(o.tamamlayan, o.oyuncu)}'i` : "") +
     kpi(sure.ortanca ? Math.round(sure.ortanca) + " dk" : "–", "Tamamlama süresi", sure.adet ? `ortanca, ${fmt(sure.adet)} kişiden` : "") +
-    kpi(fmt((o.kaydetme || 0) + (o.paylasma || 0)), "Pasaport kaydı / paylaşım", `${fmt(o.kaydetme)} kaydetme · ${fmt(o.paylasma)} paylaşım`);
+    kpi(fmt((o.kaydetme || 0) + (o.paylasma || 0)), "Pasaport kaydı / paylaşım", `${fmt(o.kaydetme)} kaydetme · ${fmt(o.paylasma)} paylaşım`) +
+    (d.yolda ? kpi(fmt(d.yolda.yolda_katilan), "Yolda katılan", `${fmt(d.yolda.yolda_baslayan)} kişi QR'ı girişten önce okuttu`) : "");
 
   // Günlük: aralıktaki her günü göster (kayıt olmayan günler 0)
   const byDay = Object.fromEntries((d.gunluk || []).map(g => [g.gun, g]));
@@ -181,7 +186,7 @@ async function load(){
   const from = $("#from").value, to = $("#to").value;
   if (!from || !to || from > to) return;
   $("#kpis").innerHTML = '<p class="note" style="color:#fff">Yükleniyor…</p>';
-  try { render(await stats(from, to), from, to); }
+  try { const d = await stats(from, to); d.yolda = await yolda(from, to).catch(() => null); render(d, from, to); }
   catch(e){ if (!session) return showLogin(e.message); $("#kpis").innerHTML = `<p class="note" style="color:#fff">${esc(e.message)}</p>`; }
 }
 function setRange(r){

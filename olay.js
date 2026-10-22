@@ -27,10 +27,10 @@ const platform = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === "MacInt
 function queue(){ try { return JSON.parse(store.get(QUEUE)) || []; } catch(e){ return []; } }
 function setQueue(q){ store.set(QUEUE, JSON.stringify(q.slice(-MAX))); }
 
-let sending = false;
+let sending = false, batchSize = 50;
 function flush(keepalive){
   if (!ENABLED || sending || !navigator.onLine) return;
-  const batch = queue().slice(0, 50);
+  const batch = queue().slice(0, batchSize);
   if (!batch.length) return;
   sending = true;
   fetch(URL_, {
@@ -39,11 +39,13 @@ function flush(keepalive){
     body: JSON.stringify(batch)
   }).then(r => {
     // Gönderilenleri kuyruktan çıkar; sunucu kaydı reddettiyse (400) de çıkar, yoksa sonsuza dek takılır.
+    // Paketteki tek bir geçersiz kayıt diğerlerini yakmasın: reddedilince kayıtlar tek tek gönderilir.
+    if (r.status === 400 && batch.length > 1) { batchSize = 1; sending = false; setTimeout(flush, 0); return; }
     if (r.ok || r.status === 400 || r.status === 409) {
       const sent = new Set(batch.map(x => x.happened_at + x.event + (x.station || "")));
       setQueue(queue().filter(x => !sent.has(x.happened_at + x.event + (x.station || ""))));
       sending = false;
-      if (queue().length) setTimeout(flush, 500);
+      if (queue().length) setTimeout(flush, batchSize === 1 ? 50 : 500); else batchSize = 50;
     } else sending = false;
   }).catch(() => { sending = false; });
 }

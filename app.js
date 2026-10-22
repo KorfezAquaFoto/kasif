@@ -546,14 +546,23 @@ function resumeTask(){
   lesson = st; stack = ["v-home"]; show("v-learn", false); renderLesson();
 }
 function setBolge(st){ if (FX.bolgeRenk) { if (st) document.documentElement.dataset.bolge = st.region; else delete document.documentElement.dataset.bolge; } }
+// Yolda QR okutan ziyaretçi: ekranın ortasında, az yazılı ve simgeli bir oyun tanıtımı (bir kez).
+function showGuestWelcome(st){
+  $("#gw-art").innerHTML=artSVG(st.art);
+  $("#gw-dots").innerHTML=ST.map(s=>'<i class="'+(s.id===st.id?'on':'')+'"></i>').join('');
+  $("#gw-first").innerHTML='Akvaryumda <b>'+ST.length+' keşif</b> var. İlki: <b>'+esc(st.name)+'</b>';
+  $("#guest-welcome").classList.remove("hidden");
+  setTimeout(()=>$("#gw-go").focus({preventScroll:true}),350);
+}
+$("#gw-go").onclick=()=>{ $("#guest-welcome").classList.add("hidden"); if(S){S.introSeen=true;save();} };
 function renderLesson(){
   $(".learn-card").scrollTop=0;
   stopSpeech();const st=lesson; setBolge(st);
   // Eski iki aşamalı kayıtları tek hazırlık ekranına taşı.
   S.flow.step="find";save();
   $("#learn-heading").textContent="Tanış ve bul";
-  const gi=$("#guest-intro");gi.classList.toggle("hidden",!S.guest);$("#v-learn").classList.toggle("guest",!!S.guest);
-  if(S.guest)gi.innerHTML=`<span aria-hidden="true">🧭</span><span><b>Bu bir keşif oyunu!</b> Akvaryumda ${ST.length} canlıyı bul, soruları bil, damgaları topla. İlk damgan bu canlıdan!</span>`;
+  $("#v-learn").classList.toggle("guest",!!S.guest);
+  if(S.guest&&!S.introSeen)showGuestWelcome(st);
   $("#learn-region").innerHTML=`<span class="region-symbol">${globeIcon}</span><span class="region-name">${esc(REG[st.region].label.toLocaleUpperCase("tr-TR"))}</span><span class="region-counter" aria-label="${ST.indexOf(st)+1}. görev, toplam ${ST.length} görev">${ST.indexOf(st)+1} / ${ST.length}</span>`;
   $("#learn-name").textContent=st.name;
   $("#learn-art").dataset.creature=st.id;$("#learn-art").innerHTML=artSVG(st.art);
