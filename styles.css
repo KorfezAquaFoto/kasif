@@ -967,3 +967,11 @@ html[data-layout=tiny] .gw-box h2{font-size:22px;margin-bottom:10px}html[data-la
 html[data-layout=tiny] .gw-steps li{font-size:13px}html[data-layout=tiny] .gw-first{margin-bottom:10px;font-size:14px}html[data-layout=tiny] .gw-box .btn{min-height:46px;font-size:17px}
 /* v46: telefon karanlık modunda tarayıcının renkleri zorla koyulaştırmasını engelle (oyun aydınlık tasarlandı) */
 :root{color-scheme:only light}
+/* v47: Samsung İnternet karanlık modu, kendi karanlık teması olan siteleri zorla koyulaştırmaz.
+   Bu "karanlık tema" bilerek aydınlık temanın aynısıdır; Chrome/Safari için yukarıdaki satır yeterli. */
+@media (prefers-color-scheme:dark){
+  :root{color-scheme:only light}
+  html,body{background:var(--deep);color:#fff}
+  .paper,.drawer-box,.modal-box,.gw-box{background:var(--paper);color:var(--ink)}
+  input{background:#fff;color:var(--ink)}
+}
