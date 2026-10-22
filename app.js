@@ -58,6 +58,8 @@ const av = key => artSVG(AVATARS.includes(key) ? key : AVATARS[0]);
 // ---------- Görünümler ----------
 let current = null, stack = [];
 function show(id, push = true){
+  // Yolda katılan (misafir) kaşif: damgasını aldıktan sonra ana ekran yerine kayıt ekranına gelir.
+  if (id === "v-home" && S && S.guest) { id = "v-welcome"; push = false; renderWelcome(); }
   stopSpeech();
   if (current === "v-scan" && id !== "v-scan") stopCam();
   if (push && current && current !== id && !["v-reward","v-quiz"].includes(current)) stack.push(current);
@@ -92,7 +94,17 @@ function modal(ico, title, text, buttons = [{label:"Tamam"}]){
 let avatar = AVATARS[0];
 function renderWelcome(animate=false){
   document.querySelectorAll("[data-aq]").forEach(el=>el.textContent=D.aquarium);
-  document.querySelectorAll(".sheet-lead b").forEach(b => b.textContent = ST.length + " damgayı");
+  const guest = !!(S && S.guest), got = count(), left = ST.length - got;
+  $("#v-welcome").classList.toggle("join-mode", guest);
+  if (guest && got) {
+    if (!AVATARS.includes(avatar)) avatar = AVATARS[0];
+    const first = got === 1 ? "İlk damgan hazır! ⭐" : `${got} damgan hazır! ⭐`;
+    $(".sheet-lead-full").innerHTML = `${first} Adını yaz, kaşif dostunu seç ve kalan <b>${left} damgayı</b> topla.`;
+    $(".sheet-lead-short").innerHTML = `${first} Kalan <b>${left} damgayı</b> topla.`;
+  } else {
+    $(".sheet-lead-full").innerHTML = `Keşfet, QR kodlarını bul, soruları cevapla ve <b>${ST.length} damgayı</b> topla!`;
+    $(".sheet-lead-short").innerHTML = `QR kodlarını bul, <b>${ST.length} damgayı</b> topla!`;
+  }
   const box = $("#avatars"); box.innerHTML = "";
   AVATARS.forEach(a => {
     const b = document.createElement("button"); b.type = "button";
@@ -105,8 +117,14 @@ function renderWelcome(animate=false){
 $("#in-name").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();e.currentTarget.blur();}});
 $("#btn-start").onclick = () => {
   const name = $("#in-name").value.trim().slice(0,16) || "Kaşif";
-  S = { v:1, id:newId(), name, avatar, badges:{}, created:Date.now() };
-  save(); requestPersist(); olay("start");
+  if (S && S.guest) {
+    // Yolda katılan kaşif: kazandığı damgalar korunur, yalnızca adı ve dostu eklenir.
+    S.name = name; S.avatar = avatar; delete S.guest; $("#v-welcome").classList.remove("join-mode");
+    save(); requestPersist(); olay("join", null, count());
+  } else {
+    S = { v:1, id:newId(), name, avatar, badges:{}, created:Date.now() };
+    save(); requestPersist(); olay("start");
+  }
   // Kapak kitap gibi açılır, altında kaşif dostu ve "Merhaba" görünür
   $("#idpage-w").innerHTML = helloHTML();
   $("#ready-msg").textContent = `Pasaportun hazır, ${S.name}!`;
@@ -142,13 +160,26 @@ function renderHome(){
   $("#me-rank").classList.toggle("hidden", !rank);
   if (rank) $("#me-rank").textContent = rank[1] + " " + rank[2];
   $("#done-banner").classList.toggle("hidden", n !== t);
-  if (!target || S.badges[target]) target = (ST.find(s => !S.badges[s.id]) || {}).id || null;
+  if (!target || S.badges[target]) target = nextTarget();
   renderTarget(); renderRoad();
   if (chestSeq) runChestSequence();
   $("#btn-scan").classList.toggle("pulse", n === 0);
   S.last = null;
   renderInstall();
 }
+// Yolda katılan ya da sırayı atlayan kaşif geri gönderilmez: son damgadan sonraki ilk eksik durak önerilir,
+// sona gelince kaçırılanlara döner.
+function lastStampIndex(){
+  let best = -1, ts = -1;
+  ST.forEach((s, i) => { const t = S.badges[s.id]; if (t && t >= ts) { ts = t; best = i; } });
+  return best;
+}
+function nextTarget(){
+  const n = ST.length, from = lastStampIndex();
+  for (let k = 1; k <= n; k++) { const st = ST[(from + k + n) % n]; if (!S.badges[st.id]) return st.id; }
+  return null;
+}
+function isMissed(st){ const last = lastStampIndex(); return last >= 0 && ST.indexOf(st) < last && !S.badges[st.id]; }
 // Konum simgeleri: metne eşlik eder, tek başlarına anlam taşımak zorunda değildir.
 function locationCue(st){
   const paths = st.id === "fosil" ? '<path d="M12 21V4M5 11l7-7 7 7"/>' : st.id === "orfoz" ? '<path d="M3 19l4-10 7-5 6 7 1 8Z M7 9l6 5 7-3 M13 14l-2 5"/>' : st.id === "vatoz" ? '<path d="M3 21V11a9 9 0 0 1 18 0v10M7 21V11a5 5 0 0 1 10 0v10 M3 21h18"/>' : st.id === "kabuk" ? '<path d="M12 21L3 9Q2 2 8 4Q12 0 16 4Q22 2 21 9ZM12 21V5M12 21L7 7M12 21l5-14"/>' : '<path d="M2 12Q12 0 22 12Q12 24 2 12Z"/><circle cx="12" cy="12" r="3"/>';
@@ -157,7 +188,7 @@ function locationCue(st){
 function renderTarget(){
   const st = ST.find(s => s.id === target), box = $("#target");
   box.classList.toggle("hidden", !st); if (!st) return;
-  box.innerHTML = `<div class="target-heading"><span class="target-art" aria-hidden="true">${artSVG(st.art)}<span class="target-step">${ST.indexOf(st)+1}</span></span><div class="tg-txt"><p class="target-kicker">SIRADAKİ KEŞFİN</p><h2 class="tg-k">${esc(st.name)}</h2></div></div><p class="tg-where location-cue">${locationCue(st)}</p><button class="btn btn-gold" id="target-learn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5Q7 2 2 4v15q5-2 10 1q5-3 10-1V4q-5-2-10 1Z M12 5v15"/></svg>${S.flow && S.flow.id === st.id ? "Kaldığın yerden devam et →" : "Tanış ve bul →"}</button>`;
+  box.innerHTML = `<div class="target-heading"><span class="target-art" aria-hidden="true">${artSVG(st.art)}<span class="target-step">${ST.indexOf(st)+1}</span></span><div class="tg-txt"><p class="target-kicker">${isMissed(st) ? "KAÇIRDIĞIN KEŞİF" : "SIRADAKİ KEŞFİN"}</p><h2 class="tg-k">${esc(st.name)}</h2></div></div><p class="tg-where location-cue">${locationCue(st)}</p><button class="btn btn-gold" id="target-learn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5Q7 2 2 4v15q5-2 10 1q5-3 10-1V4q-5-2-10 1Z M12 5v15"/></svg>${S.flow && S.flow.id === st.id ? "Kaldığın yerden devam et →" : "Tanış ve bul →"}</button>`;
   $("#target-learn").onclick = () => {
     if (S.flow && S.flow.id === st.id) resumeTask(); else openLesson(st, false);
   };
@@ -521,6 +552,8 @@ function renderLesson(){
   // Eski iki aşamalı kayıtları tek hazırlık ekranına taşı.
   S.flow.step="find";save();
   $("#learn-heading").textContent="Tanış ve bul";
+  const gi=$("#guest-intro");gi.classList.toggle("hidden",!S.guest);$("#v-learn").classList.toggle("guest",!!S.guest);
+  if(S.guest)gi.innerHTML=`<span aria-hidden="true">🧭</span><span><b>Bu bir keşif oyunu!</b> Akvaryumda ${ST.length} canlıyı bul, soruları bil, damgaları topla. İlk damgan bu canlıdan!</span>`;
   $("#learn-region").innerHTML=`<span class="region-symbol">${globeIcon}</span><span class="region-name">${esc(REG[st.region].label.toLocaleUpperCase("tr-TR"))}</span><span class="region-counter" aria-label="${ST.indexOf(st)+1}. görev, toplam ${ST.length} görev">${ST.indexOf(st)+1} / ${ST.length}</span>`;
   $("#learn-name").textContent=st.name;
   $("#learn-art").dataset.creature=st.id;$("#learn-art").innerHTML=artSVG(st.art);
@@ -662,7 +695,7 @@ function award(st){
   $("#rw-count").classList.toggle("rank-up", rankUp);
   if (rankUp) $("#rw-count").innerHTML = '<span>⭐ ' + n + ' / ' + t + '</span><span class="rank-new">' + newRank[1] + ' ' + esc(newRank[2]) + ' oldun!</span>';
   const chestNext = FX.sandik && n === t && !reducedMotion();
-  $("#rw-next").textContent = n === t ? (chestNext ? "Hazineyi aç 🎁" : "Final damgamı bas ⭐") : "Pasaportuma dön";
+  $("#rw-next").textContent = S.guest ? "Damgamı pasaportuma kaydet →" : n === t ? (chestNext ? "Hazineyi aç 🎁" : "Final damgamı bas ⭐") : "Pasaportuma dön";
   $("#rw-next").onclick = () => { if (n !== t) return show("v-home", false); if (chestNext) { chestSeq = true; show("v-home", false); } else openCert(); };
   stack = []; show("v-reward", false);
   $("#v-reward").classList.remove("shake");
@@ -992,7 +1025,16 @@ function readHash(){
   const h = location.hash; if (!h || h.length < 3) return;
   window.history.replaceState(null, "", location.pathname + location.search);
   const p = parse(h);
-  if (p.type === "code") { if (S) handleCode(p.value); else pending = p.value; }
+  if (p.type === "code") {
+    if (S) return handleCode(p.value);
+    const st = ST.find(s => s.code === p.value);
+    if (!st) { pending = p.value; return; }
+    // "Bu ne?" diye yolda okutan ziyaretçi: önce canlıyla tanışır, damgasını kazanır, adını sonra yazar.
+    avatar = AVATARS[0];
+    S = { v:1, id:newId(), name:"Kaşif", avatar, badges:{}, created:Date.now(), guest:true };
+    save(); requestPersist(); olay("start", st.id, "yolda");
+    handleCode(p.value);
+  }
 }
 window.addEventListener("hashchange", readHash);
 

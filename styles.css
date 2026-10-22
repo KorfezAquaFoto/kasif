@@ -936,3 +936,11 @@ html[data-layout=tiny] .quiz-buddy{display:none}
 
 /* --- Hikâye paylaşımı: yalnızca dolu pasaport önizlemesinde --- */
 #v-cert:not(.preview-passport) #btn-story{display:none!important}
+
+/* v44: yolda katılan ziyaretçi için kısa tanıtım ve kayıt ekranı */
+.guest-intro{display:flex;gap:10px;align-items:flex-start;margin:0;padding:10px 14px;border-radius:16px;background:#fff1cc;border:2px solid var(--gold);color:#4a2d00;font-size:15px;line-height:1.3;flex-shrink:0;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.guest-intro>span:first-child{font-size:22px;line-height:1}
+.guest-intro b{color:#4a2d00}
+#v-learn.guest .task-progress{display:none}
+html[data-layout=tiny] .guest-intro{font-size:13px;padding:7px 10px}
+html[data-layout=tiny] .guest-intro>span:first-child{display:none}
