@@ -33,7 +33,8 @@ async def certificate_cases(pg,engine):
    return fill.call(this,value,x,y,...rest);
   };
   proto.arc=function(x,y,r,...rest){
-   if(this.canvas.width===1080&&this.canvas.height===1350)window.__certArcs.push({x,y,r});
+   // Yazılar gibi çemberler de çizim dönüşümüyle (v44: kart %95 ölçek) gerçek konuma çevrilir.
+   if(this.canvas.width===1080&&this.canvas.height===1350){const m=this.getTransform(),p=new DOMPoint(x,y).matrixTransform(m);window.__certArcs.push({x:p.x,y:p.y,r:r*Math.hypot(m.a,m.b),r0:r});}
    return arc.call(this,x,y,r,...rest);
   };
  })()""")
@@ -73,7 +74,7 @@ async def certificate_cases(pg,engine):
   if index==7:await pg.emulate_media(reduced_motion='no-preference')
   await pg.wait_for_function('document.querySelector("#cert-img").naturalWidth===1080')
   result=await pg.evaluate("""name=>{
-   const texts=__certTexts,hero=texts.find(t=>t.value===name&&t.top<400),circle=__certArcs.find(t=>t.r===80);
+   const texts=__certTexts,hero=texts.find(t=>t.value===name&&t.top<400),circle=__certArcs.find(t=>t.r0===80);
    const problems=[];
    const letters=texts.filter(t=>t.value.trim().length===1&&t.top<200);
    if(letters.length<10||((letters[0].top+letters[0].bottom+letters[letters.length-1].top+letters[letters.length-1].bottom)/4-(letters[Math.floor(letters.length/2)].top+letters[Math.floor(letters.length/2)].bottom)/2)<10)problems.push('curved certificate heading');
@@ -81,7 +82,7 @@ async def certificate_cases(pg,engine):
    if(hero&&circle&&(hero.left<circle.x+circle.r+20||hero.right>1010))problems.push('name overlaps or clips');
    if(texts.some(t=>t.left<65||t.right>1015||t.top<60||t.bottom>1245))problems.push('certificate text outside page');
    if(texts.some(t=>/tamamlayarak|oldun|hepsini keşfetti/.test(t.value)))problems.push('removed sentence returned');
-   const dates=texts.filter(t=>t.value==='15 Ekim 2026'),seal=__certArcs.find(t=>t.r===36);
+   const dates=texts.filter(t=>t.value==='15 Ekim 2026'),seal=__certArcs.find(t=>t.r0===36);
    if(dates.length!==1)problems.push('single completion date');
    if(dates.length&&Math.abs((dates[0].left+dates[0].right)/2-540)>2)problems.push('completion date not centered');
    if(!seal||!hero||hero.right+24>seal.x-45||Math.abs(seal.y-circle.y)>1)problems.push('name/seal clearance');
@@ -157,6 +158,8 @@ async def main():
     # Kullanıcı yazıyı büyüttüğünde metnin tamamı erişilebilir kalır.
     await pg.add_style_tag(content='.guide-bubble p,.quick-tip{font-size:24px!important}')
     await pg.click('#hint-home');await pg.click('#btn-hints')
+    # v44: ipuçları sıradaki durağın bölümünden açılır; dokuz bölümü gezmek için önce başa dön.
+    while not await pg.locator('#hint-prev').is_disabled():await pg.click('#hint-prev')
     for i in range(9):
      await pg.wait_for_timeout(100)
      card=pg.locator('.hint-card');await card.evaluate('(e)=>e.scrollTop=e.scrollHeight')
