@@ -163,12 +163,22 @@ function renderHome(){
   if (!target || S.badges[target]) target = nextTarget();
   renderTarget(); renderRoad();
   if (chestSeq) runChestSequence();
+  else if (S.behindNote) showBehindNote();
   $("#btn-scan").classList.toggle("pulse", n === 0);
   S.last = null;
   renderInstall();
 }
 // Yolda katılan ya da sırayı atlayan kaşif geri gönderilmez: son damgadan sonraki ilk eksik durak önerilir,
 // sona gelince kaçırılanlara döner.
+// Geride kalan keşifler: zorunlu değil, çocuğa nazikçe hatırlatılır (bir kez).
+function showBehindNote(){
+  S.behindNote = false; S.behindShown = true; save();
+  const missing = ST.filter(x => !S.badges[x.id]), first = missing[0];
+  setTimeout(() => { if (current !== "v-home") return;
+    modal(first.art, "Yolun sonuna geldin! 🎉", "Geride " + missing.length + " keşif kaldı. İstersen geri dönüp onları da bulabilir, hazineyi açabilirsin.", [
+      { label: "Geride kalanlara bak", onClick: () => { target = first.id; S.target = target; save(); renderTarget(); renderRoad(); } },
+      { label: "Tamam", cls: "btn-ghost" }]); }, 900);
+}
 function lastStampIndex(){
   let best = -1, ts = -1;
   ST.forEach((s, i) => { const t = S.badges[s.id]; if (t && t >= ts) { ts = t; best = i; } });
@@ -188,7 +198,7 @@ function locationCue(st){
 function renderTarget(){
   const st = ST.find(s => s.id === target), box = $("#target");
   box.classList.toggle("hidden", !st); if (!st) return;
-  box.innerHTML = `<div class="target-heading"><span class="target-art" aria-hidden="true">${artSVG(st.art)}<span class="target-step">${ST.indexOf(st)+1}</span></span><div class="tg-txt"><p class="target-kicker">${isMissed(st) ? "KAÇIRDIĞIN KEŞİF" : "SIRADAKİ KEŞFİN"}</p><h2 class="tg-k">${esc(st.name)}</h2></div></div><p class="tg-where location-cue">${locationCue(st)}</p><button class="btn btn-gold" id="target-learn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5Q7 2 2 4v15q5-2 10 1q5-3 10-1V4q-5-2-10 1Z M12 5v15"/></svg>${S.flow && S.flow.id === st.id ? "Kaldığın yerden devam et →" : "Tanış ve bul →"}</button>`;
+  box.innerHTML = `<div class="target-heading"><span class="target-art" aria-hidden="true">${artSVG(st.art)}<span class="target-step">${ST.indexOf(st)+1}</span></span><div class="tg-txt"><p class="target-kicker">${isMissed(st) ? "GERİDE KALAN KEŞİF" : "SIRADAKİ KEŞFİN"}</p><h2 class="tg-k">${esc(st.name)}</h2></div></div><p class="tg-where location-cue">${locationCue(st)}</p><button class="btn btn-gold" id="target-learn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5Q7 2 2 4v15q5-2 10 1q5-3 10-1V4q-5-2-10 1Z M12 5v15"/></svg>${S.flow && S.flow.id === st.id ? "Kaldığın yerden devam et →" : "Tanış ve bul →"}</button>`;
   $("#target-learn").onclick = () => {
     if (S.flow && S.flow.id === st.id) resumeTask(); else openLesson(st, false);
   };
@@ -684,7 +694,11 @@ function openQuiz(st){
 
 // ---------- Damga ----------
 function award(st){
-  S.badges[st.id] = Date.now(); S.flow=null; save();
+  S.badges[st.id] = Date.now(); S.flow=null;
+  // Yolun sonuna gelindi ama geride boş durak var: ana ekrana dönünce bir kez bilgi penceresi.
+  const missing = ST.filter(x => !S.badges[x.id]), last = lastStampIndex();
+  if (missing.length && missing.every(x => ST.indexOf(x) < last) && !S.behindShown) S.behindNote = true;
+  save();
   olay("stamp", st.id); if (count() === ST.length) olay("complete");
   S.last = st.id;   // haritada yeni yanan bölge parlasın
   // Damga aleti pasaport sayfasına iner, damga basılır
@@ -1022,7 +1036,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v47`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v49`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
