@@ -5,7 +5,7 @@ permissions:
 jobs:
   mobile-flow:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20   # akış uzadıkça 10 dakika sınırına yaklaştı
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -21,7 +21,7 @@ jobs:
           path: tests/out/*.png
   mobile-layout:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20   # akış uzadıkça 10 dakika sınırına yaklaştı
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
