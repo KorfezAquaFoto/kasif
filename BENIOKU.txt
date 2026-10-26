@@ -3,20 +3,27 @@ OKYANUS KAŞİFİ PASAPORTU
 
 Körfez Aqua için çocuklara yönelik QR damga toplama oyunu.
 Uygulama indirilmez; tarayıcıda açılır, ilk açılıştan sonra internetsiz çalışır.
-Sunucu, veritabanı, hesap yok. Maliyet sıfır.
+Sunucu yok, maliyet sıfır. Çocuğun yalnızca takma adı alınır ve telefonda kalır.
 
 ADRES: https://korfezaquafoto.github.io/kasif/
 (Not: pages.dev adresleri Türkiye'de erişime engelli, Cloudflare Pages kullanmayın.)
 
 NASIL OYNANIR
 1. Girişteki QR okutulur → çocuk adını yazar, kaşif dostunu seçer → pasaport açılır.
-2. Ana ekran "macera yolu": Başla'dan Hazine'ye 9 durak. Kaşif dostu aranan durağın
-   üstünde durur, altta ipucu ve QR'ın yeri yazar.
-3. Canlının yanındaki QR, oyundaki "QR Tara" ile okutulur → soru gelir.
-   Yanlışta "Neredeyse! İpucu" çıkar, kaybetmek yok.
-4. Doğru cevapta damga aleti iner, damga basılır, canlı hakkında bilgi gelir.
-5. 9 damga tamamlanınca altın "Okyanus Kaşifi" final damgası kapağa basılır, kapak
-   altına döner. Dolu pasaportun resmi telefona kaydedilir / paylaşılır.
+   Girişi atlayıp doğrudan bir görev QR'ı okutan da oynayabilir: önce bir hoş geldin
+   penceresi çıkar, ilk damgasını alır, adını sonra yazar.
+2. Ana ekran "macera yolu": Başla'dan Hazine'ye 9 durak. Kaşif dostu sıradaki durağın
+   üstünde durur; altta canlının adı ve nerede olduğu yazar. Sıra zorunlu değildir.
+3. "Tanış ve bul" ekranında kısa bir ipucu okunur; canlının yanındaki QR, oyundaki
+   "QR Tara" ile okutulur (kamera çalışmazsa QR'ın altındaki kod elle yazılır).
+4. Soru gelir. Yanlışta ipucu çıkar, sınırsız deneme; kaybetmek yok.
+5. Doğru cevapta damga basılır, canlı hakkında kısa bir bilgi gelir.
+   3, 6 ve 9 damgada kaşif unvanı kazanılır (Yavru, Cesur, Okyanus Kaşifi).
+6. 9 damga tamamlanınca hazine sandığı açılır, içinden sertifika çıkar. Sertifika
+   telefona kaydedilir, paylaşılır ya da dik "hikâye" resmi olarak paylaşılır.
+7. 9'u tamamlamadan çıkmak isteyen menüden "Pasaportumu şimdi al" ile o ana kadar
+   topladığı damgalarla pasaport resmini alabilir; isterse devam edip tamamlar.
+   Oyun tek ziyarette bitirilecek şekilde tasarlandı.
 
 9 GÖREV
  1 Güney Amerika  Pirana            PRN-3T9F
@@ -30,28 +37,39 @@ NASIL OYNANIR
  9 Büyük Tünel    Vatoz             VTZ-9K3A
 
 QR POSTERLERİ
-- Yayın adresinde  /qr-kodlari.html  sayfasını aç → Yazdır (A4'e 2 poster).
-  Giriş + 9 görev QR'ı otomatik üretilir. Asmadan önce her QR'ı telefonla dene,
-  mat laminasyon önerilir.
+- Yayın adresinde  /qr-kodlari.html  sayfasını aç → Yazdır.
+  A4'e tek poster; giriş + 9 görev, büyük QR ve altında elle yazılabilir kod.
+  Yazdırırken: A4, %100 / gerçek boyut, kenar boşluğu yok, arka plan grafikleri açık.
+- Asmadan önce her QR'ı telefonla dene; mat laminasyon önerilir.
+- Bir görev kodu ya da sitenin adresi değişirse posterler yeniden basılmalı.
+
+İSTATİSTİK
+- Oyun isimsiz kullanım bilgisi gönderir (hangi görev, saat, telefon türü; isim yok).
+  İnternet yoksa telefonda bekler, bağlantı gelince gönderilir.
+- Sonuçlar /istatistik.html sayfasında, yalnızca yönetici girişiyle görülür.
 
 GÜNCELLEME
-- Değişiklikler Claude Code ile yapılıp git ile GitHub'a gönderilir; site 1-2 dakikada
-  güncellenir, telefonlar internete bağlanınca yeni sürümü kendiliğinden alır.
-- Elle düzenlenecekse: görevler/sorular/kodlar data.js'te, çizimler art.js'te.
-  Her değişiklikte sw.js içindeki VERSION'ı artır (ör. kasif-v13 → kasif-v14).
-- Bir görev kodu değişirse posterler yeniden basılmalı.
+- Değişiklikler git ile GitHub'a gönderilir; site 1-2 dakikada güncellenir,
+  telefonlar internete bağlanınca yeni sürümü kendiliğinden alır.
+- Görevler, sorular, ipuçları ve kodlar data.js'te.
+- Her değişiklikte sw.js içindeki VERSION'ı ve menüdeki sürüm yazısını (app.js) artır.
+- Her gönderimde GitHub Actions otomatik testleri çalıştırır (görev akışı, 16 telefon
+  boyutu, tablet, Chromium + Safari motoru, poster QR'ları).
 
 DOSYALAR
  index.html, styles.css   ekranlar ve görünüm
  app.js                   oyun mantığı
- data.js                  görevler, sorular, ipuçları
- art.js                   canlı çizimleri ve damgalar
+ data.js                  görevler, sorular, ipuçları, bilgi yazıları
+ art.js, art-assets.js    canlı çizimleri, damgalar, hazine sandığı
+ assets/                  onaylı çizim paketi
+ olay.js                  isimsiz kullanım istatistiği
+ istatistik.html          yönetici istatistik sayfası
  sw.js                    internetsiz çalışma
  qr-kodlari.html          yazdırılabilir QR posterleri
- fonts/ icons/ vendor/    yazı tipi, ikonlar, QR okuyucu
- tests/e2e.py             otomatik test
+ logo2.png                Körfez Aqua logosu
+ fonts/ icons/ vendor/    yazı tipleri, ikonlar, QR okuyucu
+ tests/                   otomatik testler
 
-BİLİNEN SINIRLAR (sunucusuz olduğu için)
-- İlerleme telefonda saklanır. iPhone'da site 7 gün açılmazsa silinebilir
-  (gezi tek günlük olduğu için genelde sorun olmaz).
-- İstatistik yok. Kodlar dosyada açık; çocuk oyunu için koruma soru adımıdır.
+BİLİNEN SINIRLAR
+- İlerleme telefonda saklanır; başka telefona taşınmaz.
+- Kodlar dosyada açık; çocuk oyunu için koruma, soru adımıdır.
