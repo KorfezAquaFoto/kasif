@@ -175,9 +175,9 @@ function showBehindNote(){
   S.behindNote = false; S.behindShown = true; save();
   const missing = ST.filter(x => !S.badges[x.id]), first = missing[0];
   setTimeout(() => { if (current !== "v-home") return;
-    modal(first.art, "Yolun sonuna geldin! 🎉", "Geride " + missing.length + " keşif kaldı. İstersen geri dönüp onları da bulabilir, hazineyi açabilirsin.", [
-      { label: "Geride kalanlara bak", onClick: () => { target = first.id; S.target = target; save(); renderTarget(); renderRoad(); } },
-      { label: "Tamam", cls: "btn-ghost" }]); }, 900);
+    modal(first.art, "Yolun sonuna geldin! 🎉", count() + " / " + ST.length + " keşif tamamladın. İstersen geri dönüp kalan " + missing.length + " keşfi bul, istersen pasaportunu şimdi al.", [
+      { label: "Geri dönüp keşfet", onClick: () => { target = first.id; S.target = target; save(); renderTarget(); renderRoad(); } },
+      { label: "Pasaportumu şimdi al", cls: "btn-ghost", onClick: () => openCert({ partial: true }) }]); }, 900);
 }
 function lastStampIndex(){
   let best = -1, ts = -1;
@@ -748,10 +748,14 @@ function confetti(N, sel = "#confetti", view = "v-reward"){
 // Damga aleti büyük altın "Okyanus Kaşifi" damgasını kapağa basar, kapak altına döner.
 // Paylaşılan resim sertifika değil, çocuğun dolu pasaportu.
 let certBlob = null, certAnimationRun = 0;
+let certPartial = false;
 function openCert(opts = {}){
-  if (count() < ST.length) return show("v-home", false);
+  const partial = count() < ST.length;
+  if (partial && !(opts.partial && count() > 0)) return show("v-home", false);
+  certPartial = partial;
   stack = ["v-home"]; show("v-cert", false);
-  $("#v-cert").classList.toggle("preview-passport", !!opts.preview);
+  $("#v-cert").classList.toggle("preview-passport", !!opts.preview || partial);
+  $("#v-cert .tb-title").textContent = partial ? "Kaşif pasaportun" : "Pasaportun tamamlandı!";
   certBlob=null; $("#btn-save").disabled=true; $("#btn-share").disabled=true; $("#btn-story").disabled=true;
   $("#btn-story").classList.toggle("hidden", !FX.hikaye);
   document.querySelectorAll("#v-cert [data-aq]").forEach(el => el.textContent = D.aquarium);
@@ -813,13 +817,13 @@ async function shareFile(){
 }
 $("#btn-save").onclick = async () => {
   if (!certBlob) return;
-  olay("save");
+  olay("save", null, certPartial ? "yarim" : null);
   if (IOS && canShareFile() && await shareFile()) return;
   download();
 };
 $("#btn-share").onclick = async () => {
   if (!certBlob) return;
-  olay("share");
+  olay("share", null, certPartial ? "yarim" : null);
   if (canShareFile() && await shareFile()) return;
   if (navigator.share) { try { await navigator.share({ title:"Okyanus Kaşifi", text:`${D.aquarium}'da Okyanus Kaşifi oldum!`, url: location.origin + location.pathname }); return; } catch(e){ if (e && e.name === "AbortError") return; } }
   download();
@@ -839,8 +843,8 @@ async function storyBlob(){
   x.strokeStyle = "rgba(255,255,255,.3)"; x.lineWidth = 3;
   [[90, 1630, 14], [150, 1550, 9], [985, 1590, 16], [935, 1712, 10], [62, 420, 10], [1016, 385, 13], [120, 1815, 8], [1000, 1830, 7]].forEach(([a, b, r]) => { x.beginPath(); x.arc(a, b, r, 0, Math.PI * 2); x.stroke(); });
   const line = (t, y, size, color, weight = 700) => { let fs = size; x.font = weight + " " + fs + "px " + F; while (x.measureText(t).width > 960 && fs > 24) { fs--; x.font = weight + " " + fs + "px " + F; } x.fillStyle = color; x.textAlign = "center"; x.textBaseline = "alphabetic"; x.fillText(t, W / 2, y); };
-  line("Okyanus Kaşifi oldum!", 205, 92, "#ffffff");
-  line(D.aquarium + "'da " + ST.length + " keşfi tamamladım", 285, 44, "#ffe38a", 600);
+  line(certPartial ? "Okyanus Kaşifi pasaportum" : "Okyanus Kaşifi oldum!", 205, 92, "#ffffff");
+  line(D.aquarium + "'da " + count() + " keşif " + (certPartial ? "yaptım" : "tamamladım"), 285, 44, "#ffe38a", 600);
   x.save(); x.shadowColor = "rgba(0,0,0,.45)"; x.shadowBlur = 40; x.shadowOffsetY = 18;
   rr(x, 90, 350, 900, 1125, 44); x.fillStyle = "#fff8ec"; x.fill(); x.restore();
   x.save(); rr(x, 90, 350, 900, 1125, 44); x.clip(); x.drawImage(cert, 90, 350, 900, 1125); x.restore();
@@ -965,7 +969,8 @@ async function drawCert(){
       x.beginPath();x.ellipse(0,0,rx,ry,0,0,Math.PI*2);x.fillStyle=gold;x.fill();x.restore();
     });
   });
-  text("SERTİFİKASI",540,180,44,680);
+  const partial=count()<ST.length;
+  text(partial?"KEŞİF PASAPORTU":"SERTİFİKASI",540,180,44,680);
   x.strokeStyle="#b78624";x.lineWidth=2.5;
   x.beginPath();x.moveTo(356,224);x.lineTo(505,224);x.moveTo(575,224);x.lineTo(724,224);x.stroke();
   star(540,224,18,gold);
@@ -982,12 +987,16 @@ async function drawCert(){
   x.font="700 "+fs+"px "+F;x.textAlign="left";x.textBaseline="alphabetic";x.fillStyle=navy;
   x.fillText(name,nameX,cy+(metrics.actualBoundingBoxAscent-metrics.actualBoundingBoxDescent)/2);
   // Tarihsiz, düz duran koleksiyon damgaları ve canlı/nesne adları.
-  const stamps=await Promise.all(ST.map(st=>svgImg(stampSVG(st,{certificate:true}))));
+  const stamps=await Promise.all(ST.map(st=>S.badges[st.id]?svgImg(stampSVG(st,{certificate:true})):null));
   const centers=[250,540,830],rows=[510,770,1030],size=212;
   ST.forEach((st,i)=>{
     const cx=centers[i%3],sy=rows[Math.floor(i/3)];
-    if(stamps[i])x.drawImage(stamps[i],cx-size/2,sy-size/2,size,size);
-    text(st.name,cx,sy+132,27,268);
+    if(S.badges[st.id]){ if(stamps[i])x.drawImage(stamps[i],cx-size/2,sy-size/2,size,size); text(st.name,cx,sy+132,27,268); return; }
+    // Yarım pasaport: henüz alınmamış damganın yeri soluk ve boş
+    x.save();x.beginPath();x.arc(cx,sy,92,0,Math.PI*2);x.fillStyle="#f3eee2";x.fill();
+    x.setLineDash([9,9]);x.lineWidth=4;x.strokeStyle="#cdbf9c";x.stroke();x.restore();
+    text("?",cx,sy,84,120,"#cdbf9c");
+    text(st.name,cx,sy+132,27,268,"#a5adbb");
   });
   // Tamamlanma tarihi bir kez: son keşfin tarihi.
   const finishedAt=Math.max(...ST.map(st=>Number(S.badges[st.id])||0))||Date.now();
@@ -1005,7 +1014,7 @@ async function drawCert(){
   for(let i=0;i<18;i++){const a=i*Math.PI/9;x.beginPath();x.arc(sealX+Math.cos(a)*37,sealY+Math.sin(a)*37,8,0,Math.PI*2);x.fill();}
   x.beginPath();x.arc(sealX,sealY,36,0,Math.PI*2);x.fillStyle="#ffe38a";x.fill();
   x.lineWidth=2;x.strokeStyle=gold;x.stroke();
-  text(ST.length+" / "+ST.length,sealX,sealY-6,26,72);
+  text(count()+" / "+ST.length,sealX,sealY-6,26,72);
   text("keşif",sealX,sealY+18,15,60);
   x.restore();
   // Orijinal marka, navy zemine çerçevesiz oturur.
@@ -1036,7 +1045,8 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ $("#ver").textContent = `${D.aquarium} · ${D.season} · v49`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v50`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+$("#btn-partial").onclick=()=>openCert({ partial: true });
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
   {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
