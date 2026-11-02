@@ -975,3 +975,7 @@ html[data-layout=tiny] .gw-steps li{font-size:13px}html[data-layout=tiny] .gw-fi
   .paper,.drawer-box,.modal-box,.gw-box{background:var(--paper);color:var(--ink)}
   input{background:#fff;color:var(--ink)}
 }
+/* v51: 8 görevde küçük ekran ızgarası: son sıradaki iki durak ortalanır */
+html[data-layout=tiny] #road-nodes.n8{grid-template-columns:repeat(6,1fr)}
+html[data-layout=tiny] #road-nodes.n8 .stop{grid-column:span 2}
+html[data-layout=tiny] #road-nodes.n8 .stop:nth-child(7){grid-column:2/span 2}

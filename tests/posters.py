@@ -58,7 +58,7 @@ async def check_set(pg,base,label,dim=True):
  await pg.evaluate('document.fonts.ready');await pg.add_script_tag(path=str(ROOT/'vendor/jsQR.js'))
  await pg.emulate_media(media='print');await pg.wait_for_timeout(150)
  stations=await pg.evaluate('KASIF.stations.map(s=>({id:s.id,code:s.code,title:s.title,q:s.quiz?.q,tip:s.tip,reward:s.reward}))')
- posters=pg.locator('.poster');assert await posters.count()==len(stations)+1==10
+ posters=pg.locator('.poster');assert await posters.count()==len(stations)+1
  expected=[base]+[base+'#s='+s['code'] for s in stations]
  bounds=await geometry(pg)
  for index,g in enumerate(bounds):
@@ -126,7 +126,7 @@ async def main():
   for backgrounds,suffix in [(True,'a4'),(False,'no-background')]:
    path=OUT/f'korfez-aqua-posterler-{suffix}.pdf'
    await pg.pdf(path=str(path),format='A4',prefer_css_page_size=True,print_background=backgrounds,display_header_footer=False)
-   reader=PdfReader(path);assert len(reader.pages)==10,('PDF page count',suffix,len(reader.pages))
+   reader=PdfReader(path);assert len(reader.pages)==len(stations)+1,('PDF page count',suffix,len(reader.pages))
    for i,page in enumerate(reader.pages):
     assert abs(float(page.mediabox.width)-595.276)<1 and abs(float(page.mediabox.height)-841.89)<1,('PDF A4',i)
     text=page.extract_text()
@@ -150,6 +150,6 @@ async def main():
   await ctx.close();await browser.close()
  server.shutdown()
  (OUT/'results.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf-8')
- print('PASS: 10 posters, local/published URLs, dim/blur, 20 PDF QR decodes, background-off printing',flush=True)
+ print(f'PASS: {len(stations)+1} posters, local/published URLs, dim/blur, 20 PDF QR decodes, background-off printing',flush=True)
 
 if __name__=='__main__':asyncio.run(main())

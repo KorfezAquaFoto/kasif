@@ -245,6 +245,7 @@ window.KASIF = {
     },
     {
       "id": "kabuk",
+      "active": false,
       "code": "KAB-6R9T",
       "region": "kabuk",
       "art": "kabuk",
@@ -346,3 +347,6 @@ window.KASIF = {
     "tunel"
   ]
 };
+// Pasif görevler ("active": false) oyunda, posterlerde ve istatistikte görünmez.
+// Kabuk Sergisi görevi 2 Kasım 2026'da kapatıldı: QR'ı yerleştirecek uygun yer bulunamadı. Geri açmak için "active": false satırını sil.
+window.KASIF.stations = window.KASIF.stations.filter(s => s.active !== false);

@@ -74,11 +74,11 @@ async def main():
       await pg.reload();await pg.click('#btn-help');await check_help(pg,f'{w}x{h}-help')
       if w in [253,320,375,390,844]:await pg.screenshot(path=str(OUT/f'responsive-{w}x{h}-help.png'))
       await pg.click('#help-close');await pg.click('#btn-hints')
-      for i in range(9):
+      for i in range(await pg.evaluate('KASIF.stations.length')):
         await check(pg,f'{w}x{h}-hint-{i}')
         if i==0 and w in [280,320,375]:await pg.screenshot(path=str(OUT/f'responsive-{w}x{h}-hints.png'))
         if i==3 and w in [320,375,390]:await pg.screenshot(path=str(OUT/f'responsive-{w}x{h}-fossil.png'))
-        if i<8:await pg.click('#hint-next')
+        if i<await pg.evaluate('KASIF.stations.length')-1:await pg.click('#hint-next')
       await pg.click('#hint-home')
       for st in await pg.evaluate('KASIF.stations.map(s=>s.id)'):
         await pg.click(f'.stop[data-id="{st}"]');await pg.click('#target-learn');await check(pg,f'{w}x{h}-learn-{st}')
@@ -103,7 +103,7 @@ async def main():
       await ctx.close()
     await br.close()
   server.shutdown()
-  print('PASS: 16 mobile configurations, all 9 hints and lessons; touch sizes, clipping and overlaps')
+  print('PASS: 16 mobile configurations, all hints and lessons; touch sizes, clipping and overlaps')
   from PIL import Image,ImageOps,ImageDraw
   import io,base64
   names=['responsive-320x480-welcome.png','responsive-320x480-hints.png','responsive-375x667-welcome.png','responsive-375x667-hints.png']

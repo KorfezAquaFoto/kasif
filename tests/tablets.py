@@ -37,10 +37,11 @@ async def tablet_cases(br,engine,base,configs=None):
   await pg.click('#btn-help');await pg.wait_for_timeout(400)
   assert await pg.evaluate("document.querySelector('#howto').scrollHeight<=document.querySelector('#howto').clientHeight+2"),(label,'help scrolling')
   await pg.click('#help-close');await pg.click('#btn-hints')
-  for i in range(9):
+  N=await pg.evaluate('KASIF.stations.length')
+  for i in range(N):
    await fits(pg,label+f'-hint-{i}')
    if i==3:await pg.screenshot(path=str(OUT/(label+'-fossil.png')))
-   if i<8:await pg.click('#hint-next')
+   if i<N-1:await pg.click('#hint-next')
   await pg.click('#hint-home')
   stations=await pg.evaluate("KASIF.stations.filter(s=>['pirana','fosil','megalodon'].includes(s.id))")
   for st in stations:

@@ -73,7 +73,7 @@ async def main():
       assert await pg.locator('#learn-heading').inner_text()=='Tanış ve bul'
       assert await pg.locator('.quick-tip').count()==1
       assert 'GÜNEY AMERİKA' in await pg.locator('#learn-region').inner_text()
-      assert await pg.locator('.region-counter').inner_text()=='1 / 9'
+      assert await pg.locator('.region-counter').inner_text()=='1 / '+str(await pg.evaluate('KASIF.stations.length'))
       assert await pg.locator('.tip-fact').count()==1
       assert await pg.locator('.tip-heading').evaluate('(e)=>getComputedStyle(e).justifyContent')=='center'
       assert await pg.locator('.quick-tip').evaluate('(e)=>getComputedStyle(e).textAlign')=='left'
@@ -89,7 +89,7 @@ async def main():
         assert ' '.join((await pg.locator('#hint-copy').inner_text()).split())==' '.join(st['tip'].split())
         assert len(st['tip'].split())<=30
         await fits(pg,prefix+'-hint-region-'+str(i),False)
-        if i<8: await pg.click('#hint-next')
+        if i<len(stations)-1: await pg.click('#hint-next')
       assert await pg.locator('#hint-next').is_disabled()
       await pg.click('#hint-home');await pg.locator('#v-home.active').wait_for();await pg.click('#btn-hints');await pg.click('#hint-go')
       await pg.fill('#in-code','PRN-3T9F');await pg.click('#manual-form button')
@@ -153,7 +153,7 @@ async def main():
       # Önbellek güncellemesi sonrası çevrimdışı açılış ve damgaların korunması.
       await pg.evaluate('navigator.serviceWorker.ready');await pg.wait_for_timeout(1000)
       await ctx.set_offline(True);await pg.reload();await pg.locator('#v-home.active').wait_for()
-      assert '9/9' in await pg.locator('#me-count').inner_text()
+      n=await pg.evaluate('KASIF.stations.length');assert f'{n}/{n}' in await pg.locator('#me-count').inner_text()
       assert not errors,errors
       await ctx.close()
     # Gerçek QR çözümleyici: jsQR ile giriş ve dokuz görev QR'ını çöz.
@@ -203,8 +203,9 @@ async def main():
     await pg.evaluate("""()=>{document.body.lastElementChild.innerHTML=KASIF.stations.map(s=>'<div style="display:grid;justify-items:center;align-content:center;gap:3px;font-size:16px"><div style="width:168px;height:168px">'+stampSVG(s,{date:Date.now()})+'</div>'+s.name+'</div>').join('')}""")
     await pg.screenshot(path=str(OUT/'stamp-gallery.png'))
     await pg.goto(B+'qr-kodlari.html')
-    assert await pg.locator('.poster').count()==10
-    assert await pg.locator('.poster .em image').count()==10
+    n=await pg.evaluate('KASIF.stations.length')
+    assert await pg.locator('.poster').count()==n+1
+    assert await pg.locator('.poster .em image').count()==n+1
     assert await pg.locator('.code').all_text_contents()==codes
     await pg.evaluate("async()=>{const i=new Image();i.src=KASIF_ART_PACK.src;await i.decode()}")
     await br.close()
@@ -244,6 +245,6 @@ async def main():
   data=io.BytesIO();sheet.save(data,format='JPEG',quality=85)
   print('QUIZ_ART_QA_BASE64:'+base64.b64encode(data.getvalue()).decode(),flush=True)
   server.shutdown()
-  print('PASS: 5 ekran boyutu, 9 görev, bilgi/gözlem, QR, final, kayıt ve çevrimdışı açılış')
+  print('PASS: 5 ekran boyutu, tüm görevler, bilgi/gözlem, QR, final, kayıt ve çevrimdışı açılış')
 
 asyncio.run(main())

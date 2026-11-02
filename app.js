@@ -18,14 +18,14 @@ const FX = {
   qrEfekt: true,   // QR okununca "Buldun!" patlaması
   bolgeRenk: true, // Tanış/soru/damga ekranında bölgeye göre arka plan
   yol: true,       // macera yolunda altın iz ve yürüyen kaşif dostu
-  unvan: true,     // 3 / 6 / 9 damgada kaşif unvanı
+  unvan: true,     // 3 / 6 / tüm damgalarda kaşif unvanı
   tepki: true,     // soru ekranında kaşif dostunun sevinci/düşünmesi
   sandik: true,    // 9/9'da hazine sandığının açılması
   hikaye: true     // dolu pasaportu dik "hikâye" resmi olarak paylaşma
 };
 Object.keys(FX).forEach(k => document.documentElement.classList.toggle("fx-" + k, !!FX[k]));
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-const RANKS = [[9, "🏆", "Okyanus Kaşifi"], [6, "🐬", "Cesur Kaşif"], [3, "🐠", "Yavru Kaşif"]];
+const RANKS = [[ST.length, "🏆", "Okyanus Kaşifi"], [6, "🐬", "Cesur Kaşif"], [3, "🐠", "Yavru Kaşif"]];
 const rankOf = n => RANKS.find(r => n >= r[0]) || null;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
@@ -151,6 +151,8 @@ function helloHTML(){
 // Çocuğun ilk gördüğü yer oyunun kendisi: Başla'dan Hazine'ye zikzak bir yol, üstünde 9 durak.
 // Kaşif dostu aranan durağın üstünde durur; ipucu alttaki konuşma balonunda.
 const ROAD = [[18,79],[50,79],[82,79],[82,51],[50,51],[18,51],[18,23],[50,23],[82,23]];   // % konumlar, 3 sıra zikzak
+// Durak yerleri yol çizgisinin üstündedir. 8 görevde sıralar 3-2-3: ortadaki iki durak eşit aralıklı.
+const STOPS_XY = ST.length === 8 ? [[18,79],[50,79],[82,79],[66,51],[34,51],[18,23],[50,23],[82,23]] : ROAD;
 let target = S && S.target || null;   // aranan görev; boş bir durağa dokununca değişir
 function renderHome(){
   $("#me-av").innerHTML = av(S.avatar); $("#me-name").textContent = S.name;
@@ -205,8 +207,9 @@ function renderTarget(){
 }
 function renderRoad(){
   const done = count() === ST.length;
+  $("#road-nodes").classList.toggle("n8", ST.length === 8);
   $("#road-nodes").innerHTML = ST.map((st, i) => {
-    const [x, y] = ROAD[i] || [50, 50], has = !!S.badges[st.id], on = st.id === target;
+    const [x, y] = STOPS_XY[i] || [50, 50], has = !!S.badges[st.id], on = st.id === target;
     return `<button type="button" class="stop ${has ? "got" : "locked"}${on ? " on" : ""}" data-id="${st.id}" style="left:${x}%;top:${y}%;--rot:${ROT[i % ROT.length]}deg" aria-label="${esc((i+1)+". durak: "+st.name+(has?", tamamlandı":on?", buradasın":""))}" aria-current="${on ? "step" : "false"}">
       ${has ? stampSVG(st, { date: S.badges[st.id], shine: FX.parlak }) : `<span class="sil">${artSVG(st.art)}</span>`}<span class="num">${i + 1}</span>
       ${has ? `<span class="stop-done" aria-hidden="true">✓</span>` : ""}${on ? `<span class="here-pin">Buradasın<span aria-hidden="true">▼</span></span>` : ""}</button>`;
@@ -222,7 +225,11 @@ function renderRoad(){
 
 // ---------- v41 macera yolu: altın iz ve yürüyen kaşif dostu ----------
 // Yol noktaları road-svg ile aynı yüzde koordinatlarında: Başla → 9 durak → Hazine.
-const ROUTE = [[18,97], ...ROAD, [82,4], [65,7]];   // son nokta: hazinenin yanı (yalnızca kaşif dostu için)
+// Yolun köşe noktaları + duraklar (kaşif dostu ve altın iz bu sırayla ilerler); son nokta hazinenin yanı.
+const ROUTE = ST.length === 8
+  ? [[18,97],[18,79],[50,79],[82,79],[82,51],[66,51],[34,51],[18,51],[18,23],[50,23],[82,23],[82,4],[65,7]]
+  : [[18,97], ...ROAD, [82,4], [65,7]];
+const STOP_ROUTE = ST.length === 8 ? [1,2,3,5,6,8,9,10] : ST.map((_, i) => i + 1);   // durak → ROUTE sırası
 let walkerAt = null, trailAt = null, chestSeq = false, chestTimer = 0, stopWalk = null, stopTrail = null;
 function routePoint(p){
   const i = Math.max(0, Math.min(ROUTE.length - 2, Math.floor(p))), f = Math.max(0, Math.min(1, p - i));
@@ -234,8 +241,8 @@ function roadFxVisible(){
   return FX.yol && current === "v-home" && !!road.offsetWidth && !!svg && getComputedStyle(svg).display !== "none";
 }
 // Kaşif dostu aranan durağın üstünde durur; hepsi bitince hazinenin önünde.
-function walkerGoal(){ const i = ST.findIndex(s => s.id === target); return i < 0 ? (count() === ST.length ? ROUTE.length - 1 : 1) : i + 1; }
-function trailGoal(){ const n = count(); return n === ST.length ? ROUTE.length - 2 : n; }
+function walkerGoal(){ const i = ST.findIndex(s => s.id === target); return i < 0 ? (count() === ST.length ? ROUTE.length - 1 : 1) : STOP_ROUTE[i]; }
+function trailGoal(){ const n = count(); return n === ST.length ? ROUTE.length - 2 : n ? STOP_ROUTE[n - 1] : 0; }
 function drawTrail(q){
   const pts = [];
   if (q > 0) { for (let i = 0; i <= Math.floor(q) && i < ROUTE.length; i++) pts.push(ROUTE[i]); if (q % 1) pts.push(routePoint(q)); }
@@ -245,7 +252,7 @@ function drawTrail(q){
 function placeWalker(p, hop = 0){
   const w = $("#walker"); if (!w) return;
   const [x, y] = routePoint(p), stop = $("#road-nodes .stop");
-  const lift = p > 9.5 ? 2 : (stop ? stop.offsetHeight / 2 : 36) + 2;
+  const lift = p > ROUTE.length - 2.5 ? 2 : (stop ? stop.offsetHeight / 2 : 36) + 2;
   w.style.left = x + "%"; w.style.top = y + "%";
   w.style.transform = "translate(-50%, calc(-100% - " + (lift + hop).toFixed(1) + "px))";
 }
@@ -990,7 +997,7 @@ async function drawCert(){
   const stamps=await Promise.all(ST.map(st=>S.badges[st.id]?svgImg(stampSVG(st,{certificate:true})):null));
   const centers=[250,540,830],rows=[510,770,1030],size=212;
   ST.forEach((st,i)=>{
-    const cx=centers[i%3],sy=rows[Math.floor(i/3)];
+    const row=Math.floor(i/3),inRow=Math.min(3,ST.length-row*3),cx=inRow===3?centers[i%3]:540+((i%3)-(inRow-1)/2)*290,sy=rows[row];
     if(S.badges[st.id]){ if(stamps[i])x.drawImage(stamps[i],cx-size/2,sy-size/2,size,size); text(st.name,cx,sy+132,27,268); return; }
     // Yarım pasaport: henüz alınmamış damganın yeri soluk ve boş
     x.save();x.beginPath();x.arc(cx,sy,92,0,Math.PI*2);x.fillStyle="#f3eee2";x.fill();
@@ -1045,7 +1052,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v50`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v51`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#btn-partial").onclick=()=>openCert({ partial: true });
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[

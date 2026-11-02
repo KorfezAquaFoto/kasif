@@ -86,7 +86,7 @@ async def certificate_cases(pg,engine):
    if(dates.length!==1)problems.push('single completion date');
    if(dates.length&&Math.abs((dates[0].left+dates[0].right)/2-540)>2)problems.push('completion date not centered');
    if(!seal||!hero||hero.right+24>seal.x-45||Math.abs(seal.y-circle.y)>1)problems.push('name/seal clearance');
-   if(!texts.some(t=>t.value==='9 / 9'&&t.top<400))problems.push('discovery seal beside name');
+   if(!texts.some(t=>t.value===KASIF.stations.length+' / '+KASIF.stations.length&&t.top<400))problems.push('discovery seal beside name');
    for(const st of KASIF.stations){
     if(!texts.some(t=>t.value===st.name&&t.top>500))problems.push('missing creature caption '+st.id);
     const svg=stampSVG(st,{certificate:true});
@@ -132,9 +132,10 @@ async def main():
     # WebKit'te pencere açılış animasyonu ve alt piksel yuvarlaması yerleşene kadar bekle.
     await pg.wait_for_function("""()=>{const d=document.querySelector('#help .drawer-box').getBoundingClientRect(),l=document.querySelector('#howto'),b=document.querySelector('#help-close').getBoundingClientRect();window.__helpLayout={top:d.top,bottom:d.bottom,viewport:visualViewport.height,scroll:l.scrollHeight,client:l.clientHeight};return d.top>=0&&d.bottom<=visualViewport.height+2&&b.bottom<=d.bottom+2&&l.scrollHeight<=l.clientHeight+2&&[...l.querySelectorAll('p')].every(e=>getComputedStyle(e).textAlign==='left')}""",timeout=3000)
     await pg.click('#help-close');await pg.click('#btn-hints')
-    for i in range(9):
+    N=await pg.evaluate('KASIF.stations.length')
+    for i in range(N):
      await bounds(pg,f'{engine.name}-{w}-hint-{i}')
-     if i<8:await pg.click('#hint-next')
+     if i<N-1:await pg.click('#hint-next')
     # Yeni damga, her iki tarayıcıda da karta sığmalı ve düz durmalı.
     await pg.click('#hint-home')
     st=await pg.evaluate("KASIF.stations.find(s=>s.id==='korfez')")
@@ -160,12 +161,12 @@ async def main():
     await pg.click('#hint-home');await pg.click('#btn-hints')
     # v44: ipuçları sıradaki durağın bölümünden açılır; dokuz bölümü gezmek için önce başa dön.
     while not await pg.locator('#hint-prev').is_disabled():await pg.click('#hint-prev')
-    for i in range(9):
+    for i in range(await pg.evaluate('KASIF.stations.length')):
      await pg.wait_for_timeout(100)
      card=pg.locator('.hint-card');await card.evaluate('(e)=>e.scrollTop=e.scrollHeight')
      assert await pg.locator('#hint-copy').inner_text()
      r=await pg.locator('#hint-copy').bounding_box();c=await card.bounding_box();assert r['y']+r['height']<=c['y']+c['height']+2,(engine.name,w,'large-font',i,r,c)
-     if i<8:await pg.click('#hint-next')
+     if i<await pg.evaluate('KASIF.stations.length')-1:await pg.click('#hint-next')
     if w==390:await certificate_cases(pg,engine.name)
     await ctx.close()
    await tablet_cases(br,engine.name,B)
