@@ -12,33 +12,33 @@ NASIL OYNANIR
 1. Girişteki QR okutulur → çocuk adını yazar, kaşif dostunu seçer → pasaport açılır.
    Girişi atlayıp doğrudan bir görev QR'ı okutan da oynayabilir: önce bir hoş geldin
    penceresi çıkar, ilk damgasını alır, adını sonra yazar.
-2. Ana ekran "macera yolu": Başla'dan Hazine'ye 9 durak. Kaşif dostu sıradaki durağın
+2. Ana ekran "macera yolu": Başla'dan Hazine'ye 8 durak. Kaşif dostu sıradaki durağın
    üstünde durur; altta canlının adı ve nerede olduğu yazar. Sıra zorunlu değildir.
 3. "Tanış ve bul" ekranında kısa bir ipucu okunur; canlının yanındaki QR, oyundaki
    "QR Tara" ile okutulur (kamera çalışmazsa QR'ın altındaki kod elle yazılır).
 4. Soru gelir. Yanlışta ipucu çıkar, sınırsız deneme; kaybetmek yok.
 5. Doğru cevapta damga basılır, canlı hakkında kısa bir bilgi gelir.
-   3, 6 ve 9 damgada kaşif unvanı kazanılır (Yavru, Cesur, Okyanus Kaşifi).
-6. 9 damga tamamlanınca hazine sandığı açılır, içinden sertifika çıkar. Sertifika
+   3, 6 ve 8 damgada kaşif unvanı kazanılır (Yavru, Cesur, Okyanus Kaşifi).
+6. 8 damga tamamlanınca hazine sandığı açılır, içinden sertifika çıkar. Sertifika
    telefona kaydedilir, paylaşılır ya da dik "hikâye" resmi olarak paylaşılır.
-7. 9'u tamamlamadan çıkmak isteyen menüden "Pasaportumu şimdi al" ile o ana kadar
+7. Hepsini tamamlamadan çıkmak isteyen menüden "Pasaportumu şimdi al" ile o ana kadar
    topladığı damgalarla pasaport resmini alabilir; isterse devam edip tamamlar.
    Oyun tek ziyarette bitirilecek şekilde tasarlandı.
 
-9 GÖREV
+8 GÖREV
  1 Güney Amerika  Pirana            PRN-3T9F
  2 Asya           Mersin balığı     MRS-4N7C
  3 Avustralya     Keşiş yengeci     KSY-2P6L
  4 Afrika         Fosiller          FSL-8D3M
  5 Avrupa         Orfoz             ORF-5G2H
  6 İzmit Körfezi  Körfez balıkları  KRF-7S1B  (dip çamuru temizliği vurgusu)
- 7 Kabuk Sergisi  Deniz kabukları   KAB-6R9T
- 8 Megalodon      Çene maketi       MGL-8W4K
- 9 Büyük Tünel    Vatoz             VTZ-9K3A
+ 7 Megalodon      Çene maketi       MGL-8W4K
+ 8 Büyük Tünel    Vatoz             VTZ-9K3A
+ (Kabuk Sergisi görevi kapatıldı: QR için uygun yer bulunamadı.)
 
 QR POSTERLERİ
 - Yayın adresinde  /qr-kodlari.html  sayfasını aç → Yazdır.
-  A4'e tek poster; giriş + 9 görev, büyük QR ve altında elle yazılabilir kod.
+  A4'e tek poster; giriş + 8 görev, büyük QR ve altında elle yazılabilir kod.
   Yazdırırken: A4, %100 / gerçek boyut, kenar boşluğu yok, arka plan grafikleri açık.
 - Asmadan önce her QR'ı telefonla dene; mat laminasyon önerilir.
 - Bir görev kodu ya da sitenin adresi değişirse posterler yeniden basılmalı.
