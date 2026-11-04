@@ -1052,7 +1052,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v51`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v52`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#btn-partial").onclick=()=>openCert({ partial: true });
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[

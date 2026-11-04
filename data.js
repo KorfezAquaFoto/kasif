@@ -338,9 +338,9 @@ window.KASIF = {
   "regionOrder": [
     "guney-amerika",
     "asya",
+    "avrupa",
     "avustralya",
     "afrika",
-    "avrupa",
     "izmit",
     "kabuk",
     "megalodon",
@@ -350,3 +350,5 @@ window.KASIF = {
 // Pasif görevler ("active": false) oyunda, posterlerde ve istatistikte görünmez.
 // Kabuk Sergisi görevi 2 Kasım 2026'da kapatıldı: QR'ı yerleştirecek uygun yer bulunamadı. Geri açmak için "active": false satırını sil.
 window.KASIF.stations = window.KASIF.stations.filter(s => s.active !== false);
+// Görevler yoldaki sırayla dizilir (regionOrder); posterler, testler ve istatistik de aynı sırayı görür.
+window.KASIF.stations.sort((a, b) => window.KASIF.regionOrder.indexOf(a.region) - window.KASIF.regionOrder.indexOf(b.region));
