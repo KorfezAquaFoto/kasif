@@ -153,7 +153,7 @@ function render(d, from, to){
   $("#kpis").innerHTML =
     kpi(fmt(o.oyuncu), "Oyuna başlayan", `${fmt(o.cihaz)} telefon siteyi açtı`) +
     kpi(fmt(o.damga), "Toplam damga", o.oyuncu ? `kişi başı ${(o.damga / o.oyuncu).toLocaleString("tr-TR",{maximumFractionDigits:1})}` : "") +
-    kpi(fmt(o.tamamlayan), "9/9 tamamlayan", o.oyuncu ? `başlayanların %${pct(o.tamamlayan, o.oyuncu)}'i` : "") +
+    kpi(fmt(o.tamamlayan), `${ORDER.length}/${ORDER.length} tamamlayan`, o.oyuncu ? `başlayanların %${pct(o.tamamlayan, o.oyuncu)}'i` : "") +
     kpi(sure.ortanca ? Math.round(sure.ortanca) + " dk" : "–", "Tamamlama süresi", sure.adet ? `ortanca, ${fmt(sure.adet)} kişiden` : "") +
     kpi(fmt((o.kaydetme || 0) + (o.paylasma || 0)), "Pasaport kaydı / paylaşım", `${fmt(o.kaydetme)} kaydetme · ${fmt(o.paylasma)} paylaşım`) +
     (d.yolda ? kpi(fmt(d.yolda.yolda_katilan), "Yolda katılan", `${fmt(d.yolda.yolda_baslayan)} kişi QR'ı girişten önce okuttu`) : "");
@@ -168,7 +168,7 @@ function render(d, from, to){
   bars($("#hourly"), Array.from({ length:13 }, (_, i) => ({ saat:i + 8, cihaz:byHour[i + 8] || 0 })), r => String(r.saat).padStart(2, "0"), r => r.cihaz);
 
   const b = h.basladi || 0;
-  hbars($("#funnel"), [["Başladı", b, ""], ["1+ damga", h.en_az_1, `%${pct(h.en_az_1, b)}`], ["5+ damga", h.en_az_5, `%${pct(h.en_az_5, b)}`], ["9 damga", h.tumu_9, `%${pct(h.tumu_9, b)}`]]);
+  hbars($("#funnel"), [["Başladı", b, ""], ["1+ damga", h.en_az_1, `%${pct(h.en_az_1, b)}`], ["5+ damga", h.en_az_5, `%${pct(h.en_az_5, b)}`], [`${ORDER.length} damga`, o.tamamlayan, `%${pct(o.tamamlayan, b)}`]]);
 
   const pn = { ios:"iPhone / iPad", android:"Android", diger:"Diğer" }, tot = (d.cihaz_turu || []).reduce((a, p) => a + p.cihaz, 0);
   hbars($("#platform"), (d.cihaz_turu || []).sort((a, z) => z.cihaz - a.cihaz).map(p => [pn[p.tur] || p.tur, p.cihaz, `%${pct(p.cihaz, tot)}`]));
