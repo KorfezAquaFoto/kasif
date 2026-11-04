@@ -320,20 +320,21 @@ function runChestSequence(){
   chestCertPromise.then(putCert);
   const finish = async () => {
     if (done) return; done = true;
-    timers.forEach(clearTimeout); document.removeEventListener("pointerdown", skip, true);
+    timers.forEach(clearTimeout); document.removeEventListener("click", block, true);
     chestSeq = false; end.classList.remove("shaking", "lifted"); end.classList.add("open");
     const blob = await chestCertPromise; chestCertPromise = null;
     if (current === "v-home") { openCert({ blob, preview: true }); confetti(70, "#confetti2", "v-cert"); }
     box.classList.add("leaving");
     setTimeout(() => { box.className = "chest-show hidden"; box.innerHTML = ""; if (certUrl) URL.revokeObjectURL(certUrl); }, 500);
   };
-  const skip = e => { e.preventDefault(); e.stopPropagation(); finish(); };
-  document.addEventListener("pointerdown", skip, true);
+  // Animasyon atlanamaz; bitene kadar ekrandaki dokunuşlar yok sayılır.
+  const block = e => { e.preventDefault(); e.stopPropagation(); };
+  document.addEventListener("click", block, true);
   end.classList.remove("open", "shaking", "lifted");
   // 1) Kaşif dostu hazineye varır, sandık yerinde sallanır
-  later(1400, () => end.classList.add("shaking"));
+  later(1200, () => end.classList.add("shaking"));
   // 2) Sandık yerinden kalkıp ekranın ortasına büyüyerek gelir
-  later(2200, () => {
+  later(1850, () => {
     const from = end.querySelector(".chest").getBoundingClientRect();
     box.innerHTML = '<div class="cs-back"></div><div class="cs-rays"></div><div class="cs-chest"><span class="cs-leak"></span>' + chestSVG() + '</div><div class="cs-flash"></div><div class="cs-cert"><div class="cs-ph"><b>OKYANUS KAŞİFİ</b><span>SERTİFİKASI</span></div></div>';
     box.className = "chest-show";
@@ -346,12 +347,12 @@ function runChestSequence(){
     void big.offsetWidth; requestAnimationFrame(() => box.classList.add("center"));
   });
   // 3) İçinden ışık sızar, sandık titrer
-  later(3100, () => box.classList.add("glow"));
+  later(2500, () => box.classList.add("glow"));
   // 4) Kapak açılır, ışık patlar
-  later(3900, () => { box.classList.add("open"); if (navigator.vibrate) navigator.vibrate([30, 40, 70]); playStampSound(); });
+  later(3100, () => { box.classList.add("open"); if (navigator.vibrate) navigator.vibrate([30, 40, 70]); playStampSound(); });
   // 5) Sertifika sandıktan yükselip ekranı doldurur
-  later(4450, () => box.classList.add("reveal"));
-  later(6400, finish);
+  later(3550, () => box.classList.add("reveal"));
+  later(5200, finish);
 }
 $("#road-nodes").addEventListener("click", e => {
   const b = e.target.closest(".stop"); if (!b) return;
@@ -1052,7 +1053,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v52`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v53`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#btn-partial").onclick=()=>openCert({ partial: true });
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
