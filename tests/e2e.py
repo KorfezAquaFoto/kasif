@@ -26,8 +26,8 @@ async def lesson_to_quiz(pg, label='task'):
     await fits(pg,label+'-quiz',False)
 
 async def group_race(br):
-  """v55 grup yarışı: Supabase sahte bellek içi sunucu; rehber, 2 ekip, kaçan damga, sıralama ve eşitlik."""
-  store={'groups':{},'seq':['K7QM','P2XB'],'down':False,'t':0}
+  """v56 Grup Mücadelesi: grup tek telefonla oynar, gruplar arası sıralama (sahte Supabase, bellek içi)."""
+  store={'rows':{},'down':False,'t':0}
   cors={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'POST, OPTIONS'}
   async def rpc(route):
     req=route.request
@@ -35,136 +35,118 @@ async def group_race(br):
     if store['down']: return await route.abort()
     name=req.url.split('?')[0].rsplit('/',1)[1];body=json.loads(req.post_data or '{}')
     async def reply(obj,status=200): await route.fulfill(status=status,headers={**cors,'content-type':'application/json'},body=json.dumps(obj))
-    if name=='kasif_grup_ac':
-      kod=store['seq'].pop(0);store['groups'][kod]={'ad':body['p_ad'],'ekipler':{}};return await reply(kod)
-    g=store['groups'].get((body.get('p_kod') or '').upper())
-    if name=='kasif_ekip_yaz':
-      if not g: return await reply({'message':'Grup bulunamadı'},400)
+    if name=='kasif_grup_yaz':
       assert 8<=len(body['p_cihaz'])<=40
-      store['t']+=1
-      g['ekipler'][body['p_cihaz']]={'ad':body['p_ad'],'damga':body['p_damga'],'yanlis':body['p_yanlis'],'kacan':body['p_kacan'],'bitti':body['p_bitti'],'t':store['t'],'cihaz':body['p_cihaz']}
+      store['t']+=1;old=store['rows'].get(body['p_cihaz'],{'donem':'hafta'})
+      store['rows'][body['p_cihaz']]={'ad':body['p_ad'],'damga':body['p_damga'],'yanlis':body['p_yanlis'],'kacan':body['p_kacan'],'bitti':body['p_bitti'],'t':store['t'],'cihaz':body['p_cihaz'],'donem':old['donem']}
       return await route.fulfill(status=204,headers=cors,body='')
-    if name=='kasif_siralama':
-      if not g: return await reply(None)
-      rows=sorted(g['ekipler'].values(),key=lambda e:(-e['damga'],e['yanlis'],e['t']))
-      return await reply({'kod':body['p_kod'],'ad':g['ad'],'ekipler':[{**{k:e[k] for k in ('ad','damga','yanlis','kacan','bitti')},'ben':e['cihaz']==body.get('p_cihaz')} for e in rows]})
+    if name=='kasif_grup_siralama':
+      d=body['p_donem'];me=body.get('p_cihaz')
+      ok={'hafta':['hafta'],'ay':['hafta','ay'],'tum':['hafta','ay','tum']}[d]
+      rows=sorted([e for e in store['rows'].values() if e['donem'] in ok and (e['damga']>0 or e['bitti'] or e['cihaz']==me)],key=lambda e:(-e['damga'],e['yanlis'],e['t']))
+      out=[]
+      for i,e in enumerate(rows):
+        sira=i+1 if not i or (e['damga'],e['yanlis'])!=(rows[i-1]['damga'],rows[i-1]['yanlis']) else out[-1]['sira']
+        out.append({'ad':e['ad'],'damga':e['damga'],'yanlis':e['yanlis'],'bitti':e['bitti'],'sira':sira,'ben':e['cihaz']==me})
+      ben=next(({**o,'ben':True} for o in out if o['ben']),None)
+      return await reply({'toplam':len(out),'liste':out[:store.get('limit',30)],'ben':ben})
     return await reply({'message':'?'},404)
   errors=[]
-  async def newpage():
-    ctx=await br.new_context(viewport={'width':390,'height':844},has_touch=True,service_workers='block')
-    await ctx.route('**/rest/v1/rpc/*',rpc)
-    pg=await ctx.new_page();pg.on('pageerror',lambda e:errors.append(str(e)));return pg
-  def row(name):
-    return next(e for e in store['groups']['K7QM']['ekipler'].values() if e['ad']==name)
-  async def modal_with(pg,text):
-    await pg.wait_for_function("t=>!document.querySelector('#modal').classList.contains('hidden')&&document.querySelector('#modal').textContent.includes(t)",arg=text)
-  async def answer(pg,i): await pg.click(f"#quiz-opts .opt:nth-child({i+1})")
-  # Rehber yarışı açar
-  r=await newpage();await r.goto(B);await r.locator('#v-welcome.active').wait_for()
-  await r.click('#grp-link');await r.locator('#v-grup.active').wait_for();await fits(r,'grup-ekran')
-  await r.fill('#grp-name','5-B');await r.click('#grp-start');await r.locator('#v-rehber.active').wait_for()
-  assert await r.locator('#rh-code').inner_text()=='G-K7QM'
-  await fits(r,'grup-rehber')
-  decoded=await r.evaluate('''async()=>{
-    const image=new Image();image.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(document.querySelector('#rh-qr svg').outerHTML.replace('<svg ','<svg width="400" height="400" '));await image.decode();
-    const c=document.createElement('canvas');c.width=c.height=400;const x=c.getContext('2d');x.fillStyle='white';x.fillRect(0,0,400,400);x.drawImage(image,0,0,400,400);
-    return jsQR(x.getImageData(0,0,400,400).data,400,400)?.data;}''')
-  assert decoded and decoded.endswith('#g=K7QM'),decoded
-  st=await r.evaluate('KASIF.stations.map(s=>({id:s.id,code:s.code,answer:s.quiz.answer,n:s.quiz.options.length}))')
-  # Ekip A: yarış QR'ı ile katılır
-  a=await newpage();await a.goto(B+'#g=K7QM');await a.locator('#v-welcome.group-mode').wait_for()
-  assert '5-B mücadelesi' in await a.locator('.sheet-lead-full .grp-band').text_content()
-  assert await a.locator('#name-label').inner_text()=='Ekip adınız'
-  assert await a.locator('#in-name').get_attribute('placeholder')=='ör. Köpekbalıkları'
+  ctx=await br.new_context(viewport={'width':390,'height':844},has_touch=True,service_workers='block')
+  await ctx.route('**/rest/v1/rpc/*',rpc)
+  a=await ctx.new_page();a.on('pageerror',lambda e:errors.append(str(e)))
+  def row(): return next(e for e in store['rows'].values() if e['ad']=='5-B Atatürk')
+  async def modal_with(text):
+    await a.wait_for_function("t=>!document.querySelector('#modal').classList.contains('hidden')&&document.querySelector('#modal').textContent.includes(t)",arg=text)
+  async def answer(i): await a.click(f"#quiz-opts .opt:nth-child({i+1})")
+  st=None
+  # Girişte oyun türü: Grup Mücadelesi
+  await a.goto(B);await a.locator('#v-welcome.active').wait_for()
+  assert await a.locator('#mode-solo').get_attribute('aria-checked')=='true'
+  await a.click('#mode-group')
+  assert await a.locator('#name-label').inner_text()=='Grubunuzun adı'
+  assert await a.locator('#in-name').get_attribute('maxlength')=='24'
   await fits(a,'grup-karsilama')
-  await a.fill('#in-name','Köpekbalıkları');await a.click('#btn-start')
-  await a.locator('#v-home.active').wait_for();await modal_with(a,'1 yanlış hakkınız')
+  await a.fill('#in-name','5-B Atatürk');await a.click('#btn-start')
+  await a.locator('#v-home.active').wait_for();await modal_with('1 yanlış hakkınız')
   await a.click('#modal-btns button');assert await a.locator('#btn-race').is_visible()
   await fits(a,'grup-ana')
-  assert row('Köpekbalıkları')['damga']==0
+  assert row()['damga']==0
+  st=await a.evaluate('KASIF.stations.map(s=>({id:s.id,code:s.code,answer:s.quiz.answer,n:s.quiz.options.length}))')
   # Pirana: 2 yanlış → damga kaçar, doğru bulunana kadar devam
   pir,mer=st[0],st[1];wrong=[i for i in range(pir['n']) if i!=pir['answer']]
   await a.goto(B+'#s='+pir['code']);await lesson_to_quiz(a,'grup-pirana')
   assert '1 yanlış hakkınız' in await a.locator('#quiz-msg').inner_text()
-  await answer(a,wrong[0]);assert 'Son hakkınız' in await a.locator('#quiz-msg').inner_text()
-  await answer(a,wrong[1]);assert 'kaçırdınız' in await a.locator('#quiz-msg').inner_text()
+  await answer(wrong[0]);assert 'Son hakkınız' in await a.locator('#quiz-msg').inner_text()
+  await answer(wrong[1]);assert 'kaçırdınız' in await a.locator('#quiz-msg').inner_text()
   await fits(a,'grup-kacti-soru')
   await a.goto(B+'#s='+pir['code']);await a.locator('#v-quiz.active').wait_for()   # QR yeniden: doğrudan soru
   assert 'kaçtı' in await a.locator('#quiz-msg').inner_text()
-  await answer(a,pir['answer']);await a.locator('#v-reward.active.missed').wait_for();await a.wait_for_timeout(900)
+  await answer(pir['answer']);await a.locator('#v-reward.active.missed').wait_for();await a.wait_for_timeout(900)
   assert await a.locator('#rw-title').inner_text()=='Damga kaçtı'
   assert 'artık biliyorsunuz' in await a.locator('#rw-fact-title').text_content()
   await fits(a,'grup-kacti-damga')
   await a.click('#rw-next');await a.locator('#v-home.active').wait_for()
   assert await a.locator('.stop.missed[data-id="'+pir['id']+'"] .stop-done').inner_text()=='✕'
   assert await a.locator('.stop.on').get_attribute('data-id')==mer['id']
-  await a.goto(B+'#s='+pir['code']);await modal_with(a,'damga kaçtı');await a.click('#modal-btns button')
-  await a.goto(B+'#s='+mer['code']);await lesson_to_quiz(a,'grup-mersin');await answer(a,mer['answer'])
+  await a.goto(B+'#s='+pir['code']);await modal_with('damga kaçtı');await a.click('#modal-btns button')
+  await a.goto(B+'#s='+mer['code']);await lesson_to_quiz(a,'grup-mersin');await answer(mer['answer'])
   await a.locator('#v-reward.active:not(.missed)').wait_for();await a.click('#rw-next')
   await a.wait_for_timeout(300)
-  assert {k:row('Köpekbalıkları')[k] for k in ('damga','yanlis','kacan','bitti')}=={'damga':1,'yanlis':2,'kacan':1,'bitti':False},row('Köpekbalıkları')
-  # Ekip B: eski damgaları var, kodu elle yazar → uyarı → yeni pasaport
-  b=await newpage();await b.goto(B)
-  await b.evaluate("localStorage.setItem('okyanus-kasifi-v1',JSON.stringify({v:1,id:'5555',name:'Eski',avatar:'vatoz',badges:{pirana:Date.now()},created:Date.now()}))")
-  await b.reload();await b.locator('#v-home.active').wait_for()
-  await b.click('#btn-menu');await b.click('#btn-grup');await b.locator('#v-grup.active').wait_for()
-  await b.fill('#grp-code','g k7qm');await b.click('#grp-join')
-  await modal_with(b,'damgalar silinecek');await b.click('#modal-btns button:first-child')
-  await b.locator('#v-welcome.group-mode').wait_for()
-  assert await b.evaluate("localStorage.getItem('okyanus-kasifi-v1')") is None
-  await b.fill('#in-name','Yunuslar');await b.click('#btn-start')
-  await b.locator('#v-home.active').wait_for();await modal_with(b,'1 yanlış hakkınız');await b.click('#modal-btns button')
-  assert await b.evaluate("KASIF.stations.every(s=>!document.querySelector('.stop[data-id=\"'+s.id+'\"]').classList.contains('got'))")
-  for s in (pir,mer):
-    await b.goto(B+'#s='+s['code']);await lesson_to_quiz(b,'grup-b');await answer(b,s['answer'])
-    await b.locator('#v-reward.active').wait_for();await b.click('#rw-next')
-  await b.wait_for_timeout(300)
-  assert row('Yunuslar')['damga']==2 and row('Yunuslar')['yanlis']==0
-  # Eşitlik: aynı damga + aynı yanlış aynı sırayı paylaşır
-  for i,ad in enumerate(['Ahtapotlar','Mürenler']):
-    store['t']+=1;store['groups']['K7QM']['ekipler']['x'*10+str(i)]={'ad':ad,'damga':1,'yanlis':1,'kacan':0,'bitti':False,'t':store['t'],'cihaz':'x'*10+str(i)}
+  assert {k:row()[k] for k in ('damga','yanlis','kacan','bitti')}=={'damga':1,'yanlis':2,'kacan':1,'bitti':False},row()
+  # Başka gruplar: eşitlik aynı sırayı paylaşır; dönem sekmeleri
+  for i,(ad,dm,yn,donem) in enumerate([('Yunuslar',2,0,'hafta'),('Ahtapotlar',1,1,'hafta'),('Mürenler',1,1,'hafta'),('Geçen ay',8,0,'tum'),('Bu ayın başı',3,0,'ay'),('Hiç damga yok',0,0,'hafta')]):
+    store['t']+=1;c='x'*10+str(i);store['rows'][c]={'ad':ad,'damga':dm,'yanlis':yn,'kacan':0,'bitti':False,'t':store['t'],'cihaz':c,'donem':donem}
   await a.click('#btn-race');await a.locator('#v-race.active').wait_for()
   await a.wait_for_function("document.querySelectorAll('#race-list li').length===4")
   rows=await a.locator('#race-list li').all_inner_texts()
   assert '🥇' in rows[0] and 'Yunuslar' in rows[0],rows
   assert rows[1].startswith('🥈') and rows[2].startswith('🥈') and 'Ahtapotlar' in rows[1] and 'Mürenler' in rows[2],rows
-  assert rows[3].startswith('4.') and 'Köpekbalıkları (siz)' in rows[3] and '⭐ 1 · 2 yanlış' in rows[3],rows
-  assert await a.locator('#race-list li.ben').count()==1
+  assert rows[3].startswith('4.') and '5-B Atatürk (siz)' in rows[3] and '⭐ 1 · 2 yanlış' in rows[3],rows
+  assert 'Bu hafta 4 grup arasında 4. sıradasınız' in await a.locator('#race-me').inner_text()
   assert 'Son güncelleme' in await a.locator('#race-status').inner_text()
   await fits(a,'grup-siralama')
-  await r.click('#rh-race');await r.wait_for_function("document.querySelectorAll('#race-list li').length===4")
-  assert '(siz)' not in ''.join(await r.locator('#race-list li').all_inner_texts())
+  await a.click('#race-tabs [data-donem="ay"]');await a.wait_for_function("document.querySelectorAll('#race-list li').length===5")
+  await a.click('#race-tabs [data-donem="tum"]');await a.wait_for_function("document.querySelectorAll('#race-list li').length===6")
+  assert 'Geçen ay' in (await a.locator('#race-list li').all_inner_texts())[0]
+  # Kendi grubu ilk listede yoksa altta ayrıca gösterilir
+  store['limit']=2;await a.click('#race-tabs [data-donem="hafta"]')
+  await a.wait_for_function("document.querySelector('#race-list li.gap')&&document.querySelector('#race-list li.ben')")
+  store.pop('limit')
   # İnternet yok: oyun sürer, skor bekler; bağlanınca gönderilir
   store['down']=True
   await a.click('#v-race [data-back]');await a.click('#btn-race')
   await a.wait_for_function("document.querySelector('#race-status').textContent.includes('İnternet yok')")
   await a.click('#v-race [data-back]')
   kes=st[2];await a.goto(B+'#s='+kes['code']);await lesson_to_quiz(a,'grup-kesis')
-  await answer(a,[i for i in range(kes['n']) if i!=kes['answer']][0]);await answer(a,kes['answer'])
+  await answer([i for i in range(kes['n']) if i!=kes['answer']][0]);await answer(kes['answer'])
   await a.locator('#v-reward.active:not(.missed)').wait_for();await a.click('#rw-next')
   assert await a.evaluate("JSON.parse(localStorage.getItem('okyanus-kasifi-v1')).group.dirty===true")
   store['down']=False;await a.evaluate("window.dispatchEvent(new Event('online'))")
   await a.wait_for_function("JSON.parse(localStorage.getItem('okyanus-kasifi-v1')).group.dirty===false")
-  assert row('Köpekbalıkları')['damga']==2 and row('Köpekbalıkları')['yanlis']==3
-  # Bitiş: son görev → "Yarışı bitir" → sıralama + pasaport
+  assert row()['damga']==2 and row()['yanlis']==3
+  # Bitiş: son görev → "Mücadeleyi bitir" → sıralama + pasaport
   await a.evaluate("""ids=>{const s=JSON.parse(localStorage.getItem('okyanus-kasifi-v1'));ids.forEach((id,i)=>s.badges[id]=Date.now()+i);localStorage.setItem('okyanus-kasifi-v1',JSON.stringify(s));}""",[x['id'] for x in st[3:-1]])
   await a.reload();await a.locator('#v-home.active').wait_for()
-  last=st[-1];await a.goto(B+'#s='+last['code']);await lesson_to_quiz(a,'grup-son');await answer(a,last['answer'])
+  last=st[-1];await a.goto(B+'#s='+last['code']);await lesson_to_quiz(a,'grup-son');await answer(last['answer'])
   await a.locator('#v-reward.active').wait_for()
   assert await a.locator('#rw-next').inner_text()=='Mücadeleyi bitir 🏁'
   await a.click('#rw-next');await a.locator('#v-race.active').wait_for()
   n=len(st);assert f'Mücadeleyi bitirdiniz! {n-1}/{n} damga' in await a.locator('#race-finish-title').inner_text()
-  await a.wait_for_function("document.querySelectorAll('#race-list li').length===4")
+  await a.wait_for_function("document.querySelector('#race-list li.ben')&&document.querySelector('#race-list li.ben').dataset.rank==='1'")
   await fits(a,'grup-bitis')
-  assert row('Köpekbalıkları')['bitti'] is True and row('Köpekbalıkları')['damga']==n-1
+  assert row()['bitti'] is True and row()['damga']==n-1
   await a.click('#race-cert');await a.locator('#v-cert.active.preview-passport').wait_for()
   await a.wait_for_function('document.querySelector("#cert-img").naturalWidth===1080')
   await a.click('#v-cert [data-back]');await a.locator('#v-home.active').wait_for()
   await a.click('#road-end');await a.locator('#v-race.active #race-finish:not(.hidden)').wait_for()
-  # Grup dışı oyun değişmedi: tek başına oynayan sınırsız dener (yukarıdaki ana testler).
+  # Tek kişilik oyunda grup parçaları görünmez, sınırsız deneme sürer
+  await a.evaluate("localStorage.clear()");await a.reload();await a.locator('#v-welcome.active').wait_for()
+  await a.fill('#in-name','Tek');await a.click('#btn-start');await a.locator('#v-home.active').wait_for()
+  assert not await a.locator('#btn-race').is_visible()
   assert not errors,errors
-  for pg in (r,a,b): await pg.context.close()
-  print('PASS: grup yarışı (rehber, 2 ekip, kaçan damga, eşitlik, çevrimdışı skor, bitiş)',flush=True)
+  await ctx.close()
+  print('PASS: Grup Mücadelesi (tek telefon, kaçan damga, gruplar sıralaması, dönemler, çevrimdışı skor, bitiş)',flush=True)
 
 async def main():
   handler=functools.partial(http.server.SimpleHTTPRequestHandler,directory=str(ROOT))

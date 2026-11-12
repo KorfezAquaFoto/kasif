@@ -1,9 +1,9 @@
 // Çevrimdışı çalışma: ilk açılışta tüm dosyalar telefona kaydedilir.
 // İçerik değiştiğinde VERSION'ı artırın; telefonlar bir sonraki internet bağlantısında günceller.
-const VERSION = "kasif-v55";
+const VERSION = "kasif-v56";
 const FILES = [
   "./", "./logo2.png", "./index.html", "./styles.css", "./app.js", "./olay.js", "./data.js", "./art.js", "./art-assets.js", "./assets/art-atlas-v27.webp",
-  "./vendor/jsQR.js", "./vendor/qrcode.js", "./grup.js", "./manifest.webmanifest",
+  "./vendor/jsQR.js", "./grup.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/apple-touch-icon.png",
   "./fonts/dynapuff-variable.woff2", "./fonts/baloo-2-latin-600-normal.woff2", "./fonts/baloo-2-latin-ext-600-normal.woff2",
   "./fonts/baloo-2-latin-800-normal.woff2", "./fonts/baloo-2-latin-ext-800-normal.woff2"
