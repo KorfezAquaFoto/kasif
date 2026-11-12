@@ -25,6 +25,14 @@ NASIL OYNANIR
    topladığı damgalarla pasaport resmini alabilir; isterse devam edip tamamlar.
    Oyun tek ziyarette bitirilecek şekilde tasarlandı.
 
+GRUP MÜCADELESİ (v55)
+- Okul grupları için. Rehber oyunda "Grup Mücadelesi" > "Mücadeleyi başlat" der, grup
+  adını yazar; ekranında QR ve kod (ör. G-K7QM) çıkar. Ekipler (tek telefon) QR'ı okutur.
+- Kural: her soruda 1 yanlış hakkı; 2. yanlışta damga kaçar ama doğru cevap bulunup
+  devam edilir. Sıralama: çok damga önde, eşitlikte az yanlış önde. Süre yok.
+- Sıralama internet ister (Supabase); oyunun geri kalanı yine internetsiz çalışır.
+- Sunucu kurulumu bir kez: supabase/grup-yarisi.sql dosyası Supabase SQL Editor'de çalıştırılır.
+
 8 GÖREV
  1 Güney Amerika  Pirana            PRN-3T9F
  2 Asya           Mersin balığı     MRS-4N7C
@@ -63,6 +71,7 @@ DOSYALAR
  art.js, art-assets.js    canlı çizimleri, damgalar, hazine sandığı
  assets/                  onaylı çizim paketi
  olay.js                  isimsiz kullanım istatistiği
+ grup.js, supabase/       Grup Mücadelesi sıralaması (Supabase fonksiyonları)
  istatistik.html          yönetici istatistik sayfası
  sw.js                    internetsiz çalışma
  qr-kodlari.html          yazdırılabilir QR posterleri

@@ -52,6 +52,12 @@ function save(){
   }
 }
 function count(){ return S ? ST.filter(st => S.badges[st.id]).length : 0; }
+// v55 grup yarışı: 2. yanlışta damga kaçar; doğru cevap bulununca görev yine "bitmiş" sayılır.
+const escaped = st => !!(S && S.missed && S.missed[st.id]);
+const isDone = st => !!(S && (S.badges[st.id] || (escaped(st) && S.solved && S.solved[st.id])));
+const doneCount = () => S ? ST.filter(isDone).length : 0;
+const allDone = () => !!S && ST.every(isDone);
+const inGroup = () => !!(S && S.group);
 function newId(){ return String(1000 + Math.floor(Math.random()*9000)); }
 const av = key => artSVG(AVATARS.includes(key) ? key : AVATARS[0]);
 
@@ -72,10 +78,12 @@ function show(id, push = true){
   if (id === "v-scan") startCam();
   if (id === "v-menu") renderMenu();
   if (id === "v-hints") renderHints();
+  if (id === "v-grup") renderGrup();
 }
 function back(){ show(stack.pop() || (S ? "v-home" : "v-welcome"), false); }
 document.querySelectorAll("[data-back]").forEach(b => b.onclick = back);
 
+const closeModal = () => $("#modal").classList.add("hidden");
 // ico: emoji ya da canlı adı (art.js)
 function modal(ico, title, text, buttons = [{label:"Tamam"}]){
   $("#modal-ico").innerHTML = (window.ART && ART[ico]) ? artSVG(ico) : esc(ico);
@@ -92,11 +100,20 @@ function modal(ico, title, text, buttons = [{label:"Tamam"}]){
 
 // ---------- Karşılama ----------
 let avatar = AVATARS[0];
+let pendingGroup = null;   // v55: yarış QR'ı okutuldu, ekip adı bekleniyor
 function renderWelcome(animate=false){
   document.querySelectorAll("[data-aq]").forEach(el=>el.textContent=D.aquarium);
-  const guest = !!(S && S.guest), got = count(), left = ST.length - got;
+  const guest = !!(S && S.guest), got = count(), left = ST.length - got, gm = !!pendingGroup && !guest;
   $("#v-welcome").classList.toggle("join-mode", guest);
-  if (guest && got) {
+  $("#v-welcome").classList.toggle("group-mode", gm);
+  $("#name-label").textContent = gm ? "Ekip adınız" : "Kaşif adın";
+  $("#in-name").placeholder = gm ? "ör. Köpekbalıkları" : "Adını yaz";
+  const gl = $("#grp-link"); gl.hidden = guest; gl.textContent = gm ? "✕ Mücadeleden çık" : "👥 Grup Mücadelesi";
+  if (gm) {
+    const band = `<span class="grp-band">🏁 ${esc(groupTitle(pendingGroup.ad))}</span>`;
+    $(".sheet-lead-full").innerHTML = band + " Ekip adınızı yazın, kaşif dostunuzu seçin!";
+    $(".sheet-lead-short").innerHTML = band;
+  } else if (guest && got) {
     if (!AVATARS.includes(avatar)) avatar = AVATARS[0];
     const first = got === 1 ? "İlk damgan hazır! ⭐" : `${got} damgan hazır! ⭐`;
     $(".sheet-lead-full").innerHTML = `${first} Adını yaz, kaşif dostunu seç ve kalan <b>${left} damgayı</b> topla.`;
@@ -114,10 +131,17 @@ function renderWelcome(animate=false){
     b.onclick = () => { avatar = a; renderWelcome(true); document.querySelector('#avatars [data-avatar="'+a+'"]').focus({preventScroll:true}); }; box.appendChild(b);
   });
 }
+$("#grp-link").onclick = () => { if (pendingGroup) { pendingGroup = null; renderWelcome(); } else show("v-grup"); };
 $("#in-name").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();e.currentTarget.blur();}});
 $("#btn-start").onclick = () => {
-  const name = $("#in-name").value.trim().slice(0,16) || "Kaşif";
-  if (S && S.guest) {
+  const gm = !!pendingGroup && !(S && S.guest);
+  const name = $("#in-name").value.trim().slice(0,16) || (gm ? "Ekip" : "Kaşif");
+  if (gm) {
+    S = { v:1, id:newId(), name, avatar, badges:{}, created:Date.now(), wrongs:0, tries:{}, missed:{}, solved:{},
+      group:{ kod:pendingGroup.kod, ad:pendingGroup.ad || "", cihaz:deviceId(), dirty:true, rev:1 } };
+    pendingGroup = null; $("#v-welcome").classList.remove("group-mode");
+    save(); requestPersist(); olay("start", null, "grup"); grupSync();
+  } else if (S && S.guest) {
     // Yolda katılan kaşif: kazandığı damgalar korunur, yalnızca adı ve dostu eklenir.
     S.name = name; S.avatar = avatar; delete S.guest; $("#v-welcome").classList.remove("join-mode");
     save(); requestPersist(); olay("join", null, count());
@@ -135,6 +159,7 @@ $("#btn-start").onclick = () => {
     $("#v-welcome").classList.remove("opening");
     show("v-home", false);
     if (pending) { const p = pending; pending = null; setTimeout(() => handleCode(p), 350); }
+    else if (S.group && !S.group.rulesSeen) setTimeout(showRules, 400);
   }, 2600);
 };
 
@@ -161,8 +186,12 @@ function renderHome(){
   const rank = FX.unvan && rankOf(n);
   $("#me-rank").classList.toggle("hidden", !rank);
   if (rank) $("#me-rank").textContent = rank[1] + " " + rank[2];
-  $("#done-banner").classList.toggle("hidden", n !== t);
-  if (!target || S.badges[target]) target = nextTarget();
+  const grp = inGroup(), all = allDone();
+  $("#done-banner").classList.toggle("hidden", !(n === t || (grp && all)));
+  $("#done-title").textContent = grp ? "Mücadeleyi bitirdiniz!" : "Pasaportun tamamlandı!";
+  $("#done-sub").textContent = grp ? "Sıralamayı ve pasaportunu gör." : "Final damgan seni bekliyor.";
+  $("#btn-race").classList.toggle("hidden", !grp);
+  if (!target || isDone({ id: target })) target = nextTarget();
   renderTarget(); renderRoad();
   if (chestSeq) runChestSequence();
   else if (S.behindNote) showBehindNote();
@@ -175,7 +204,8 @@ function renderHome(){
 // Geride kalan keşifler: zorunlu değil, çocuğa nazikçe hatırlatılır (bir kez).
 function showBehindNote(){
   S.behindNote = false; S.behindShown = true; save();
-  const missing = ST.filter(x => !S.badges[x.id]), first = missing[0];
+  const missing = ST.filter(x => !isDone(x)), first = missing[0];
+  if (!first) return;
   setTimeout(() => { if (current !== "v-home") return;
     modal(first.art, "Yolun sonuna geldin! 🎉", count() + " / " + ST.length + " keşif tamamladın. İstersen geri dönüp kalan " + missing.length + " keşfi bul, istersen pasaportunu şimdi al.", [
       { label: "Geri dönüp keşfet", onClick: () => { target = first.id; S.target = target; save(); renderTarget(); renderRoad(); } },
@@ -183,15 +213,15 @@ function showBehindNote(){
 }
 function lastStampIndex(){
   let best = -1, ts = -1;
-  ST.forEach((s, i) => { const t = S.badges[s.id]; if (t && t >= ts) { ts = t; best = i; } });
+  ST.forEach((s, i) => { const t = S.badges[s.id] || (isDone(s) && S.solved[s.id]); if (t && t >= ts) { ts = t; best = i; } });
   return best;
 }
 function nextTarget(){
   const n = ST.length, from = lastStampIndex();
-  for (let k = 1; k <= n; k++) { const st = ST[(from + k + n) % n]; if (!S.badges[st.id]) return st.id; }
+  for (let k = 1; k <= n; k++) { const st = ST[(from + k + n) % n]; if (!isDone(st)) return st.id; }
   return null;
 }
-function isMissed(st){ const last = lastStampIndex(); return last >= 0 && ST.indexOf(st) < last && !S.badges[st.id]; }
+function isMissed(st){ const last = lastStampIndex(); return last >= 0 && ST.indexOf(st) < last && !isDone(st); }
 // Konum simgeleri: metne eşlik eder, tek başlarına anlam taşımak zorunda değildir.
 function locationCue(st){
   const paths = st.id === "fosil" ? '<path d="M12 21V4M5 11l7-7 7 7"/>' : st.id === "orfoz" ? '<path d="M3 19l4-10 7-5 6 7 1 8Z M7 9l6 5 7-3 M13 14l-2 5"/>' : st.id === "vatoz" ? '<path d="M3 21V11a9 9 0 0 1 18 0v10M7 21V11a5 5 0 0 1 10 0v10 M3 21h18"/>' : st.id === "kabuk" ? '<path d="M12 21L3 9Q2 2 8 4Q12 0 16 4Q22 2 21 9ZM12 21V5M12 21L7 7M12 21l5-14"/>' : '<path d="M2 12Q12 0 22 12Q12 24 2 12Z"/><circle cx="12" cy="12" r="3"/>';
@@ -206,20 +236,20 @@ function renderTarget(){
   };
 }
 function renderRoad(){
-  const done = count() === ST.length;
+  const full = count() === ST.length;
   $("#road-nodes").classList.toggle("n8", ST.length === 8);
   $("#road-nodes").innerHTML = ST.map((st, i) => {
-    const [x, y] = STOPS_XY[i] || [50, 50], has = !!S.badges[st.id], on = st.id === target;
-    return `<button type="button" class="stop ${has ? "got" : "locked"}${on ? " on" : ""}" data-id="${st.id}" style="left:${x}%;top:${y}%;--rot:${ROT[i % ROT.length]}deg" aria-label="${esc((i+1)+". durak: "+st.name+(has?", tamamlandı":on?", buradasın":""))}" aria-current="${on ? "step" : "false"}">
-      ${has ? stampSVG(st, { date: S.badges[st.id], shine: FX.parlak }) : `<span class="sil">${artSVG(st.art)}</span>`}<span class="num">${i + 1}</span>
-      ${has ? `<span class="stop-done" aria-hidden="true">✓</span>` : ""}${on ? `<span class="here-pin">Buradasın<span aria-hidden="true">▼</span></span>` : ""}</button>`;
+    const [x, y] = STOPS_XY[i] || [50, 50], has = !!S.badges[st.id], miss = !has && isDone(st), on = st.id === target;
+    return `<button type="button" class="stop ${has ? "got" : miss ? "got missed" : "locked"}${on ? " on" : ""}" data-id="${st.id}" style="left:${x}%;top:${y}%;--rot:${ROT[i % ROT.length]}deg" aria-label="${esc((i+1)+". durak: "+st.name+(has?", tamamlandı":miss?", tamamlandı (kaçtı)":on?", buradasın":""))}" aria-current="${on ? "step" : "false"}">
+      ${has || miss ? stampSVG(st, { date: has ? S.badges[st.id] : S.solved[st.id], shine: has && FX.parlak }) : `<span class="sil">${artSVG(st.art)}</span>`}<span class="num">${i + 1}</span>
+      ${has ? `<span class="stop-done" aria-hidden="true">✓</span>` : miss ? `<span class="stop-done" aria-hidden="true">✕</span>` : ""}${on ? `<span class="here-pin">Buradasın<span aria-hidden="true">▼</span></span>` : ""}</button>`;
   }).join("");
   const end = $("#road-end");
-  end.classList.toggle("done", done);
+  end.classList.toggle("done", full);
   if (FX.sandik) {
     if (!end.querySelector(".chest-svg")) end.querySelector(".chest").innerHTML = '<span class="chest-rays" aria-hidden="true"></span>' + chestSVG();
-    end.classList.toggle("open", done && !chestSeq);
-  } else end.querySelector(".chest").innerHTML = done ? finalSealSVG() : "🎁";
+    end.classList.toggle("open", full && !chestSeq);
+  } else end.querySelector(".chest").innerHTML = full ? finalSealSVG() : "🎁";
   updateRoadFx();
 }
 
@@ -241,8 +271,8 @@ function roadFxVisible(){
   return FX.yol && current === "v-home" && !!road.offsetWidth && !!svg && getComputedStyle(svg).display !== "none";
 }
 // Kaşif dostu aranan durağın üstünde durur; hepsi bitince hazinenin önünde.
-function walkerGoal(){ const i = ST.findIndex(s => s.id === target); return i < 0 ? (count() === ST.length ? ROUTE.length - 1 : 1) : STOP_ROUTE[i]; }
-function trailGoal(){ const n = count(); return n === ST.length ? ROUTE.length - 2 : n ? STOP_ROUTE[n - 1] : 0; }
+function walkerGoal(){ const i = ST.findIndex(s => s.id === target); return i < 0 ? (allDone() ? ROUTE.length - 1 : 1) : STOP_ROUTE[i]; }
+function trailGoal(){ const n = doneCount(); return n === ST.length ? ROUTE.length - 2 : n ? STOP_ROUTE[n - 1] : 0; }
 function drawTrail(q){
   const pts = [];
   if (q > 0) { for (let i = 0; i <= Math.floor(q) && i < ROUTE.length; i++) pts.push(ROUTE[i]); if (q % 1) pts.push(routePoint(q)); }
@@ -357,16 +387,17 @@ function runChestSequence(){
 $("#road-nodes").addEventListener("click", e => {
   const b = e.target.closest(".stop"); if (!b) return;
   const st = ST.find(s => s.id === b.dataset.id);
-  if (S.badges[st.id]) return openDrawer(st, true);
+  if (isDone(st)) return openDrawer(st, true);
   target = st.id; S.target = target; save(); renderTarget(); renderRoad();
 });
-$("#road-end").onclick = () => count() === ST.length ? openCert()
+$("#road-end").onclick = () => inGroup() && allDone() ? openRace({ finished: true }) : count() === ST.length ? openCert()
   : modal("🎁", "Hazine burada!", `${ST.length} damgayı topla, tamamlanmış pasaportunu aç!`, [{ label: "Tamam" }]);
 function openDrawer(st, got){
-  const art = $("#dr-art"); art.innerHTML = got ? stampSVG(st, { date: S.badges[st.id], shine: FX.parlak }) : artSVG(st.art);
+  const miss = got && !S.badges[st.id];
+  const art = $("#dr-art"); art.innerHTML = got ? stampSVG(st, { date: miss ? S.solved[st.id] : S.badges[st.id], shine: FX.parlak && !miss }) : artSVG(st.art);
   art.style.transform = ""; art.classList.remove("tilting");
-  art.classList.toggle("sil", !got);
-  $("#dr-name").textContent = REG[st.region].label + " · " + (got ? st.name : "Gizemli görev");
+  art.classList.toggle("sil", !got); art.classList.toggle("missed", miss);
+  $("#dr-name").textContent = REG[st.region].label + " · " + (got ? st.name + (miss ? " · damga kaçtı" : "") : "Gizemli görev");
   $("#dr-title").textContent = st.title;
   $("#dr-text").textContent = got ? st.fact : "İpucu: " + st.hint;
   $("#dr-where").textContent = got || !st.where ? "" : st.where;
@@ -393,7 +424,8 @@ $("#btn-menu").onclick = () => show("v-menu");
 $("#btn-help").onclick = () => { $("#howto").innerHTML = howtoHTML(); $("#help").classList.remove("hidden"); };
 $("#help-close").onclick = () => $("#help").classList.add("hidden");
 $("#help").onclick = e => { if (e.target.id === "help") $("#help").classList.add("hidden"); };
-$("#btn-cert").onclick = () => openCert();
+$("#btn-cert").onclick = () => inGroup() && allDone() ? openRace({ finished: true }) : openCert();
+$("#btn-race").onclick = () => openRace({ finished: allDone() });
 
 // Ana ekrana ekleme ipucu (iPhone'da verinin silinmemesi için önemli)
 let deferredInstall = null;
@@ -526,7 +558,9 @@ $("#manual-form").onsubmit = e => {
 function parse(text){
   const t = String(text).trim();
   let m = t.match(/[#?&]s=([A-Za-z0-9\-]+)/);     if (m) return { type:"code", value:m[1].toUpperCase() };
+  m = t.match(/[#?&]g=([A-Za-z0-9\-]+)/); if (m) { const g = normGroup(m[1]); return g ? { type:"group", value:g } : { type:"unknown" }; }
   m = t.toUpperCase().replace(/\s/g,"").match(/^([A-Z]{3})-?([A-Z0-9]{4})$/); if (m) return { type:"code", value:`${m[1]}-${m[2]}` };
+  const g = normGroup(t); if (g) return { type:"group", value:g };
   try { const u = new URL(t); if (u.origin === location.origin) return { type:"entry" }; } catch(e){}
   return { type:"unknown" };
 }
@@ -534,6 +568,7 @@ const goHome = () => show(S ? "v-home" : "v-welcome", false);
 const retry = () => show("v-scan", false);
 function handleText(text){
   const p = parse(text);
+  if (p.type === "group") return joinGroup(p.value);
   if (!S) return goHome();
   if (p.type === "code") return handleCode(p.value);
   if (p.type === "entry") return modal("🚪","Bu, giriş QR kodu","Pasaportun zaten açık! Şimdi akvaryumdaki görev QR kodlarını bul.",[{label:"Tamam",onClick:goHome}]);
@@ -543,7 +578,10 @@ function handleCode(code){
   const st = ST.find(s => s.code === code), src = scanSource; scanSource = "link";
   if (!st) return modal("🤔","Kod bulunamadı","Bu kodu tanıyamadık. Harfleri kontrol edip tekrar dene.",[{label:"Tekrar dene",onClick:retry},{label:"Pasaportuma dön",cls:"btn-ghost",onClick:goHome}]);
   if (S.badges[st.id]) return modal(st.art,"Bu damga zaten sende!",`“${st.title}” görevini daha önce tamamladın. Diğer görevleri keşfet!`,[{label:"Pasaportuma dön",onClick:goHome}]);
+  if (isDone(st)) return modal(st.art,"Bu görev tamam, damga kaçtı",`“${st.title}” görevini bitirdiniz ama damgası kaçtı. Diğer görevlere bakın!`,[{label:"Pasaportuma dön",onClick:goHome}]);
   olay("scan", st.id, src);
+  // Kaçan damganın sorusu: doğru cevap bulunana kadar QR doğrudan soruya götürür.
+  if (escaped(st) && st.quiz) { lesson = st; target = st.id; S.target = target; return openQuiz(st); }
   if (st.quiz) {
     if (S.flow && S.flow.id === st.id && S.flow.step === "find") { S.flow.verified = true; save(); openQuiz(st); }
     else openLesson(st, true);
@@ -559,7 +597,7 @@ function openLesson(st, verified){
 }
 function resumeTask(){
   const f = S && S.flow, st = f && ST.find(s => s.id === f.id);
-  if (!st || S.badges[st.id]) { if(S){S.flow=null;save();} return goHome(); }
+  if (!st || isDone(st)) { if(S){S.flow=null;save();} return goHome(); }
   if (f.step === "quiz" && f.verified) return openQuiz(st);
   lesson = st; stack = ["v-home"]; show("v-learn", false); renderLesson();
 }
@@ -678,6 +716,13 @@ function openQuiz(st){
   $("#quiz-title").textContent = `${st.name} · ${st.title}`;
   $("#quiz-q").textContent = st.quiz.q;
   const msg = $("#quiz-msg"); msg.textContent = ""; msg.style.color = "";
+  const grp = inGroup();
+  if (grp) {
+    S.tries = S.tries || {}; S.missed = S.missed || {};
+    // Mücadele kuralı: her soruda 1 yanlış hakkı
+    msg.textContent = S.missed[st.id] ? "Damga kaçtı. Doğru cevabı bulmadan geçmek yok!" : S.tries[st.id] ? "⚠️ Son hakkınız!" : "🏁 Mücadele: 1 yanlış hakkınız var.";
+    msg.style.color = "var(--sea2)";
+  }
   const box = $("#quiz-opts"); box.innerHTML = "";
   st.quiz.options.forEach((o, i) => {
     const el = document.createElement("button"); el.className = "opt";
@@ -685,8 +730,19 @@ function openQuiz(st){
     el.onclick = () => {
       if (i === st.quiz.answer) {
         el.classList.add("right");el.querySelector('.l').textContent='✓';el.setAttribute('aria-label',o+' — Doğru cevap'); box.querySelectorAll(".opt").forEach(x => x.disabled = true);
-        msg.textContent = "Doğru! Damgan geliyor…"; msg.style.color = "var(--ok)"; react("happy", "✨");
-        setTimeout(() => award(st), 800);
+        const miss = grp && !!S.missed[st.id];
+        msg.textContent = miss ? "Doğru! Ama bu damga kaçtı…" : "Doğru! Damgan geliyor…"; msg.style.color = "var(--ok)"; react("happy", "✨");
+        setTimeout(() => award(st, { missed: miss }), 800);
+      } else if (grp) {
+        el.classList.add("wrong"); el.disabled = true; olay("wrong", st.id, i);
+        S.tries[st.id] = (S.tries[st.id] || 0) + 1; S.wrongs = (S.wrongs || 0) + 1;
+        if (S.tries[st.id] >= 2) S.missed[st.id] = true;
+        const clue = " 💡 İpucu: " + (st.quiz.clue || "Tabelaya bir daha bak.");
+        msg.textContent = S.missed[st.id] ? "Bu damgayı kaçırdınız. Doğru cevabı bulmadan geçmek yok!" + clue : "⚠️ Son hakkınız!" + clue;
+        msg.style.color = S.missed[st.id] ? "var(--bad)" : "var(--sea2)";
+        save(); grupMark();
+        if (navigator.vibrate) navigator.vibrate([40,40,40]);
+        react("think", "?");
       } else {
         el.classList.add("wrong"); olay("wrong", st.id, i);
         // Kaybetmek yok: yanlış cevapta yön gösteren ipucu, istediği kadar deneyebilir
@@ -701,36 +757,42 @@ function openQuiz(st){
 }
 
 // ---------- Damga ----------
-function award(st){
-  S.badges[st.id] = Date.now(); S.flow=null;
+function award(st, opts = {}){
+  const miss = !!opts.missed;   // v55 yarış: damga kaçtı ama cevap bulundu
+  if (miss) { S.solved = S.solved || {}; S.solved[st.id] = Date.now(); } else S.badges[st.id] = Date.now();
+  S.flow=null;
   // Yolun sonuna gelindi ama geride boş durak var: ana ekrana dönünce bir kez bilgi penceresi.
-  const missing = ST.filter(x => !S.badges[x.id]), last = lastStampIndex();
+  const missing = ST.filter(x => !isDone(x)), last = lastStampIndex();
   if (missing.length && missing.every(x => ST.indexOf(x) < last) && !S.behindShown) S.behindNote = true;
   save();
-  olay("stamp", st.id); if (count() === ST.length) olay("complete");
+  if (!miss) { olay("stamp", st.id); if (count() === ST.length) olay("complete"); }
+  grupMark();
   S.last = st.id;   // haritada yeni yanan bölge parlasın
   // Damga aleti pasaport sayfasına iner, damga basılır
   const stage = $("#rw-stamp"), ring = $("#ink-ring"), tool = $("#rw-tool");
-  stage.innerHTML = stampSVG(st, { date: S.badges[st.id], shine: FX.parlak }); setBolge(st);
+  stage.innerHTML = stampSVG(st, { date: miss ? S.solved[st.id] : S.badges[st.id], shine: FX.parlak && !miss }); setBolge(st);
+  $("#v-reward").classList.toggle("missed", miss);
+  $("#rw-kicker").textContent = miss ? "Görev tamam" : "Yeni damga!";
   const g = D.groups.find(x => x.kind === REG[st.region].kind);
   $("#rw-page-hd").textContent = g ? `${g.icon || ""} ${g.label}` : "";
   [stage, ring, tool].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
   $("#rw-name").textContent = REG[st.region].label;
-  $("#rw-title").textContent = st.name + " keşfedildi!";
-  $("#rw-fact-title").textContent = st.factTitle || "Biliyor muydun?";
-  $(".fact-card").classList.toggle("eco", !!st.factTitle);
+  $("#rw-title").textContent = miss ? "Damga kaçtı" : st.name + " keşfedildi!";
+  $("#rw-fact-title").textContent = miss ? "Ama artık biliyorsunuz!" : st.factTitle || "Biliyor muydun?";
+  $(".fact-card").classList.toggle("eco", !miss && !!st.factTitle);
   $("#rw-fact").textContent = st.reward || st.fact;
   const n = count(), t = ST.length;
   $("#rw-count").textContent = `⭐ ${n} / ${t} damga`;
-  const newRank = FX.unvan && rankOf(n), oldRank = rankOf(n - 1), rankUp = !!newRank && newRank !== oldRank;
+  const newRank = FX.unvan && rankOf(n), oldRank = rankOf(n - 1), rankUp = !miss && !!newRank && newRank !== oldRank;
   $("#rw-count").classList.toggle("rank-up", rankUp);
   if (rankUp) $("#rw-count").innerHTML = '<span>⭐ ' + n + ' / ' + t + '</span><span class="rank-new">' + newRank[1] + ' ' + esc(newRank[2]) + ' oldun!</span>';
   const chestNext = FX.sandik && n === t && !reducedMotion();
-  $("#rw-next").textContent = S.guest ? "Damgamı pasaportuma kaydet →" : n === t ? (chestNext ? "Hazineyi aç 🎁" : "Final damgamı bas ⭐") : "Pasaportuma dön";
-  $("#rw-next").onclick = () => { if (n !== t) return show("v-home", false); if (chestNext) { chestSeq = true; show("v-home", false); } else openCert(); };
+  const raceEnd = inGroup() && allDone();
+  $("#rw-next").textContent = S.guest ? "Damgamı pasaportuma kaydet →" : raceEnd ? "Mücadeleyi bitir 🏁" : n === t ? (chestNext ? "Hazineyi aç 🎁" : "Final damgamı bas ⭐") : "Pasaportuma dön";
+  $("#rw-next").onclick = () => { if (raceEnd) return openRace({ finished: true }); if (n !== t) return show("v-home", false); if (chestNext) { chestSeq = true; show("v-home", false); } else openCert(); };
   stack = []; show("v-reward", false);
   $("#v-reward").classList.remove("shake");
-  setTimeout(() => { if(current!=="v-reward"||S.last!==st.id)return; if(navigator.vibrate&&!matchMedia('(prefers-reduced-motion: reduce)').matches)navigator.vibrate(60);playStampSound();confetti(22); },560);
+  setTimeout(() => { if(miss||current!=="v-reward"||S.last!==st.id)return; if(navigator.vibrate&&!matchMedia('(prefers-reduced-motion: reduce)').matches)navigator.vibrate(60);playStampSound();confetti(22); },560);
 }
 function confetti(N, sel = "#confetti", view = "v-reward"){
   if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -1053,12 +1115,154 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v54`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v55`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#btn-partial").onclick=()=>openCert({ partial: true });
+$("#btn-grup").onclick=()=>show("v-grup");
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
-  {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
+  {label:"Evet, sıfırla",cls:"btn-danger",onClick:()=>{ try{localStorage.removeItem(KEY);}catch(e){} S = null; pendingGroup = null; stack = []; target = null; renderWelcome(); show("v-welcome",false); }},
   {label:"Vazgeç",cls:"btn-ghost"}]);
+
+
+// ---------- v55 Grup Mücadelesi ----------
+// Rehber yarış açar (QR + G-KOD), ekipler katılır; her damga/kaçış/yanlışta telefonun durumu ortak sıralamaya yazılır.
+// Oyun internetsiz çalışmaya devam eder; yalnızca sıralama internet ister.
+const GALPHA = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", RKEY = "kasif-rehber";
+function normGroup(v){
+  const m = String(v || "").toUpperCase().replace(/[\s-]/g, "").match(/^G?([A-Z0-9]{4})$/);
+  return m && [...m[1]].every(c => GALPHA.includes(c)) ? m[1] : null;
+}
+function groupTitle(ad){ return ad ? ad + " mücadelesi" : "Grup Mücadelesi"; }
+function deviceId(){
+  const a = new Uint8Array(12);
+  try { crypto.getRandomValues(a); } catch(e) { a.forEach((_, i) => a[i] = Math.random() * 256 | 0); }
+  return Array.from(a, b => b.toString(16).padStart(2, "0")).join("");
+}
+function rehberGet(){ try { return JSON.parse(localStorage.getItem(RKEY)) || null; } catch(e){ return null; } }
+const withTimeout = (p, ms = 8000) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("zaman aşımı")), ms))]);
+const hasProgress = () => !!S && (count() > 0 || Object.keys(S.missed || {}).length > 0);
+function showRules(){
+  if (!S || !S.group) return; S.group.rulesSeen = true; save();
+  modal("🏁", groupTitle(S.group.ad), "Her soruda 1 yanlış hakkınız var. İkinci yanlışta o damga kaçar ama doğru cevabı bulup devam edersiniz. En çok damgayı toplayan ekip kazanır; eşitlikte az yanlış yapan önde. Süre yok, acele etmeyin!", [{ label: "Haydi başlayalım!" }]);
+}
+let joining = false;
+async function joinGroup(kod){
+  if (joining) return;
+  if (S && S.group && S.group.kod === kod) return show("v-home", false);
+  joining = true; modal("🏁", "Mücadele aranıyor…", "", []);
+  let ad = "", found = true;
+  try { const g = await withTimeout(window.kasifGrup.siralama(kod)); if (g) ad = g.ad || ""; else found = false; }
+  catch(e) { /* internet yok: yine de katılır, sıralama bağlanınca görünür */ }
+  joining = false; closeModal();
+  if (!found) return modal("🤔", "Mücadele bulunamadı", "Bu kodla açık bir mücadele yok. Kodu rehberinize sorup tekrar deneyin.", [{ label: "Tamam", onClick: () => { if (current === "v-scan") retry(); } }]);
+  const go = () => {
+    pendingGroup = { kod, ad };
+    try { localStorage.removeItem(KEY); } catch(e){}
+    S = null; target = null; stack = []; $("#in-name").value = ""; renderWelcome(); show("v-welcome", false);
+  };
+  if (hasProgress()) return modal("⚠️", "Mücadele yeni pasaportla başlar", "Bu telefondaki damgalar silinecek.", [
+    { label: "Yeni pasaportla katıl", onClick: go }, { label: "Vazgeç", cls: "btn-ghost", onClick: goHome }]);
+  go();
+}
+// Skor senkronu: tüm durum tek satır (idempotent). İnternet yoksa "dirty" kalır, sonra yeniden denenir.
+let grupSending = false;
+function grupMark(){ if (!inGroup()) return; S.group.dirty = true; S.group.rev = (S.group.rev || 0) + 1; save(); grupSync(); }
+async function grupSync(){
+  const g = S && S.group;
+  if (!g || !g.dirty || grupSending || !window.kasifGrup) return;
+  grupSending = true; const rev = g.rev;
+  try {
+    await withTimeout(window.kasifGrup.yaz({ kod: g.kod, cihaz: g.cihaz, ad: S.name, damga: count(), yanlis: S.wrongs || 0,
+      kacan: ST.filter(escaped).length, bitti: allDone() }));
+    if (S && S.group === g && g.rev === rev) { g.dirty = false; save(); }
+  } catch(e) {}
+  grupSending = false;
+  if (S && S.group === g && g.dirty && g.rev !== rev) return grupSync();
+}
+window.addEventListener("online", () => grupSync());
+document.addEventListener("visibilitychange", () => { if (!document.hidden) grupSync(); });
+
+function renderGrup(){
+  const r = rehberGet(), parts = [];
+  if (S && S.group) parts.push(`<p class="eyebrow">Ekibiniz</p><h3>${esc(S.name)} · ${esc(groupTitle(S.group.ad))}</h3><button class="btn btn-gold sm" type="button" data-g="race">🏆 Sıralamayı aç</button>`);
+  if (r) parts.push(`<p class="eyebrow">Açtığınız mücadele</p><h3>${esc(groupTitle(r.ad))} · G-${esc(r.kod)}</h3><button class="btn btn-ghost sm" type="button" data-g="rehber">Mücadele QR'ını göster</button>`);
+  $("#grp-mine").innerHTML = parts.join("<hr>"); $("#grp-mine").classList.toggle("hidden", !parts.length);
+}
+$("#grp-mine").onclick = e => { const b = e.target.closest("[data-g]"); if (!b) return; if (b.dataset.g === "race") openRace({ finished: allDone() }); else openRehber(); };
+$("#grp-join-form").onsubmit = e => {
+  e.preventDefault(); const k = normGroup($("#grp-code").value); $("#grp-code").blur();
+  if (!k) return modal("🤔", "Kod hatalı", "Mücadele kodu 4 harf ya da rakamdır. Örnek: G-K7QM", [{ label: "Tamam" }]);
+  $("#grp-code").value = ""; joinGroup(k);
+};
+$("#grp-scan").onclick = () => show("v-scan");
+$("#grp-start-form").onsubmit = async e => {
+  e.preventDefault(); const ad = $("#grp-name").value.trim().slice(0, 24); $("#grp-name").blur();
+  if (!ad) return modal("✏️", "Grup adı", "Önce grubunuzun adını yazın. Örnek: 5-B", [{ label: "Tamam" }]);
+  const b = $("#grp-start"); b.disabled = true;
+  try {
+    const kod = await withTimeout(window.kasifGrup.ac(ad)); if (!kod) throw new Error("kod yok");
+    try { localStorage.setItem(RKEY, JSON.stringify({ kod, ad, t: Date.now() })); } catch(e){}
+    $("#grp-name").value = ""; openRehber();
+  } catch(e) { modal("📶", "Mücadele açılamadı", "Mücadele başlatmak için internet gerekli. Bağlantıyı kontrol edip tekrar deneyin.", [{ label: "Tamam" }]); }
+  b.disabled = false;
+};
+function openRehber(){
+  const r = rehberGet(); if (!r) return show("v-grup", false);
+  $("#rh-name").textContent = "🏁 " + groupTitle(r.ad);
+  $("#rh-code").textContent = "G-" + r.kod;
+  const url = location.origin + location.pathname + "#g=" + r.kod;
+  try { const q = qrcode(0, "M"); q.addData(url); q.make(); $("#rh-qr").innerHTML = q.createSvgTag({ cellSize: 8, margin: 4, scalable: true, alt: "Mücadele QR kodu" }); }
+  catch(e) { $("#rh-qr").textContent = url; }
+  show("v-rehber");
+}
+$("#rh-race").onclick = () => { const r = rehberGet(); if (r) openRace({ kod: r.kod }); };
+$("#rh-new").onclick = () => { if (stack[stack.length - 1] === "v-grup") stack.pop(); show("v-grup", false); };
+
+// Sıralama: çok damga önde, eşitlikte az yanlış; o da eşitse aynı sıra.
+let raceCtx = null, raceTimer = 0;
+function openRace(opts = {}){
+  const mine = S && S.group, kod = opts.kod || (mine && mine.kod); if (!kod) return;
+  const own = !!mine && mine.kod === kod, r = rehberGet();
+  raceCtx = { kod, cihaz: own ? mine.cihaz : null, finished: own && !!opts.finished };
+  $("#race-finish").classList.toggle("hidden", !raceCtx.finished);
+  if (raceCtx.finished) { $("#race-finish-title").textContent = `🏁 Mücadeleyi bitirdiniz! ${count()}/${ST.length} damga`; $("#race-cert").classList.toggle("hidden", count() < 1); }
+  $("#race-name").textContent = "🏁 " + groupTitle(own ? mine.ad : r && r.kod === kod ? r.ad : "");
+  $("#race-list").innerHTML = ""; $("#race-status").textContent = "Sıralama yükleniyor…";
+  show("v-race");
+  refreshRace();
+  clearInterval(raceTimer);
+  raceTimer = setInterval(() => { if (current === "v-race") refreshRace(); else clearInterval(raceTimer); }, 20000);
+}
+async function refreshRace(){
+  const ctx = raceCtx; if (!ctx) return;
+  if (ctx.cihaz) await grupSync();
+  try {
+    const g = await withTimeout(window.kasifGrup.siralama(ctx.kod, ctx.cihaz));
+    if (ctx !== raceCtx) return;
+    if (!g) { $("#race-list").innerHTML = ""; $("#race-status").textContent = "Bu mücadele bulunamadı ya da süresi doldu."; return; }
+    if (g.ad) {
+      $("#race-name").textContent = "🏁 " + groupTitle(g.ad);
+      if (ctx.cihaz && S && S.group && S.group.kod === ctx.kod && S.group.ad !== g.ad) { S.group.ad = g.ad; save(); }
+    }
+    const list = g.ekipler || [];
+    renderRaceList(list);
+    $("#race-status").textContent = (list.length ? "" : "Henüz ekip yok. ") + "Son güncelleme: " + new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+  } catch(e) { if (ctx === raceCtx) $("#race-status").textContent = "İnternet yok, bağlanınca sıralama görünecek."; }
+}
+const MEDAL = ["🥇", "🥈", "🥉"];
+function renderRaceList(list){
+  const rows = list.slice().sort((a, b) => (b.damga - a.damga) || (a.yanlis - b.yanlis));
+  let rank = 0;
+  $("#race-list").innerHTML = rows.map((e, i) => {
+    if (!i || e.damga !== rows[i - 1].damga || e.yanlis !== rows[i - 1].yanlis) rank = i + 1;
+    const meta = `⭐ ${e.damga} · ${e.yanlis} yanlış${e.bitti ? " · bitirdi 🏁" : ""}`;
+    return `<li class="${e.ben ? "ben" : ""}" data-rank="${rank}"><span class="rk">${rank <= 3 ? MEDAL[rank - 1] : rank + "."}</span><span class="who"><b>${esc(e.ad)}${e.ben ? " (siz)" : ""}</b><small>${meta}</small></span></li>`;
+  }).join("");
+}
+$("#race-cert").onclick = () => {
+  if (count() === ST.length) { if (FX.sandik && !reducedMotion()) { chestSeq = true; stack = []; show("v-home", false); } else openCert(); }
+  else openCert({ partial: true });
+};
 
 // ---------- Başlangıç ve QR linkleri ----------
 let pending = null;
@@ -1066,6 +1270,7 @@ function readHash(){
   const h = location.hash; if (!h || h.length < 3) return;
   window.history.replaceState(null, "", location.pathname + location.search);
   const p = parse(h);
+  if (p.type === "group") return joinGroup(p.value);
   if (p.type === "code") {
     if (S) return handleCode(p.value);
     const st = ST.find(s => s.code === p.value);
@@ -1083,6 +1288,7 @@ renderWelcome();
 show(S ? "v-home" : "v-welcome", false);
 readHash();
 if (S && S.flow && !location.hash && current === "v-home") resumeTask();
+grupSync();
 if (pending && !S) setTimeout(() => modal("🐠","Bir görev buldun!","Önce kaşif adını yaz. Sonra keşfine başlayıp soruyu cevaplayabilirsin.",[{label:"Tamam"}]), 300);
 
 // Service worker: çevrimdışı çalışma

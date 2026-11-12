@@ -55,9 +55,10 @@
   </div></div>
   <p class="ready-msg" id="ready-msg"></p>
   <div class="sheet">
+    <button type="button" class="grp-link" id="grp-link">👥 Grup Mücadelesi</button>
     <p class="sheet-lead"><span class="sheet-lead-full">Keşfet, QR kodlarını bul, soruları cevapla ve <b>8 damgayı</b> topla!</span><span class="sheet-lead-short">QR kodlarını bul, <b>8 damgayı</b> topla!</span></p>
     <label class="field">
-      <span>Kaşif adın</span>
+      <span id="name-label">Kaşif adın</span>
       <input id="in-name" maxlength="16" autocomplete="off" placeholder="Adını yaz" enterkeyhint="done">
     </label>
     <p class="field-label">Kaşif dostunu seç</p>
@@ -70,7 +71,7 @@
 <section id="v-home" class="view">
   <header class="topbar">
     <div class="me"><span class="me-av" id="me-av"></span><span class="me-txt"><b id="me-name"></b><small class="rank hidden" id="me-rank"></small></span></div>
-    <div class="tb-right"><span class="pill" id="me-count"></span><button class="icon-btn help-btn" id="btn-help" aria-label="Nasıl oynanır?">?</button><button class="icon-btn" id="btn-menu" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
+    <div class="tb-right"><span class="pill" id="me-count"></span><button class="icon-btn race-btn hidden" id="btn-race" aria-label="Mücadele sıralaması">🏆</button><button class="icon-btn help-btn" id="btn-help" aria-label="Nasıl oynanır?">?</button><button class="icon-btn" id="btn-menu" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
   </header>
 
   <p id="save-warning" class="hidden" role="status">İlerlemen bu telefona kaydedilemedi. Menüyü açıp yeniden dene.</p>
@@ -91,7 +92,7 @@
 
   <div class="done-banner hidden" id="done-banner">
     <div class="trophy">🏆</div>
-    <div><b>Pasaportun tamamlandı!</b><small>Final damgan seni bekliyor.</small></div>
+    <div><b id="done-title">Pasaportun tamamlandı!</b><small id="done-sub">Final damgan seni bekliyor.</small></div>
     <button class="btn btn-gold sm" id="btn-cert">Gör</button>
   </div>
   <div class="install hidden" id="install"></div>
@@ -158,7 +159,7 @@
 <!-- DAMGA KAZANILDI -->
 <section id="v-reward" class="view reward-view">
   <div class="reward">
-    <div class="reward-head"><p class="kicker">Yeni damga!</p><button class="listen-btn" data-listen>♪ Dinle</button></div>
+    <div class="reward-head"><p class="kicker" id="rw-kicker">Yeni damga!</p><button class="listen-btn" data-listen>♪ Dinle</button></div>
     <div class="rw-page">
       <div class="leaf-hd"><span id="rw-page-hd"></span></div>
       <div class="stamp-stage">
@@ -234,6 +235,7 @@
   <div class="menu">
     <button id="save-retry" class="btn btn-gold hidden">Kaydı yeniden dene</button>
     <button id="btn-partial" class="btn btn-gold hidden" type="button">📜 Pasaportumu şimdi al</button>
+    <button id="btn-grup" class="btn btn-ghost" type="button">👥 Grup Mücadelesi</button>
     <button id="sound-toggle" class="btn btn-ghost sound-setting" type="button" role="switch" aria-checked="false">♪ Damga sesi: Kapalı</button>
     <div class="paper">
       <h3>Baştan başla</h3>
@@ -241,6 +243,60 @@
       <button class="btn btn-danger" id="btn-reset">Sıfırla</button>
     </div>
     <div class="install hidden" id="install-menu"></div><p class="note">Oyunu geliştirmek için isimsiz kullanım bilgisi (hangi görev, saat, telefon türü) toplanır. Adın gönderilmez.</p><p class="note" id="ver"></p>
+  </div>
+</section>
+
+<!-- v55 GRUP YARIŞI: katıl / başlat -->
+<section id="v-grup" class="view gview">
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title">Grup Mücadelesi</b><span class="tb-sp"></span></header>
+  <div class="gbody">
+    <div class="paper gcard hidden" id="grp-mine"></div>
+    <div class="gintro">
+      <p><b>Okul grupları için.</b> Grup ekiplere ayrılır, her ekip tek telefonla oynar. En çok damgayı toplayan ekip kazanır.</p>
+    </div>
+    <div class="paper gcard">
+      <p class="gstep">1. adım · Rehber / öğretmen</p>
+      <h3>🏁 Mücadeleyi başlat</h3>
+      <p>Grubun adını yazın. Ekranınızda bir QR çıkar; ekipler onu okutarak katılır.</p>
+      <form class="row" id="grp-start-form"><input id="grp-name" placeholder="Örn. 5-B" maxlength="24" autocomplete="off"><button class="btn btn-gold sm" id="grp-start">Başlat</button></form>
+    </div>
+    <div class="paper gcard">
+      <p class="gstep">2. adım · Ekipler</p>
+      <h3>👥 Mücadeleye katıl</h3>
+      <p>Rehberin ekranındaki QR'ı okutun ya da altındaki kodu yazın.</p>
+      <form class="row" id="grp-join-form"><input id="grp-code" placeholder="Örn. G-K7QM" autocapitalize="characters" autocomplete="off" maxlength="8"><button class="btn btn-gold sm" id="grp-join">Katıl</button></form>
+      <button class="btn btn-ghost sm grp-scan" id="grp-scan" type="button">📷 QR'ı okut</button>
+    </div>
+  </div>
+</section>
+
+<!-- v55 REHBER: yarış QR'ı -->
+<section id="v-rehber" class="view gview">
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title">Mücadele QR'ı</b><span class="tb-sp"></span></header>
+  <div class="gbody rehber">
+    <div class="paper gcard center">
+      <p class="eyebrow">Grup Mücadelesi</p>
+      <h2 id="rh-name"></h2>
+      <div class="rh-qr" id="rh-qr"></div>
+      <p class="rh-code" id="rh-code"></p>
+      <p class="rh-note">Bu ekranı ekiplere gösterin. Her ekip kendi telefonuyla QR'ı okutsun ya da kodu yazsın. Sıralamayı buradan izleyebilirsiniz.</p>
+    </div>
+    <button class="btn btn-gold" id="rh-race" type="button">🏆 Sıralamayı aç</button>
+    <button class="btn btn-ghost" id="rh-new" type="button">Yeni mücadele başlat</button>
+  </div>
+</section>
+
+<!-- v55 SIRALAMA -->
+<section id="v-race" class="view gview">
+  <header class="topbar"><button class="icon-btn" data-back aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b class="tb-title">Sıralama</b><span class="tb-sp"></span></header>
+  <div class="gbody race">
+    <div class="paper gcard race-finish hidden" id="race-finish">
+      <h2 id="race-finish-title"></h2>
+      <button class="btn btn-gold" id="race-cert" type="button">📜 Pasaportumu al</button>
+    </div>
+    <h2 class="race-name" id="race-name"></h2>
+    <ol class="race-list" id="race-list"></ol>
+    <p class="race-status" id="race-status" role="status"></p>
   </div>
 </section>
 
@@ -292,10 +348,12 @@
 </div>
 
 <script src="olay.js"></script>
+<script src="grup.js"></script>
 <script src="data.js"></script>
 <script src="art-assets.js"></script>
 <script src="art.js"></script>
 <script src="vendor/jsQR.js" defer></script>
+<script src="vendor/qrcode.js" defer></script>
 <script src="app.js" defer></script>
 </body>
 </html>

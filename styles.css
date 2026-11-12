@@ -979,3 +979,56 @@ html[data-layout=tiny] .gw-steps li{font-size:13px}html[data-layout=tiny] .gw-fi
 html[data-layout=tiny] #road-nodes.n8{grid-template-columns:repeat(6,1fr)}
 html[data-layout=tiny] #road-nodes.n8 .stop{grid-column:span 2}
 html[data-layout=tiny] #road-nodes.n8 .stop:nth-child(7){grid-column:2/span 2}
+/* v55 grup yarışı: karşılamada küçük sekme, yarış/rehber/sıralama ekranları, kaçan damgalar */
+.sheet{position:relative}
+.grp-link{position:absolute;right:12px;top:-15px;z-index:2;appearance:none;border:0;border-radius:99px;padding:5px 12px;min-height:30px;font:inherit;font-size:13px;font-weight:800;background:#0f5a96;color:#fff;box-shadow:0 3px 0 #073362,0 6px 14px #0004;cursor:pointer;white-space:nowrap}
+.grp-link[hidden],.opening .grp-link{display:none}
+#v-welcome.group-mode .grp-link{background:#fde8e8;color:var(--bad);box-shadow:0 3px 0 #f1c4c4}
+.grp-band{display:inline-block;background:linear-gradient(180deg,#ffd35a,var(--gold));color:#4a2d00;font-family:var(--display-font);font-weight:700;border-radius:99px;padding:1px 12px;margin:0 2px 2px;box-shadow:0 2px 0 var(--gold2)}
+.race-btn{font-size:21px}
+.gbody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:12px;padding-bottom:4px}
+.gbody>*{flex-shrink:0}
+.gcard{padding:16px}
+.gcard h3{font-size:19px;color:var(--navy);margin:0 0 4px}
+.gcard p{margin:0 0 10px;font-size:15px;color:var(--muted)}
+.gcard hr{border:0;border-top:1px dashed #d9c9a6;margin:12px 0}
+.gcard .row input{min-width:0}
+#grp-name{text-transform:none}
+.grp-scan{margin-top:10px;width:100%}
+.rehber .gcard h2{font-size:26px;color:var(--navy);margin:2px 0 8px}
+.rh-qr{width:min(100%,300px,calc(var(--app-height) - 400px));min-width:140px;aspect-ratio:1;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden}
+.rh-qr svg{width:100%;height:100%;display:block}
+.gcard .rh-code{font-family:var(--display-font);font-size:34px;font-weight:700;letter-spacing:.08em;color:var(--navy);margin:8px 0 4px}
+.gcard .rh-note{font-size:14px;margin:0}
+.race-name{text-align:center;font-size:22px;color:#fff;margin:0}
+.race-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.race-list li{display:flex;align-items:center;gap:12px;background:var(--paper);color:var(--ink);border-radius:18px;padding:10px 14px;box-shadow:0 6px 16px #0003}
+.race-list li.ben{background:#fff3c4;outline:3px solid var(--gold)}
+.race-list .rk{font-size:28px;min-width:42px;text-align:center;font-weight:800;color:var(--navy);font-family:var(--display-font)}
+.race-list .who{display:flex;flex-direction:column;min-width:0}
+.race-list b{font-size:19px;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.race-list small{font-size:15px;color:var(--muted)}
+.race-status{color:#cfe0f7;text-align:center;font-size:14px;margin:0}
+.race-finish{text-align:center}
+.race-finish h2{font-size:22px;color:var(--navy);margin:0 0 10px}
+html[data-tablet=true] .race-name{font-size:34px}
+html[data-tablet=true] .race-list{gap:12px}
+html[data-tablet=true] .race-list li{padding:14px 22px}
+html[data-tablet=true] .race-list .rk{font-size:42px;min-width:64px}
+html[data-tablet=true] .race-list b{font-size:30px}
+html[data-tablet=true] .race-list small{font-size:21px}
+html[data-tablet=true] .race-status{font-size:18px}
+html[data-tablet=true] .rh-qr{width:min(100%,420px,calc(var(--app-height) - 430px))}
+html[data-tablet=true] .gbody{max-width:760px;width:100%;margin:0 auto}
+.stop.missed>svg{filter:grayscale(1) drop-shadow(0 4px 5px rgba(0,0,0,.3));opacity:.55}
+.stop.missed .num,.stop.missed .stop-done{background:#8a94a3}
+#v-reward.missed .big-stamp svg{filter:grayscale(1);opacity:.5}
+#v-reward.missed .ink-ring{display:none}
+#dr-art.missed svg{filter:grayscale(1);opacity:.55}
+.gintro{color:#e4f0fb;font-size:15px;line-height:1.4;text-align:center;padding:0 6px}.gintro p{margin:0}.gintro b{color:#ffe38a}
+.gcard .gstep{margin:0 0 2px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--sea2)}
+@media(orientation:landscape) and (max-height:520px){.grp-link{top:8px;right:10px;padding:3px 10px;min-height:26px;font-size:12px}}
+@media(orientation:landscape) and (max-height:520px){.menu{grid-template-columns:1fr 1fr}.menu>.paper,.menu>.install,.menu>.note,#save-retry{grid-column:1/-1}}
+#v-menu .menu{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;align-content:start}
+@media(orientation:landscape) and (max-height:520px){#v-menu .menu .paper{padding:10px 14px}#v-menu .menu .paper p{margin:2px 0 8px}#v-menu .menu .btn{padding:9px;font-size:16px}}
+@media(orientation:landscape) and (max-height:520px){.grp-link{right:auto;left:calc(100% + 10px);top:6px}}
