@@ -34,6 +34,13 @@ GRUP MÜCADELESİ (v56)
   tüm zamanlar. Sıralama internet ister (Supabase); oyun yine internetsiz çalışır.
 - Sunucu kurulumu bir kez: supabase/grup-mucadelesi.sql, Supabase SQL Editor'de çalıştırılır.
 
+PUSULA VE KEŞİF HARİTASI (v57)
+- Her damgadan sonra bir pencere açılır: pusula döner, akvaryumun resimli haritasında
+  "Buradasın" ile sıradaki canlı arasındaki yol parlar. Ana ekrandaki "Sıradaki keşfin"
+  kartında 🧭 düğmesiyle istenince tekrar açılır.
+- Telefon sensörü kullanılmaz (içeride pusula şaşar); yön haritadan gösterilir.
+- Görev noktaları ve yol harita.js içindedir; harita resmi assets/harita-plan.webp.
+
 8 GÖREV
  1 Güney Amerika  Pirana            PRN-3T9F
  2 Asya           Mersin balığı     MRS-4N7C
@@ -69,6 +76,7 @@ DOSYALAR
  index.html, styles.css   ekranlar ve görünüm
  app.js                   oyun mantığı
  data.js                  görevler, sorular, ipuçları, bilgi yazıları
+ harita.js                keşif haritası: görev noktaları ve yol
  art.js, art-assets.js    canlı çizimleri, damgalar, hazine sandığı
  assets/                  onaylı çizim paketi
  olay.js                  isimsiz kullanım istatistiği
