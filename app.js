@@ -1222,15 +1222,17 @@ function guideSeg(fromId, toId){
   const seg = HAR.yol.slice(Math.min(a, b), Math.max(a, b) + 1); if (a > b) seg.reverse();
   return seg;
 }
+// Harita stili: "ada" (okyanusta renkli adalar), "hazine" (parşömen), "resim" (çizilmiş plan). Deneme: ?harita=hazine
+const HSTIL = new URLSearchParams(location.search).get("harita") || HAR.stil || "ada";
 function guideSVG(fromId, toId, vb){
   const [vx, vy, vw, vh] = vb, pt = p => p[0].toFixed(0) + "," + p[1].toFixed(0);
-  const seg = guideSeg(fromId, toId);
-  const regions = HAR.bolgeler.map(r => `<polygon points="${r.p.map(pt).join(" ")}" fill="${r.renk}" stroke="${r.renk}"/>`).join("");
-  const labels = HAR.bolgeler.filter(r => r.ad).map(r => `<text x="${r.x}" y="${r.y}" class="${r.kucuk ? "s" : ""}"${r.dik ? ` transform="rotate(-90 ${r.x} ${r.y})"` : ""}>${esc(r.ad)}</text>`).join("");
-  const segPts = seg.map(pt).join(" ");
+  const seg = guideSeg(fromId, toId), segPts = seg.map(pt).join(" ");
+  const rs = HAR.bolgeler.filter(r => !r.yan), poly = (r, cls, extra = "") => `<polygon class="${cls}" points="${r.p.map(pt).join(" ")}" ${extra}/>`;
+  let ground;
+  if (HSTIL === "resim" && HAR.resim) ground = `<image href="${HAR.resim}" x="${HAR.viewBox[0]}" y="${HAR.viewBox[1]}" width="${HAR.viewBox[2]}" height="${HAR.viewBox[3]}" preserveAspectRatio="none"/>`;
+  else ground = `<g transform="translate(0 12)">${rs.map(r => poly(r, "gd-shade")).join("")}</g>${rs.map(r => poly(r, "gd-rim")).join("")}${rs.map(r => poly(r, "gd-land", `fill="${r.renk}" stroke="${r.renk}"`)).join("")}`;
   return `<svg viewBox="${vx} ${vy} ${vw} ${vh}" preserveAspectRatio="none" class="gd-svg" aria-hidden="true">
-    <g class="gd-regions">${regions}</g><g class="gd-labels">${labels}</g>
-    <polyline class="gd-tour" points="${HAR.yol.map(pt).join(" ")}"/>
+    ${ground}
     <polyline class="gd-glow" points="${segPts}" pathLength="100"/>
     <polyline class="gd-path" points="${segPts}" pathLength="100"/>
     <polyline class="gd-flow" points="${segPts}"/>
@@ -1238,14 +1240,15 @@ function guideSVG(fromId, toId, vb){
 }
 function guidePins(fromId, toId, vb){
   const [vx, vy, vw, vh] = vb, pos = p => `left:${((p[0]-vx)/vw*100).toFixed(2)}%;top:${((p[1]-vy)/vh*100).toFixed(2)}%`;
-  let html = ST.map((st, i) => {
+  let html = ST.map(st => {
     const p = HAR.noktalar[st.id]; if (!p || st.id === toId || st.id === fromId) return "";
-    return `<span class="gd-dot${isDone(st) ? " done" : ""}" style="${pos(p)}">${isDone(st) ? "✓" : i + 1}</span>`;
+    const ok = isDone(st);
+    return `<span class="gd-spot${ok ? " done" : ""}" style="${pos(p)}"><span class="gd-spot-art">${artSVG(st.art)}</span>${ok ? "<i>✓</i>" : ""}</span>`;
   }).join("");
-  html += `<span class="gd-tag" style="${pos(HAR.giris)}">GİRİŞ</span><span class="gd-tag" style="${pos(HAR.cikis)}">ÇIKIŞ</span>`;
   const to = ST.find(s => s.id === toId);
-  html += fromId ? `<span class="gd-here" style="${pos(HAR.noktalar[fromId])}"><b>Buradasın</b><i></i></span>` : `<span class="gd-here" style="${pos(HAR.giris)}"><b>Buradasın</b><i></i></span>`;
-  html += `<span class="gd-target" style="${pos(HAR.noktalar[toId])}"><span class="gd-target-art">${artSVG(to.art)}</span></span>`;
+  html += `<span class="gd-here" style="${pos(fromId ? HAR.noktalar[fromId] : HAR.giris)}"><b>Buradasın</b><span class="gd-me">${av(S.avatar)}</span></span>`;
+  html += `<span class="gd-target" style="${pos(HAR.noktalar[toId])}"><span class="gd-target-art">${artSVG(to.art)}</span><em>✕</em></span>`;
+  if (HSTIL === "hazine") html += '<span class="gd-rose" aria-hidden="true"><svg viewBox="0 0 60 60"><path d="M30 2 36 24 58 30 36 36 30 58 24 36 2 30 24 24Z" fill="#8a5a2b" opacity=".55"/><path d="M30 2 36 24 30 30Z M58 30 36 36 30 30Z M30 58 24 36 30 30Z M2 30 24 24 30 30Z" fill="#5c3a17" opacity=".7"/><circle cx="30" cy="30" r="3" fill="#f3e2b8"/></svg></span>';
   return html;
 }
 function compassSVG(){
@@ -1265,6 +1268,7 @@ function openGuide(fromId, toId){
   const box = $("#guide"); box.classList.remove("hidden", "drawn"); $("#gd-map").innerHTML = "";
   const map = $("#gd-map"), A = Math.max(.4, Math.min(1.6, (map.clientWidth - 16) / Math.max(1, map.clientHeight - 16)));
   const vb = guideView(guideSeg(fromId, toId), A);
+  map.className = "gd-map st-" + HSTIL;
   map.innerHTML = `<div class="gd-mapin">${guideSVG(fromId, toId, vb)}${guidePins(fromId, toId, vb)}</div>`;
   $("#gd-compass").innerHTML = compassSVG();
   $("#gd-go").textContent = S.flow && S.flow.id === toId ? "Kaldığın yerden devam et →" : "Tanış ve bul →";

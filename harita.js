@@ -1,10 +1,11 @@
 // Körfez Aqua kat planı (girişteki panodan sadeleştirilmiş). Koordinatlar panonun fotoğrafındaki piksellerdir;
 // viewBox bu alanı kırpar. Görev noktası taşınacaksa yalnızca "noktalar" içindeki x,y değiştirilir.
 window.KASIF_HARITA = {
-  viewBox: [0, 200, 780, 1210],
+  viewBox: [0, 200, 800, 1210],
+  stil: "ada", resim: "assets/harita-plan.webp",
   bolgeler: [
-    { ad: "", renk: "#e9eef2", p: [[145,718],[230,715],[230,880],[350,940],[350,1210],[400,1210],[400,1355],[145,1390]] },
-    { ad: "Hediyelik", renk: "#f6d7e3", p: [[230,715],[335,712],[335,880],[350,880],[350,940],[230,880]], x: 282, y: 812, kucuk: true },
+    { ad: "", renk: "#e9eef2", yan: true, p: [[145,718],[230,715],[230,880],[350,940],[350,1210],[400,1210],[400,1355],[145,1390]] },
+    { ad: "Hediyelik", renk: "#f6d7e3", yan: true, p: [[230,715],[335,712],[335,880],[350,880],[350,940],[230,880]], x: 282, y: 812, kucuk: true },
     { ad: "Güney Amerika", renk: "#f4eccb", p: [[180,222],[330,300],[300,430],[265,520],[150,600],[20,505]], x: 175, y: 410 },
     { ad: "", renk: "#efe6c7", p: [[150,600],[265,520],[265,650],[230,648]] },
     { ad: "Asya", renk: "#f2dcae", p: [[330,300],[640,488],[600,560],[450,590],[445,700],[340,690],[265,650],[265,520],[300,430]], x: 395, y: 500 },
