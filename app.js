@@ -1213,8 +1213,10 @@ function guideView(seg, A){
   let x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad, y0 = Math.min(...ys) - pad - 60, y1 = Math.max(...ys) + pad;
   let w = Math.max(x1 - x0, 380), h = Math.max(y1 - y0, 520);
   if (w / h > A) h = w / A; else w = h * A;
-  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-  return [cx - w / 2, cy - h / 2, w, h];
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, [bx, by, bw, bh] = HAR.viewBox;
+  // Resmin dışına taşma: görünüm haritanın içinde kalır (harita görünümden küçükse ortalanır).
+  const fit = (c, size, lo, len) => size >= len ? lo + len / 2 - size / 2 : Math.max(lo, Math.min(lo + len - size, c - size / 2));
+  return [fit(cx, w, bx, bw), fit(cy, h, by, bh), w, h];
 }
 function guideSeg(fromId, toId){
   const near = p => { let b = 0, d = 1e9; HAR.yol.forEach((q, i) => { const e = (q[0]-p[0])**2 + (q[1]-p[1])**2; if (e < d) { d = e; b = i; } }); return b; };
