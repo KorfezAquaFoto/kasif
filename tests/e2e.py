@@ -247,6 +247,12 @@ async def main():
         assert abs(bounds['x']+bounds['width']/2-width/2)<2,(prefix,selector,bounds)
       await pg.click('#rw-next')
       assert await pg.locator('.stop.got .stop-done').count() == 1
+      # Pusula: damgadan sonra sıradaki keşfin haritası kendiliğinden açılır
+      await pg.locator('#guide:not(.hidden)').wait_for()
+      assert await pg.locator('#gd-title').inner_text()==await pg.evaluate('KASIF.stations[1].name')
+      assert await pg.locator('#gd-map .gd-here').count()==1 and await pg.locator('#gd-map .gd-target').count()==1
+      await pg.wait_for_timeout(2300);await fits(pg,prefix+'-pusula')
+      await pg.click('#gd-close');assert await pg.locator('#guide').evaluate("e=>e.classList.contains('hidden')")
       stations=await pg.evaluate('KASIF.stations.map(s=>({id:s.id,code:s.code,answer:s.quiz.answer,reward:s.reward}))')
       # QR bağlantıları da bilgiden başlar; kodları değiştirmeden tüm görevler tamamlanır.
       for st in stations[1:]:
@@ -309,6 +315,12 @@ async def main():
     }''')
     # Ses iptal edilince yanlışlıkla hata penceresi açılmamalı.
     await pg.fill('#in-name','Kaşif');await pg.click('#btn-start');await pg.wait_for_timeout(2800)
+    # Hedef kartındaki 🧭: girişten ilk keşfe yol, "Tanış ve bul" görevi açar
+    await pg.click('#target-map');await pg.locator('#guide:not(.hidden)').wait_for()
+    assert 'Giriş' in await pg.locator('#gd-from').inner_text()
+    await pg.click('#gd-go');await pg.locator('#v-learn.active').wait_for()
+    assert await pg.locator('#learn-name').inner_text()==await pg.evaluate('KASIF.stations[0].name')
+    await pg.click('#learn-back');await pg.locator('#v-home.active').wait_for()
     await pg.click('#target-learn')
     await pg.evaluate('''() => {
       let active=null;

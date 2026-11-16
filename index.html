@@ -295,6 +295,16 @@
   </div>
 </div>
 
+<!-- Pusula ve keşif haritası: sıradaki QR'a yol -->
+<div class="guide hidden" id="guide" role="dialog" aria-modal="true" aria-labelledby="gd-title">
+  <div class="guide-box">
+    <div class="gd-head"><div class="gd-compass" id="gd-compass"></div><div class="gd-txt"><p class="gd-kicker" id="gd-kicker">Sıradaki keşfin</p><h3 id="gd-title"></h3><p class="gd-from" id="gd-from"></p></div></div>
+    <div class="gd-map" id="gd-map"></div>
+    <p class="gd-where location-cue" id="gd-where"></p>
+    <div class="gd-btns"><button class="btn btn-gold" id="gd-go" type="button">Tanış ve bul →</button><button class="btn btn-ghost" id="gd-close" type="button">Kapat</button></div>
+  </div>
+</div>
+
 <!-- v41 hazine sandığı açılışı -->
 <div class="chest-show hidden" id="chest-show" aria-hidden="true"></div>
 
@@ -311,6 +321,7 @@
 <script src="olay.js"></script>
 <script src="grup.js"></script>
 <script src="data.js"></script>
+<script src="harita.js"></script>
 <script src="art-assets.js"></script>
 <script src="art.js"></script>
 <script src="vendor/jsQR.js" defer></script>

@@ -21,7 +21,8 @@ const FX = {
   unvan: true,     // 3 / 6 / tüm damgalarda kaşif unvanı
   tepki: true,     // soru ekranında kaşif dostunun sevinci/düşünmesi
   sandik: true,    // 9/9'da hazine sandığının açılması
-  hikaye: true     // dolu pasaportu dik "hikâye" resmi olarak paylaşma
+  hikaye: true,    // dolu pasaportu dik "hikâye" resmi olarak paylaşma
+  pusula: true     // damgadan sonra pusula + akvaryum haritasında sıradaki keşfe yol
 };
 Object.keys(FX).forEach(k => document.documentElement.classList.toggle("fx-" + k, !!FX[k]));
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -67,6 +68,7 @@ function show(id, push = true){
   // Yolda katılan (misafir) kaşif: damgasını aldıktan sonra ana ekran yerine kayıt ekranına gelir.
   if (id === "v-home" && S && S.guest) { id = "v-welcome"; push = false; renderWelcome(); }
   stopSpeech();
+  if (window.KASIF_HARITA) $("#guide").classList.add("hidden");
   if (current === "v-scan" && id !== "v-scan") stopCam();
   if (push && current && current !== id && !["v-reward","v-quiz"].includes(current)) stack.push(current);
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === id));
@@ -230,7 +232,8 @@ function locationCue(st){
 function renderTarget(){
   const st = ST.find(s => s.id === target), box = $("#target");
   box.classList.toggle("hidden", !st); if (!st) return;
-  box.innerHTML = `<div class="target-heading"><span class="target-art" aria-hidden="true">${artSVG(st.art)}<span class="target-step">${ST.indexOf(st)+1}</span></span><div class="tg-txt"><p class="target-kicker">${isMissed(st) ? "GERİDE KALAN KEŞİF" : "SIRADAKİ KEŞFİN"}</p><h2 class="tg-k">${esc(st.name)}</h2></div></div><p class="tg-where location-cue">${locationCue(st)}</p><button class="btn btn-gold" id="target-learn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5Q7 2 2 4v15q5-2 10 1q5-3 10-1V4q-5-2-10 1Z M12 5v15"/></svg>${S.flow && S.flow.id === st.id ? "Kaldığın yerden devam et →" : "Tanış ve bul →"}</button>`;
+  box.innerHTML = `${FX.pusula && window.KASIF_HARITA ? '<button type="button" class="target-map" id="target-map" aria-label="Haritada yolu göster">🧭</button>' : ""}<div class="target-heading"><span class="target-art" aria-hidden="true">${artSVG(st.art)}<span class="target-step">${ST.indexOf(st)+1}</span></span><div class="tg-txt"><p class="target-kicker">${isMissed(st) ? "GERİDE KALAN KEŞİF" : "SIRADAKİ KEŞFİN"}</p><h2 class="tg-k">${esc(st.name)}</h2></div></div><p class="tg-where location-cue">${locationCue(st)}</p><button class="btn btn-gold" id="target-learn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5Q7 2 2 4v15q5-2 10 1q5-3 10-1V4q-5-2-10 1Z M12 5v15"/></svg>${S.flow && S.flow.id === st.id ? "Kaldığın yerden devam et →" : "Tanış ve bul →"}</button>`;
+  if ($("#target-map")) $("#target-map").onclick = () => openGuide(guideFrom(), st.id);
   $("#target-learn").onclick = () => {
     if (S.flow && S.flow.id === st.id) resumeTask(); else openLesson(st, false);
   };
@@ -786,7 +789,7 @@ function award(st, opts = {}){
   const chestNext = FX.sandik && n === t && !reducedMotion();
   const raceEnd = inGroup() && allDone();
   $("#rw-next").textContent = S.guest ? "Damgamı pasaportuma kaydet →" : raceEnd ? "Mücadeleyi bitir 🏁" : n === t ? (chestNext ? "Hazineyi aç 🎁" : "Final damgamı bas ⭐") : "Pasaportuma dön";
-  $("#rw-next").onclick = () => { if (raceEnd) return openRace({ finished: true }); if (n !== t) return show("v-home", false); if (chestNext) { chestSeq = true; show("v-home", false); } else openCert(); };
+  $("#rw-next").onclick = () => { if (raceEnd) return openRace({ finished: true }); if (n !== t) { show("v-home", false); if (FX.pusula && window.KASIF_HARITA && !S.guest) setTimeout(() => { if (current === "v-home" && target && !isDone({ id: target }) && $("#modal").classList.contains("hidden")) openGuide(st.id, target); }, 650); return; } if (chestNext) { chestSeq = true; show("v-home", false); } else openCert(); };
   stack = []; show("v-reward", false);
   $("#v-reward").classList.remove("shake");
   setTimeout(() => { if(miss||current!=="v-reward"||S.last!==st.id)return; if(navigator.vibrate&&!matchMedia('(prefers-reduced-motion: reduce)').matches)navigator.vibrate(60);playStampSound();confetti(22); },560);
@@ -1112,7 +1115,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v56`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v57`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#btn-partial").onclick=()=>openCert({ partial: true });
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[
@@ -1196,6 +1199,86 @@ function renderRaceList(list, ben){
 $("#race-cert").onclick = () => {
   if (count() === ST.length) { if (FX.sandik && !reducedMotion()) { chestSeq = true; stack = []; show("v-home", false); } else openCert(); }
   else openCert({ partial: true });
+};
+
+
+// ---------- Pusula ve keşif haritası ----------
+// Damgadan sonra (ve hedef kartındaki 🧭 ile) akvaryum planı açılır: "Buradasın" → sıradaki QR'a parlayan yol.
+// Telefon sensörü kullanılmaz; pusula ibresi haritada sıradaki keşfin yönünü gösterir.
+const HAR = window.KASIF_HARITA;
+function guideFrom(){ const i = lastStampIndex(); return i >= 0 ? ST[i].id : null; }
+// Görünüm iki durağın arasına yakınlaşır (yakın duraklarda yol da okunur kalsın).
+function guideView(seg, A){
+  const xs = seg.map(p => p[0]), ys = seg.map(p => p[1]), pad = 120;
+  let x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad, y0 = Math.min(...ys) - pad - 60, y1 = Math.max(...ys) + pad;
+  let w = Math.max(x1 - x0, 380), h = Math.max(y1 - y0, 520);
+  if (w / h > A) h = w / A; else w = h * A;
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  return [cx - w / 2, cy - h / 2, w, h];
+}
+function guideSeg(fromId, toId){
+  const near = p => { let b = 0, d = 1e9; HAR.yol.forEach((q, i) => { const e = (q[0]-p[0])**2 + (q[1]-p[1])**2; if (e < d) { d = e; b = i; } }); return b; };
+  const a = fromId ? near(HAR.noktalar[fromId]) : 0, b = near(HAR.noktalar[toId]);
+  const seg = HAR.yol.slice(Math.min(a, b), Math.max(a, b) + 1); if (a > b) seg.reverse();
+  return seg;
+}
+function guideSVG(fromId, toId, vb){
+  const [vx, vy, vw, vh] = vb, pt = p => p[0].toFixed(0) + "," + p[1].toFixed(0);
+  const seg = guideSeg(fromId, toId);
+  const regions = HAR.bolgeler.map(r => `<polygon points="${r.p.map(pt).join(" ")}" fill="${r.renk}" stroke="${r.renk}"/>`).join("");
+  const labels = HAR.bolgeler.filter(r => r.ad).map(r => `<text x="${r.x}" y="${r.y}" class="${r.kucuk ? "s" : ""}"${r.dik ? ` transform="rotate(-90 ${r.x} ${r.y})"` : ""}>${esc(r.ad)}</text>`).join("");
+  const segPts = seg.map(pt).join(" ");
+  return `<svg viewBox="${vx} ${vy} ${vw} ${vh}" preserveAspectRatio="none" class="gd-svg" aria-hidden="true">
+    <g class="gd-regions">${regions}</g><g class="gd-labels">${labels}</g>
+    <polyline class="gd-tour" points="${HAR.yol.map(pt).join(" ")}"/>
+    <polyline class="gd-glow" points="${segPts}" pathLength="100"/>
+    <polyline class="gd-path" points="${segPts}" pathLength="100"/>
+    <polyline class="gd-flow" points="${segPts}"/>
+  </svg>`;
+}
+function guidePins(fromId, toId, vb){
+  const [vx, vy, vw, vh] = vb, pos = p => `left:${((p[0]-vx)/vw*100).toFixed(2)}%;top:${((p[1]-vy)/vh*100).toFixed(2)}%`;
+  let html = ST.map((st, i) => {
+    const p = HAR.noktalar[st.id]; if (!p || st.id === toId || st.id === fromId) return "";
+    return `<span class="gd-dot${isDone(st) ? " done" : ""}" style="${pos(p)}">${isDone(st) ? "✓" : i + 1}</span>`;
+  }).join("");
+  html += `<span class="gd-tag" style="${pos(HAR.giris)}">GİRİŞ</span><span class="gd-tag" style="${pos(HAR.cikis)}">ÇIKIŞ</span>`;
+  const to = ST.find(s => s.id === toId);
+  html += fromId ? `<span class="gd-here" style="${pos(HAR.noktalar[fromId])}"><b>Buradasın</b><i></i></span>` : `<span class="gd-here" style="${pos(HAR.giris)}"><b>Buradasın</b><i></i></span>`;
+  html += `<span class="gd-target" style="${pos(HAR.noktalar[toId])}"><span class="gd-target-art">${artSVG(to.art)}</span></span>`;
+  return html;
+}
+function compassSVG(){
+  return `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47" fill="#f5bd3a"/><circle cx="50" cy="50" r="40" fill="#fff8ec" stroke="#b78624" stroke-width="2"/>
+    ${[0,45,90,135,180,225,270,315].map(d => `<line x1="50" y1="${d % 90 ? 15 : 12}" x2="50" y2="${d % 90 ? 19 : 20}" stroke="#b78624" stroke-width="${d % 90 ? 1.5 : 2.5}" transform="rotate(${d} 50 50)"/>`).join("")}
+    <g class="gd-needle"><path d="M50 16 L57 50 L43 50Z" fill="#d64545"/><path d="M50 84 L57 50 L43 50Z" fill="#10264d"/><circle cx="50" cy="50" r="5" fill="#f5bd3a" stroke="#10264d" stroke-width="2"/></g></svg>`;
+}
+let guideTo = null;
+function openGuide(fromId, toId){
+  const to = ST.find(s => s.id === toId); if (!to || !HAR || !HAR.noktalar[toId]) return;
+  guideTo = toId;
+  const from = fromId && ST.find(s => s.id === fromId), f = fromId ? HAR.noktalar[fromId] : HAR.giris, t = HAR.noktalar[toId];
+  $("#gd-kicker").textContent = isMissed(to) ? "Geride kalan keşif" : "Sıradaki keşfin";
+  $("#gd-title").textContent = to.name;
+  $("#gd-from").textContent = (from ? from.name : "Giriş") + " → " + to.name;
+  $("#gd-where").innerHTML = locationCue(to);
+  const box = $("#guide"); box.classList.remove("hidden", "drawn"); $("#gd-map").innerHTML = "";
+  const map = $("#gd-map"), A = Math.max(.4, Math.min(1.6, (map.clientWidth - 16) / Math.max(1, map.clientHeight - 16)));
+  const vb = guideView(guideSeg(fromId, toId), A);
+  map.innerHTML = `<div class="gd-mapin">${guideSVG(fromId, toId, vb)}${guidePins(fromId, toId, vb)}</div>`;
+  $("#gd-compass").innerHTML = compassSVG();
+  $("#gd-go").textContent = S.flow && S.flow.id === toId ? "Kaldığın yerden devam et →" : "Tanış ve bul →";
+  const angle = Math.atan2(t[0] - f[0], -(t[1] - f[1])) * 180 / Math.PI, needle = $("#gd-compass .gd-needle");
+  void box.offsetWidth;
+  requestAnimationFrame(() => { box.classList.add("drawn"); needle.style.transform = `rotate(${(720 + angle).toFixed(1)}deg)`; });
+}
+function closeGuide(){ $("#guide").classList.add("hidden"); guideTo = null; }
+$("#gd-close").onclick = closeGuide;
+$("#guide").onclick = e => { if (e.target.id === "guide") closeGuide(); };
+$("#gd-go").onclick = () => {
+  const st = ST.find(s => s.id === guideTo); closeGuide(); if (!st) return;
+  target = st.id; S.target = target; save();
+  if (S.flow && S.flow.id === st.id) resumeTask(); else openLesson(st, false);
 };
 
 // ---------- Başlangıç ve QR linkleri ----------
