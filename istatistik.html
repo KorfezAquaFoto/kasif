@@ -78,11 +78,13 @@ tr.gizli td{opacity:.55}
 .setup{background:#fff4dc;border:1px dashed var(--warn);border-radius:12px;padding:10px 12px;color:#7a4b10;margin-bottom:10px}
 .bars .b.we i{background:var(--gold)}
 .ban{margin-top:18px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:0 14px}
-.ban summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:12px 0;color:var(--navy);font-size:17px}
-.ban summary::-webkit-details-marker{display:none}
-.ban summary::before{content:"🔒"}.ban[open] summary::before{content:"🔓"}
-.ban .ban-open{margin-left:auto;font-size:14px;color:var(--sea);font-weight:800}.ban[open] .ban-open{font-size:0}.ban[open] .ban-open::after{content:"Gizle";font-size:14px}
-.ban[open]{padding-bottom:12px}
+.ban-head{display:flex;align-items:center;gap:8px;padding:12px 0;color:var(--navy);font-size:17px}
+.ban-head::before{content:"🔒"}.ban.open .ban-head::before{content:"🔓"}
+.ban-head .link{margin-left:auto;border:0;background:none;font:inherit;font-size:14px;color:var(--sea);font-weight:800;cursor:pointer}
+.ban-unlock{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:0 0 12px}
+.ban-unlock input{border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:#fff;min-width:200px}
+.ban-unlock .err{color:#b3261e;font-size:14px}
+.ban-body{padding-bottom:12px}
 @media(max-width:520px){.hbar{grid-template-columns:96px 1fr 48px}.kpi .v{font-size:28px}}
 </style>
 </head>
@@ -130,12 +132,15 @@ tr.gizli td{opacity:.55}
       <p class="note">Sil: grup sıralamadan kalkar (aynı telefondan oynamaya devam etse de geri gelmez). Adı düzelt: yeni ad kalıcı olur. Uygunsuz kelime geçen adlar sıralamada "İsimsiz grup" görünür.</p>
       <div class="tools"><input type="search" id="gsearch" placeholder="Grup ara…" aria-label="Grup ara"><label><input type="checkbox" id="gshowdel"> Silinenleri de göster</label></div>
       <div class="scroll"><table id="glist"></table></div>
-      <details class="ban" id="ban">
-        <summary><b>Yasaklı kelimeler</b> <span class="note" id="ban-count"></span><span class="ban-open">Göster</span></summary>
+      <div class="ban" id="ban">
+        <div class="ban-head"><b>Yasaklı kelimeler</b> <span class="note" id="ban-count"></span><button type="button" class="link" id="ban-toggle">Göster</button></div>
+        <form class="ban-unlock hidden" id="ban-unlock" autocomplete="off"><span class="note">Görmek için yönetici şifreni yaz:</span><input type="password" id="ban-pass" aria-label="Yönetici şifresi" autocomplete="new-password" required><button class="btn" type="submit">Aç</button><span class="err" id="ban-err" role="alert"></span></form>
+        <div class="ban-body hidden" id="ban-body">
         <p class="note">Grup adında bu kelimeler varsa ad kabul edilmez. "Ayrı kelime" işaretliyse yalnızca tek başına yazıldığında yakalanır (kısa kelimeler için: ör. "mal" yakalanır, "Malatya" yakalanmaz).</p>
         <form class="tools" id="wform"><input type="text" id="wnew" placeholder="Yeni kelime" aria-label="Yeni yasaklı kelime" maxlength="30" required autocomplete="off"><label><input type="checkbox" id="wtam"> Ayrı kelime</label><button class="btn" type="submit">Ekle</button><span class="note" id="wmsg"></span></form>
         <div class="chips" id="words"></div>
-      </details>
+        </div>
+      </div>
     </section>
     <p class="note" id="foot"></p>
   </div>
@@ -310,8 +315,32 @@ function renderGroups(){
       `<td><button class="mini" data-ad="${c}">Adı düzelt</button> ${g.gizli ? `<button class="mini" data-goster="${c}">Geri al</button>` : `<button class="mini red" data-gizle="${c}">Sil</button>`}</td></tr>`;
   }).join("") || `<tr><td colspan="7" class="note">${q ? "Bu adla grup yok." : "Henüz grup yok."}</td></tr>`);
   $("#ban-count").textContent = `(${admin.kelimeler.length} kelime)`;
+  renderWords();
+}
+function renderWords(){
+  if (!admin || !banOpen) { $("#words").innerHTML = ""; return; }
   $("#words").innerHTML = admin.kelimeler.map(w => `<span class="chip">${esc(w.kelime)}${w.tam ? " <small>(ayrı kelime)</small>" : ""}<button type="button" data-sil="${esc(w.kelime)}" aria-label="${esc(w.kelime)} kelimesini kaldır">✕</button></span>`).join("") || '<span class="note">Liste boş.</span>';
 }
+// Yasaklı kelimeler: panel açık olsa da kelimeler şifre yeniden yazılmadan görünmez; 3 dakika sonra kendiliğinden kilitlenir.
+let banOpen = false, banTimer = null;
+function banLock(){
+  banOpen = false; clearTimeout(banTimer); $("#ban").classList.remove("open");
+  $("#ban-body").classList.add("hidden"); $("#ban-unlock").classList.add("hidden"); $("#ban-toggle").textContent = "Göster";
+  $("#ban-pass").value = ""; $("#ban-err").textContent = ""; $("#wmsg").textContent = ""; renderWords();
+}
+function adminEmail(){ try { return JSON.parse(atob(session.token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).email || ""; } catch(e){ return ""; } }
+$("#ban-toggle").onclick = () => {
+  if (banOpen || !$("#ban-unlock").classList.contains("hidden")) return banLock();
+  $("#ban-unlock").classList.remove("hidden"); $("#ban-toggle").textContent = "Vazgeç"; $("#ban-pass").focus();
+};
+$("#ban-unlock").onsubmit = async e => {
+  e.preventDefault(); const pass = $("#ban-pass").value; $("#ban-err").textContent = "Kontrol ediliyor…";
+  try { await auth({ email:adminEmail(), password:pass }, "password"); }
+  catch(err){ $("#ban-pass").value = ""; $("#ban-err").textContent = "Şifre hatalı."; return; }
+  $("#ban-pass").value = ""; $("#ban-err").textContent = ""; $("#ban-unlock").classList.add("hidden");
+  banOpen = true; $("#ban").classList.add("open"); $("#ban-body").classList.remove("hidden"); $("#ban-toggle").textContent = "Gizle";
+  renderWords(); clearTimeout(banTimer); banTimer = setTimeout(banLock, 3 * 60 * 1000);
+};
 async function loadAdmin(){
   try { admin = await call("kasif_yonetim_gruplar"); $("#grp-setup").classList.add("hidden"); }
   catch(e){ admin = null; if (!session) return; $("#grp-setup").classList.remove("hidden"); $("#glist").innerHTML = ""; $("#words").innerHTML = ""; }
@@ -412,7 +441,7 @@ $("#login").onsubmit = async e => {
   try { await auth({ email:$("#email").value.trim(), password:$("#pass").value }, "password"); $("#pass").value = ""; showDash(); }
   catch(err){ $("#err").textContent = /invalid/i.test(err.message) ? "E-posta veya şifre hatalı." : err.message; }
 };
-$("#logout").onclick = () => { keep(null); $("#ban").open = false; showLogin(); };
+$("#logout").onclick = () => { keep(null); banLock(); showLogin(); };
 document.querySelectorAll("#ranges button[data-r]").forEach(b => b.onclick = () => setRange(b.dataset.r));
 $("#from").onchange = $("#to").onchange = () => { document.querySelectorAll("#ranges button[data-r]").forEach(b => b.classList.remove("on")); load(); };
 session ? showDash() : showLogin();
