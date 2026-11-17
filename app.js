@@ -135,9 +135,24 @@ function renderWelcome(animate=false){
 $("#mode-solo").onclick = () => { groupMode = false; renderWelcome(); };
 $("#mode-group").onclick = () => { groupMode = true; renderWelcome(); };
 $("#in-name").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();e.currentTarget.blur();}});
-$("#btn-start").onclick = () => {
+// Grup adı herkese açık sıralamada görünür: uygunsuz kelime varsa başka ad istenir.
+function badGroupName(){
+  modal("✋", "Bu ad kullanılamaz", "Sıralamada herkes görecek. Lütfen başka bir grup adı yazın, ör. sınıfınızın ya da okulunuzun adı.", [{ label: "Tamam", onClick: () => $("#in-name").focus() }]);
+}
+let nameChecking = false;
+$("#btn-start").onclick = async () => {
   const gm = groupMode && !(S && S.guest);
   const name = $("#in-name").value.trim().slice(0, gm ? 24 : 16) || (gm ? "Grup" : "Kaşif");
+  if (gm && window.kasifGrup) {
+    if (nameChecking) return;
+    if (!window.kasifGrup.uygunYerel(name)) return badGroupName();
+    if (navigator.onLine) {
+      nameChecking = true; $("#btn-start").disabled = true;
+      const ok = await withTimeout(window.kasifGrup.uygunSunucu(name), 2500).catch(() => null);
+      nameChecking = false; $("#btn-start").disabled = false;
+      if (ok === false) return badGroupName();
+    }
+  }
   if (gm) {
     S = { v:1, id:newId(), name, avatar, badges:{}, created:Date.now(), wrongs:0, tries:{}, missed:{}, solved:{},
       group:{ cihaz:deviceId(), dirty:true, rev:1 } };
@@ -1115,7 +1130,7 @@ $('#sound-toggle').onclick=()=>{S.sound=!S.sound;if(S.sound)prepareStampAudio();
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('page-hidden',document.hidden));
 
 // ---------- Menü ----------
-function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v57`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
+function renderMenu(){ const n=count(); $("#btn-partial").classList.toggle("hidden", !S || S.guest || n < 1 || n >= ST.length); $("#btn-partial").textContent = "📜 Pasaportumu şimdi al (" + n + "/" + ST.length + ")"; $("#ver").textContent = `${D.aquarium} · ${D.season} · v58`; $("#save-retry").classList.toggle("hidden",$("#save-warning").classList.contains("hidden"));renderInstall();renderSoundSetting(); }
 $("#btn-partial").onclick=()=>openCert({ partial: true });
 $("#save-retry").onclick=()=>{storageAlertShown=false;save();};
 $("#btn-reset").onclick = () => modal("🗑️","Emin misin?","Bu telefondaki tüm damgalar silinecek.",[

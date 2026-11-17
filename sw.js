@@ -1,6 +1,6 @@
 // Çevrimdışı çalışma: ilk açılışta tüm dosyalar telefona kaydedilir.
 // İçerik değiştiğinde VERSION'ı artırın; telefonlar bir sonraki internet bağlantısında günceller.
-const VERSION = "kasif-v57";
+const VERSION = "kasif-v58";
 const FILES = [
   "./", "./logo2.png", "./index.html", "./styles.css", "./app.js", "./olay.js", "./data.js", "./harita.js", "./art.js", "./art-assets.js", "./assets/art-atlas-v27.webp", "./assets/harita-plan.webp",
   "./vendor/jsQR.js", "./grup.js", "./manifest.webmanifest",

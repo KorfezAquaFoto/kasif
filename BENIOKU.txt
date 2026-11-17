@@ -41,6 +41,13 @@ PUSULA VE KEŞİF HARİTASI (v57)
 - Telefon sensörü kullanılmaz (içeride pusula şaşar); yön haritadan gösterilir.
 - Görev noktaları ve yol harita.js içindedir; harita resmi assets/harita-plan.webp.
 
+YÖNETİM VE YENİ İSTATİSTİKLER (v58)
+- istatistik.html (yönetici girişiyle): grupları sil / geri al / adı düzelt, yasaklı
+  kelimeler (kapalı kutuda), haftanın günleri, takılınan duraklar, en çok seçilen
+  yanlış şık, Grup Mücadelesi özeti, önceki döneme göre değişim, Excel'e indir (CSV).
+- Uygunsuz grup adı girişte reddedilir; sunucu da denetler, sıralamada "İsimsiz grup" görünür.
+- Kurulum: Supabase SQL Editor'da supabase/yonetim-ve-istatistik.sql bir kez çalıştırılır.
+
 8 GÖREV
  1 Güney Amerika  Pirana            PRN-3T9F
  2 Asya           Mersin balığı     MRS-4N7C

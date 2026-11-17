@@ -40,6 +40,9 @@ async def group_race(br):
       store['t']+=1;old=store['rows'].get(body['p_cihaz'],{'donem':'hafta'})
       store['rows'][body['p_cihaz']]={'ad':body['p_ad'],'damga':body['p_damga'],'yanlis':body['p_yanlis'],'kacan':body['p_kacan'],'bitti':body['p_bitti'],'t':store['t'],'cihaz':body['p_cihaz'],'donem':old['donem']}
       return await route.fulfill(status=204,headers=cors,body='')
+    if name=='kasif_ad_uygun':
+      store['adlar']=store.get('adlar',[])+[body['p_ad']]
+      return await reply('yasak' not in body['p_ad'].lower())
     if name=='kasif_grup_siralama':
       d=body['p_donem'];me=body.get('p_cihaz')
       ok={'hafta':['hafta'],'ay':['hafta','ay'],'tum':['hafta','ay','tum']}[d]
@@ -67,6 +70,11 @@ async def group_race(br):
   assert await a.locator('#name-label').inner_text()=='Grubunuzun adı'
   assert await a.locator('#in-name').get_attribute('maxlength')=='24'
   await fits(a,'grup-karsilama')
+  # Uygunsuz ad: yerel liste (internetsiz de) ve sunucudaki yönetici listesi
+  for bad in ['SAAL4K 5-B','Mal Grup','Yasakkelime']:
+    await a.fill('#in-name',bad);await a.click('#btn-start');await modal_with('Bu ad kullanılamaz')
+    await a.click('#modal-btns button');assert await a.locator('#v-welcome.active').count()==1
+  assert store['adlar']==['Yasakkelime'],store.get('adlar')
   await a.fill('#in-name','5-B Atatürk');await a.click('#btn-start')
   await a.locator('#v-home.active').wait_for();await modal_with('1 yanlış hakkınız')
   await a.click('#modal-btns button');assert await a.locator('#btn-race').is_visible()

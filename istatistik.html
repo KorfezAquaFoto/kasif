@@ -61,6 +61,28 @@ th{color:var(--muted);font-weight:700;font-size:13px}
 #login .btn{width:100%;margin-top:16px;padding:12px}
 #err{color:#b3261e;min-height:22px;margin:8px 0 0}
 .hidden{display:none!important}
+.kpi .d{font-size:13px;font-weight:800;margin-top:2px}.kpi .d.up{color:var(--ok)}.kpi .d.down{color:#b3261e}.kpi .d.eq{color:var(--muted)}
+.ranges .btn{margin-left:auto}
+td.wrap{white-space:normal;min-width:180px;text-align:left}
+.tag{display:inline-block;font-size:12px;font-weight:800;border-radius:99px;padding:0 8px;margin-left:6px;vertical-align:1px}
+.tag.bad{background:#fde2df;color:#b3261e}.tag.fix{background:#e3f1e8;color:#1f6b43}.tag.del{background:#eceff3;color:#5d7189}
+tr.gizli td{opacity:.55}
+.mini{border:1px solid var(--line);background:#fff;border-radius:99px;padding:3px 10px;font-weight:700;cursor:pointer;color:var(--ink);font-size:13px}
+.mini.red{color:#b3261e;border-color:#f1c4bf}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.tools input[type=search],.tools input[type=text]{border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:#fff;min-width:200px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{background:#fff;border:1px solid var(--line);border-radius:99px;padding:2px 4px 2px 10px;font-size:14px;display:inline-flex;align-items:center;gap:4px}
+.chip small{color:var(--muted)}
+.chip button{border:0;background:none;cursor:pointer;color:#b3261e;font-weight:800;font-size:15px;padding:0 4px}
+.setup{background:#fff4dc;border:1px dashed var(--warn);border-radius:12px;padding:10px 12px;color:#7a4b10;margin-bottom:10px}
+.bars .b.we i{background:var(--gold)}
+.ban{margin-top:18px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:0 14px}
+.ban summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:12px 0;color:var(--navy);font-size:17px}
+.ban summary::-webkit-details-marker{display:none}
+.ban summary::before{content:"🔒"}.ban[open] summary::before{content:"🔓"}
+.ban .ban-open{margin-left:auto;font-size:14px;color:var(--sea);font-weight:800}.ban[open] .ban-open{font-size:0}.ban[open] .ban-open::after{content:"Gizle";font-size:14px}
+.ban[open]{padding-bottom:12px}
 @media(max-width:520px){.hbar{grid-template-columns:96px 1fr 48px}.kpi .v{font-size:28px}}
 </style>
 </head>
@@ -82,6 +104,7 @@ th{color:var(--muted);font-weight:700;font-size:13px}
     <div class="ranges" id="ranges">
       <button data-r="0">Bugün</button><button data-r="6" class="on">Son 7 gün</button><button data-r="29">Son 30 gün</button><button data-r="all">Tümü</button>
       <input type="date" id="from" aria-label="Başlangıç"><span>–</span><input type="date" id="to" aria-label="Bitiş">
+      <button class="btn" id="excel" type="button">⬇ Excel'e indir</button>
     </div>
     <div class="grid kpis" id="kpis"></div>
     <div class="grid two" style="margin-top:14px">
@@ -92,6 +115,28 @@ th{color:var(--muted);font-weight:700;font-size:13px}
     </div>
     <section class="card" style="margin-top:14px"><h2>Görevler</h2><div class="scroll"><table id="stations"></table></div>
       <p class="note">Sayılar kişi (telefon) sayısıdır. <span class="hard">Turuncu</span>: bulmakta ya da cevaplamakta zorlanılan görev.</p></section>
+    <div class="grid two" style="margin-top:14px">
+      <section class="card"><h2>Haftanın günleri</h2><div class="bars" id="weekdays"></div><p class="note" id="weeknote">Oyuna başlayan kişi sayısı. <span style="color:#b78624">Sarı</span>: hafta sonu.</p></section>
+      <section class="card"><h2>Takılınan duraklar</h2><div class="scroll"><table id="times"></table></div>
+        <p class="note"><b>QR'ı bulma</b>: "Tanış ve bul" ekranından QR'ı okutana kadar geçen süre. <b>Önceki damgadan</b>: bir önceki damgadan bu damgaya kadar. Ortanca dakika. <span class="hard">Turuncu</span>: en uzun.</p></section>
+    </div>
+    <section class="card" style="margin-top:14px"><h2>Sorular: en çok seçilen yanlış şık</h2><div class="scroll"><table id="wrongs"></table></div>
+      <p class="note">Bir yanlış şık çok seçiliyorsa soru ya da ipucu kafa karıştırıyor olabilir.</p></section>
+    <section class="card" style="margin-top:14px" id="grp"><h2>Grup Mücadelesi</h2>
+      <div id="grp-setup" class="setup hidden">Bu bölüm için Supabase'de <b>supabase/yonetim-ve-istatistik.sql</b> bir kez çalıştırılmalı.</div>
+      <div class="grid kpis" id="gkpis"></div>
+      <div class="scroll" style="margin-top:12px"><table id="gstations"></table></div>
+      <h2 style="margin-top:18px">Grupları yönet</h2>
+      <p class="note">Sil: grup sıralamadan kalkar (aynı telefondan oynamaya devam etse de geri gelmez). Adı düzelt: yeni ad kalıcı olur. Uygunsuz kelime geçen adlar sıralamada "İsimsiz grup" görünür.</p>
+      <div class="tools"><input type="search" id="gsearch" placeholder="Grup ara…" aria-label="Grup ara"><label><input type="checkbox" id="gshowdel"> Silinenleri de göster</label></div>
+      <div class="scroll"><table id="glist"></table></div>
+      <details class="ban" id="ban">
+        <summary><b>Yasaklı kelimeler</b> <span class="note" id="ban-count"></span><span class="ban-open">Göster</span></summary>
+        <p class="note">Grup adında bu kelimeler varsa ad kabul edilmez. "Ayrı kelime" işaretliyse yalnızca tek başına yazıldığında yakalanır (kısa kelimeler için: ör. "mal" yakalanır, "Malatya" yakalanmaz).</p>
+        <form class="tools" id="wform"><input type="text" id="wnew" placeholder="Yeni kelime" aria-label="Yeni yasaklı kelime" maxlength="30" required autocomplete="off"><label><input type="checkbox" id="wtam"> Ayrı kelime</label><button class="btn" type="submit">Ekle</button><span class="note" id="wmsg"></span></form>
+        <div class="chips" id="words"></div>
+      </details>
+    </section>
     <p class="note" id="foot"></p>
   </div>
 </main>
@@ -137,9 +182,17 @@ async function stats(from, to){
   return r.json();
 }
 
-function bars(el, rows, label, value){
+async function call(name, body){
+  const r = await fetch(`${BASE}/rest/v1/rpc/${name}`, { method:"POST",
+    headers:{ apikey:KEY, Authorization:"Bearer " + await token(), "Content-Type":"application/json" }, body:JSON.stringify(body || {}) });
+  if (r.status === 401 || r.status === 403) { keep(null); throw new Error("Oturum süresi doldu, yeniden giriş yap."); }
+  if (!r.ok) { let m = ""; try { m = (await r.json()).message || ""; } catch(e){} const err = new Error(m || ("Hata " + r.status)); err.status = r.status; throw err; }
+  const t = await r.text(); return t ? JSON.parse(t) : null;
+}
+
+function bars(el, rows, label, value, cls){
   const max = Math.max(1, ...rows.map(value));
-  el.innerHTML = rows.length ? rows.map(r => `<div class="b" title="${esc(label(r))}: ${fmt(value(r))}"><em>${value(r) ? fmt(value(r)) : ""}</em><i style="height:${value(r) / max * 100}%"></i><span>${esc(label(r))}</span></div>`).join("")
+  el.innerHTML = rows.length ? rows.map(r => `<div class="b${cls ? " " + cls(r) : ""}" title="${esc(label(r))}: ${fmt(value(r))}"><em>${value(r) ? fmt(value(r)) : ""}</em><i style="height:${value(r) / max * 100}%"></i><span>${esc(label(r))}</span></div>`).join("")
     : '<p class="note">Bu aralıkta kayıt yok.</p>';
 }
 function hbars(el, rows){
@@ -147,15 +200,25 @@ function hbars(el, rows){
   el.innerHTML = rows.map(([l, v, extra]) => `<div class="hbar"><span>${esc(l)}</span><div class="t"><i style="width:${v / max * 100}%"></i></div><b>${fmt(v)}${extra ? ` <span class="pct">${extra}</span>` : ""}</b></div>`).join("");
 }
 
-function render(d, from, to){
-  const o = d.ozet || {}, h = d.huni || {}, sure = d.sure_dk || {};
-  const kpi = (v, l, s) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div>${s ? `<div class="s">${s}</div>` : ""}</div>`;
+// Önceki aynı uzunluktaki döneme göre değişim (ör. son 7 gün ↔ ondan önceki 7 gün)
+function delta(cur, old){
+  if (old == null) return "";
+  cur = Number(cur || 0); old = Number(old || 0);
+  if (!old && !cur) return "";
+  const lbl = last.prevLabel;
+  if (!old) return `<div class="d up">▲ yeni · ${lbl}</div>`;
+  const p = Math.round((cur - old) * 100 / old);
+  return p === 0 ? `<div class="d eq">= ${lbl} aynı</div>` : `<div class="d ${p > 0 ? "up" : "down"}">${p > 0 ? "▲" : "▼"} %${Math.abs(p)} · ${lbl}</div>`;
+}
+function render(d, from, to, prev){
+  const o = d.ozet || {}, h = d.huni || {}, sure = d.sure_dk || {}, po = prev ? (prev.ozet || {}) : null, pv = k => po ? po[k] || 0 : null;
+  const kpi = (v, l, s, dl) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div>${s ? `<div class="s">${s}</div>` : ""}${dl || ""}</div>`;
   $("#kpis").innerHTML =
-    kpi(fmt(o.oyuncu), "Oyuna başlayan", `${fmt(o.cihaz)} telefon siteyi açtı`) +
-    kpi(fmt(o.damga), "Toplam damga", o.oyuncu ? `kişi başı ${(o.damga / o.oyuncu).toLocaleString("tr-TR",{maximumFractionDigits:1})}` : "") +
-    kpi(fmt(o.tamamlayan), `${ORDER.length}/${ORDER.length} tamamlayan`, o.oyuncu ? `başlayanların %${pct(o.tamamlayan, o.oyuncu)}'i` : "") +
+    kpi(fmt(o.oyuncu), "Oyuna başlayan", `${fmt(o.cihaz)} telefon siteyi açtı`, delta(o.oyuncu, pv("oyuncu"))) +
+    kpi(fmt(o.damga), "Toplam damga", o.oyuncu ? `kişi başı ${(o.damga / o.oyuncu).toLocaleString("tr-TR",{maximumFractionDigits:1})}` : "", delta(o.damga, pv("damga"))) +
+    kpi(fmt(o.tamamlayan), `${ORDER.length}/${ORDER.length} tamamlayan`, o.oyuncu ? `başlayanların %${pct(o.tamamlayan, o.oyuncu)}'i` : "", delta(o.tamamlayan, pv("tamamlayan"))) +
     kpi(sure.ortanca ? Math.round(sure.ortanca) + " dk" : "–", "Tamamlama süresi", sure.adet ? `ortanca, ${fmt(sure.adet)} kişiden` : "") +
-    kpi(fmt((o.kaydetme || 0) + (o.paylasma || 0)), "Pasaport kaydı / paylaşım", `${fmt(o.kaydetme)} kaydetme · ${fmt(o.paylasma)} paylaşım`) +
+    kpi(fmt((o.kaydetme || 0) + (o.paylasma || 0)), "Pasaport kaydı / paylaşım", `${fmt(o.kaydetme)} kaydetme · ${fmt(o.paylasma)} paylaşım`, delta((o.kaydetme || 0) + (o.paylasma || 0), po ? (po.kaydetme || 0) + (po.paylasma || 0) : null)) +
     (d.yolda ? kpi(fmt(d.yolda.yolda_katilan), "Yolda katılan", `${fmt(d.yolda.yolda_baslayan)} kişi QR'ı girişten önce okuttu`) : "");
 
   // Günlük: aralıktaki her günü göster (kayıt olmayan günler 0)
@@ -186,31 +249,172 @@ function render(d, from, to){
     "İnternetsiz oynanan kısımlar telefon internete bağlanınca gelir; sayılar \"en az bu kadar\" olarak okunmalı. İsim veya kişisel bilgi tutulmaz.";
 }
 
+// ---------- v58: yeni istatistikler ----------
+const GUN = ["", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
+const ST = Object.fromEntries((window.KASIF ? KASIF.stations : []).map(s => [s.id, s]));
+const dk = v => v == null ? "–" : (v < 10 ? Number(v).toLocaleString("tr-TR", { maximumFractionDigits:1 }) : Math.round(v)) + " dk";
+let last = { prevLabel:"" }, admin = null;
+
+function render2(d2){
+  const days = Object.fromEntries(((d2 && d2.gunler) || []).map(g => [g.gun, g]));
+  const rows = [1,2,3,4,5,6,7].map(g => ({ gun:g, oyuncu:(days[g] || {}).oyuncu || 0 }));
+  bars($("#weekdays"), rows, r => GUN[r.gun], r => r.oyuncu, r => r.gun >= 6 ? "we" : "");
+  const hi = rows.slice(0, 5).reduce((a, r) => a + r.oyuncu, 0), hs = rows[5].oyuncu + rows[6].oyuncu;
+  $("#weeknote").innerHTML = `Oyuna başlayan kişi sayısı. <span style="color:#b78624">Sarı</span>: hafta sonu. Hafta içi <b>${fmt(hi)}</b> · hafta sonu <b>${fmt(hs)}</b> kişi.`;
+
+  const tm = Object.fromEntries(((d2 && d2.sureler) || []).map(t => [t.station, t]));
+  const maxB = Math.max(0, ...ORDER.map(id => (tm[id] || {}).bulma_dk || 0)), maxA = Math.max(0, ...ORDER.map(id => (tm[id] || {}).ara_dk || 0));
+  $("#times").innerHTML = `<tr><th>Görev</th><th>QR'ı bulma</th><th>Önceki damgadan</th><th>Kişi</th></tr>` + ORDER.map((id, i) => {
+    const t = tm[id] || {};
+    return `<tr><td>${i + 1}. ${esc(NAMES[id] || id)}</td><td class="${t.bulma_dk && t.bulma_dk === maxB && t.bulma_adet > 2 ? "hard" : ""}">${dk(t.bulma_dk)}</td><td class="${t.ara_dk && t.ara_dk === maxA && t.ara_adet > 2 ? "hard" : ""}">${dk(t.ara_dk)}</td><td>${fmt(Math.max(t.bulma_adet || 0, t.ara_adet || 0))}</td></tr>`;
+  }).join("");
+
+  const ws = {}; ((d2 && d2.yanlis_sik) || []).forEach(w => { (ws[w.station] = ws[w.station] || []).push(w); });
+  $("#wrongs").innerHTML = `<tr><th>Görev</th><th>Soru</th><th>En çok seçilen yanlış</th><th>Kaç kez</th><th>Diğer yanlışlar</th></tr>` + ORDER.map((id, i) => {
+    const q = (ST[id] || {}).quiz || { options:[] }, list = (ws[id] || []).sort((a, z) => z.adet - a.adet), tot = list.reduce((a, w) => a + w.adet, 0);
+    const opt = w => esc(q.options[Number(w.sik)] || ("Şık " + (Number(w.sik) + 1)));
+    const top = list[0];
+    return `<tr><td>${i + 1}. ${esc(NAMES[id] || id)}</td><td class="wrap">${esc(q.q || "")}</td><td class="wrap">${top ? `<b>${opt(top)}</b>` : '<span class="pct">yanlış yok</span>'}</td>` +
+      `<td>${top ? `${fmt(top.adet)} <span class="pct">%${pct(top.adet, tot)}</span>` : "–"}</td><td class="wrap">${list.slice(1).map(w => `${opt(w)} <span class="pct">(${fmt(w.adet)})</span>`).join(", ") || "–"}</td></tr>`;
+  }).join("");
+  last.d2 = d2;
+  renderGroupStats();
+}
+
+// ---------- v58: Grup Mücadelesi yönetimi ----------
+const yerelGun = t => ymd(new Date(t));
+function renderGroupStats(){
+  const from = $("#from").value, to = $("#to").value;
+  if (!admin) { $("#gkpis").innerHTML = ""; $("#gstations").innerHTML = ""; return; }
+  const gs = admin.gruplar.filter(g => !g.gizli && yerelGun(g.baslangic) >= from && yerelGun(g.baslangic) <= to && (g.damga > 0 || g.bitti));
+  const avg = k => gs.length ? (gs.reduce((a, g) => a + g[k], 0) / gs.length).toLocaleString("tr-TR", { maximumFractionDigits:1 }) : "–";
+  const kpi = (v, l, s) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div>${s ? `<div class="s">${s}</div>` : ""}</div>`;
+  const bit = gs.filter(g => g.bitti).length;
+  $("#gkpis").innerHTML = kpi(fmt(gs.length), "Oynayan grup", "en az 1 damga alan") + kpi(fmt(bit), "Mücadeleyi bitiren", gs.length ? `%${pct(bit, gs.length)}` : "") +
+    kpi(avg("damga"), "Ortalama damga", `${ORDER.length} damgadan`) + kpi(avg("yanlis"), "Ortalama yanlış", `ortalama ${avg("kacan")} kaçan damga`);
+  const gk = Object.fromEntries(((last.d2 && last.d2.grup_kacan) || []).map(k => [k.station, k]));
+  $("#gstations").innerHTML = `<tr><th>Görev</th><th>Oynayan grup</th><th>Damgası kaçan</th></tr>` + ORDER.map((id, i) => {
+    const k = gk[id] || {}, p = pct(k.kacan, k.oynayan);
+    return `<tr><td>${i + 1}. ${esc(NAMES[id] || id)}</td><td>${fmt(k.oynayan)}</td><td class="${p >= 30 && k.oynayan > 2 ? "hard" : ""}">${fmt(k.kacan)} <span class="pct">%${p}</span></td></tr>`;
+  }).join("");
+}
+function renderGroups(){
+  if (!admin) return;
+  const q = $("#gsearch").value.trim().toLocaleLowerCase("tr"), del = $("#gshowdel").checked;
+  const gs = admin.gruplar.filter(g => (del || !g.gizli) && (!q || g.ad.toLocaleLowerCase("tr").includes(q)));
+  const when = t => new Date(t).toLocaleString("tr-TR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+  $("#glist").innerHTML = `<tr><th>Grup adı</th><th>Damga</th><th>Yanlış</th><th>Kaçan</th><th>Durum</th><th>Başladı</th><th></th></tr>` + (gs.map(g => {
+    const tags = (g.uygun ? "" : '<span class="tag bad">uygunsuz ad · "İsimsiz grup" görünüyor</span>') + (g.ad_kilit ? '<span class="tag fix">ad düzeltildi</span>' : "") + (g.gizli ? '<span class="tag del">silindi</span>' : "");
+    const c = esc(g.cihaz);
+    return `<tr class="${g.gizli ? "gizli" : ""}"><td>${esc(g.ad)}${tags}</td><td>${fmt(g.damga)}</td><td>${fmt(g.yanlis)}</td><td>${fmt(g.kacan)}</td><td>${g.bitti ? "Bitirdi 🏁" : "Oynuyor"}</td><td>${when(g.baslangic)}</td>` +
+      `<td><button class="mini" data-ad="${c}">Adı düzelt</button> ${g.gizli ? `<button class="mini" data-goster="${c}">Geri al</button>` : `<button class="mini red" data-gizle="${c}">Sil</button>`}</td></tr>`;
+  }).join("") || `<tr><td colspan="7" class="note">${q ? "Bu adla grup yok." : "Henüz grup yok."}</td></tr>`);
+  $("#ban-count").textContent = `(${admin.kelimeler.length} kelime)`;
+  $("#words").innerHTML = admin.kelimeler.map(w => `<span class="chip">${esc(w.kelime)}${w.tam ? " <small>(ayrı kelime)</small>" : ""}<button type="button" data-sil="${esc(w.kelime)}" aria-label="${esc(w.kelime)} kelimesini kaldır">✕</button></span>`).join("") || '<span class="note">Liste boş.</span>';
+}
+async function loadAdmin(){
+  try { admin = await call("kasif_yonetim_gruplar"); $("#grp-setup").classList.add("hidden"); }
+  catch(e){ admin = null; if (!session) return; $("#grp-setup").classList.remove("hidden"); $("#glist").innerHTML = ""; $("#words").innerHTML = ""; }
+  renderGroups(); renderGroupStats();
+}
+async function groupAction(cihaz, islem, ad){
+  try { await call("kasif_yonetim_grup", { p_cihaz:cihaz, p_islem:islem, p_ad:ad || null }); await loadAdmin(); }
+  catch(e){ alert("Yapılamadı: " + e.message); }
+}
+$("#glist").onclick = e => {
+  const b = e.target.closest("button"); if (!b || !admin) return;
+  const g = admin.gruplar.find(x => x.cihaz === (b.dataset.ad || b.dataset.gizle || b.dataset.goster)); if (!g) return;
+  if (b.dataset.ad) { const ad = prompt("Grubun yeni adı (en çok 24 harf):", g.ad); if (ad && ad.trim() && ad.trim() !== g.ad) groupAction(g.cihaz, "ad", ad.trim().slice(0, 24)); }
+  else if (b.dataset.gizle) { if (confirm(`"${g.ad}" sıralamadan silinsin mi?\n(Sonra "Silinenleri de göster" ile geri alabilirsin.)`)) groupAction(g.cihaz, "gizle"); }
+  else if (b.dataset.goster) groupAction(g.cihaz, "goster");
+};
+$("#gsearch").oninput = $("#gshowdel").onchange = renderGroups;
+$("#words").onclick = async e => {
+  const b = e.target.closest("button[data-sil]"); if (!b) return;
+  if (!confirm(`"${b.dataset.sil}" yasaklı listeden çıkarılsın mı?`)) return;
+  try { await call("kasif_yonetim_kelime", { p_kelime:b.dataset.sil, p_sil:true }); await loadAdmin(); } catch(err){ alert("Yapılamadı: " + err.message); }
+};
+$("#wform").onsubmit = async e => {
+  e.preventDefault(); const k = $("#wnew").value.trim(); if (!k) return;
+  $("#wmsg").textContent = "Ekleniyor…";
+  try { await call("kasif_yonetim_kelime", { p_kelime:k, p_tam:$("#wtam").checked }); $("#wnew").value = ""; $("#wtam").checked = false; $("#wmsg").textContent = "Eklendi."; await loadAdmin(); }
+  catch(err){ $("#wmsg").textContent = /Geçersiz/.test(err.message) ? "Yalnızca harf (2–30)." : "Yapılamadı: " + err.message; }
+};
+
+// ---------- v58: Excel'e indir (CSV, Türkçe Excel ; ayırıcısıyla açılır) ----------
+function csvCell(v){
+  let s = v == null ? "" : typeof v === "number" ? String(v).replace(".", ",") : String(v);
+  if (/^[=+\-@]/.test(s)) s = "'" + s;   // Excel formül sanmasın
+  return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+$("#excel").onclick = () => {
+  const d = last.d; if (!d) return;
+  const o = d.ozet || {}, rows = [], add = (...r) => rows.push(r), gap = () => rows.push([]);
+  add("Okyanus Kaşifi istatistik", `${last.from} – ${last.to}`); gap();
+  add("ÖZET"); add("Oyuna başlayan", o.oyuncu || 0); add("Siteyi açan telefon", o.cihaz || 0); add("Toplam damga", o.damga || 0);
+  add("Tamamlayan", o.tamamlayan || 0); add("Tamamlama süresi (ortanca dk)", d.sure_dk && d.sure_dk.ortanca ? Math.round(d.sure_dk.ortanca) : "");
+  add("Pasaport kaydetme", o.kaydetme || 0); add("Paylaşım", o.paylasma || 0); gap();
+  add("GÜNLÜK"); add("Gün", "Oyuncu", "Telefon", "Damga", "Tamamlayan"); (d.gunluk || []).forEach(g => add(g.gun, g.oyuncu, g.cihaz, g.damga, g.tamamlayan)); gap();
+  const st = Object.fromEntries((d.gorevler || []).map(s => [s.station, s]));
+  add("GÖREVLER"); add("Görev", "Tanıştı", "QR okuttu", "Damga aldı", "Yanlış yapan", "Elle kod");
+  ORDER.forEach((id, i) => { const s = st[id] || {}; add(`${i + 1}. ${NAMES[id] || id}`, s.tanisti || 0, s.okuttu || 0, s.damga || 0, s.yanlis_yapan || 0, s.elle_kod || 0); }); gap();
+  const d2 = last.d2;
+  if (d2) {
+    const tm = Object.fromEntries((d2.sureler || []).map(t => [t.station, t]));
+    add("SÜRELER (ortanca dk)"); add("Görev", "QR'ı bulma", "Önceki damgadan", "Kişi");
+    ORDER.forEach((id, i) => { const t = tm[id] || {}; add(`${i + 1}. ${NAMES[id] || id}`, t.bulma_dk == null ? "" : Math.round(t.bulma_dk * 10) / 10, t.ara_dk == null ? "" : Math.round(t.ara_dk * 10) / 10, Math.max(t.bulma_adet || 0, t.ara_adet || 0)); }); gap();
+    add("YANLIŞ ŞIKLAR"); add("Görev", "Şık", "Kaç kez", "Kaç kişi");
+    (d2.yanlis_sik || []).slice().sort((a, z) => ORDER.indexOf(a.station) - ORDER.indexOf(z.station) || z.adet - a.adet)
+      .forEach(w => add(NAMES[w.station] || w.station, ((ST[w.station] || {}).quiz || { options:[] }).options[Number(w.sik)] || "Şık " + (Number(w.sik) + 1), w.adet, w.cihaz)); gap();
+    add("HAFTANIN GÜNLERİ"); add("Gün", "Oyuncu"); const dd = Object.fromEntries((d2.gunler || []).map(g => [g.gun, g]));
+    [1,2,3,4,5,6,7].forEach(g => add(GUN[g], (dd[g] || {}).oyuncu || 0)); gap();
+  }
+  if (admin) {
+    add("GRUPLAR"); add("Grup adı", "Damga", "Yanlış", "Kaçan", "Bitirdi", "Başladı", "Durum");
+    admin.gruplar.filter(g => yerelGun(g.baslangic) >= last.from && yerelGun(g.baslangic) <= last.to)
+      .forEach(g => add(g.ad, g.damga, g.yanlis, g.kacan, g.bitti ? "evet" : "hayır", new Date(g.baslangic).toLocaleString("tr-TR"), g.gizli ? "silindi" : g.uygun ? "" : "uygunsuz ad"));
+  }
+  const blob = new Blob(["\ufeff" + rows.map(r => r.map(csvCell).join(";")).join("\r\n")], { type:"text/csv;charset=utf-8" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `kasif-istatistik-${last.from}_${last.to}.csv`;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+};
+
+function prevRange(from, to){
+  const f = new Date(from + "T12:00:00"), t = new Date(to + "T12:00:00"), n = Math.round((t - f) / 864e5) + 1;
+  const pt = new Date(f); pt.setDate(pt.getDate() - 1); const pf = new Date(pt); pf.setDate(pf.getDate() - n + 1);
+  return { from:ymd(pf), to:ymd(pt), label: n === 1 ? "önceki güne göre" : `önceki ${n} güne göre` };
+}
 async function load(){
   const from = $("#from").value, to = $("#to").value;
   if (!from || !to || from > to) return;
   $("#kpis").innerHTML = '<p class="note" style="color:#fff">Yükleniyor…</p>';
-  try { const d = await stats(from, to); d.yolda = await yolda(from, to).catch(() => null); render(d, from, to); }
+  try {
+    const all = document.querySelector('#ranges button.on[data-r="all"]'), pr = prevRange(from, to);
+    const [d, prev, d2, yd] = await Promise.all([stats(from, to), all || pr.to < START ? null : stats(pr.from, pr.to).catch(() => null),
+      call("kasif_stats2", { baslangic:from, bitis:to }).catch(() => null), yolda(from, to).catch(() => null)]);
+    d.yolda = yd; last = { d, from, to, prevLabel:pr.label, d2:null };
+    render(d, from, to, prev); render2(d2);
+  }
   catch(e){ if (!session) return showLogin(e.message); $("#kpis").innerHTML = `<p class="note" style="color:#fff">${esc(e.message)}</p>`; }
 }
 function setRange(r){
   const today = new Date(); let from = new Date(today);
   if (r === "all") from = new Date(START + "T12:00:00"); else from.setDate(today.getDate() - Number(r));
   $("#from").value = ymd(from); $("#to").value = ymd(today);
-  document.querySelectorAll("#ranges button").forEach(b => b.classList.toggle("on", b.dataset.r === String(r)));
+  document.querySelectorAll("#ranges button[data-r]").forEach(b => b.classList.toggle("on", b.dataset.r === String(r)));
   load();
 }
 function showLogin(msg){ $("#login").classList.remove("hidden"); $("#dash").classList.add("hidden"); $("#logout").classList.add("hidden"); $("#err").textContent = msg || ""; }
-function showDash(){ $("#login").classList.add("hidden"); $("#dash").classList.remove("hidden"); $("#logout").classList.remove("hidden"); setRange(6); }
+function showDash(){ $("#login").classList.add("hidden"); $("#dash").classList.remove("hidden"); $("#logout").classList.remove("hidden"); setRange(6); loadAdmin(); }
 
 $("#login").onsubmit = async e => {
   e.preventDefault(); $("#err").textContent = "Giriş yapılıyor…";
   try { await auth({ email:$("#email").value.trim(), password:$("#pass").value }, "password"); $("#pass").value = ""; showDash(); }
   catch(err){ $("#err").textContent = /invalid/i.test(err.message) ? "E-posta veya şifre hatalı." : err.message; }
 };
-$("#logout").onclick = () => { keep(null); showLogin(); };
-document.querySelectorAll("#ranges button").forEach(b => b.onclick = () => setRange(b.dataset.r));
-$("#from").onchange = $("#to").onchange = () => { document.querySelectorAll("#ranges button").forEach(b => b.classList.remove("on")); load(); };
+$("#logout").onclick = () => { keep(null); $("#ban").open = false; showLogin(); };
+document.querySelectorAll("#ranges button[data-r]").forEach(b => b.onclick = () => setRange(b.dataset.r));
+$("#from").onchange = $("#to").onchange = () => { document.querySelectorAll("#ranges button[data-r]").forEach(b => b.classList.remove("on")); load(); };
 session ? showDash() : showLogin();
 })();
 </script>
